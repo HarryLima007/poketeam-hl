@@ -20,7 +20,7 @@
       <select id="rouletteType"><option value="all">Todos os tipos</option></select>
     </div>
     <div id="rouletteCategories" class="chips roulette-categories"></div>
-    <label class="shiny-toggle"><input id="rouletteShiny" type="checkbox"> ✨ Usar versões Shiny na roleta e no resultado</label>
+    <p class="roulette-help">Cada variante conta como uma opção separada. Você pode selecionar o mesmo Pokémon em versão normal e Shiny ao mesmo tempo.</p>
   </div>
   <div class="roulette-layout">
     <div class="wheel-panel panel">
@@ -32,11 +32,17 @@
       <div id="spinResult"></div>
     </div>
     <div class="picker panel">
-      <div class="picker-actions"><button id="selectVisible">Selecionar exibidos</button><button id="removeVisible">Remover exibidos</button><b id="rouletteCount">0 selecionados</b></div>
+      <div class="picker-actions">
+        <button id="selectVisibleNormal">Selecionar normais exibidos</button>
+        <button id="selectVisibleShiny">Selecionar Shinies exibidos</button>
+        <button id="removeVisible">Remover exibidos</button>
+        <b id="rouletteCount">0 selecionados</b>
+      </div>
       <div id="roulettePicker"></div>
     </div>
   </div>
 </section>
 </main>
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><button id="closeModal" class="modal-close">×</button><div id="modalContent"></div></div></div>
+<div id="teamChooser" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card team-chooser-card"><button id="closeTeamChooser" class="modal-close">×</button><div id="teamChooserContent"></div></div></div>
 <div id="toast" class="toast"></div><script src="app.js"></script></body></html>
