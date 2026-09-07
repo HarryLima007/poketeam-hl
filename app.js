@@ -46,6 +46,7 @@ let favs=new Set(store.get('favs',[])),
     favShiny=store.get('favShiny',{}),
     teams=store.get('teams',[]),
     roulette=new Set(store.get('roulette',[])),
+    rouletteShiny=!!store.get('rouletteShiny',false),
     recent=store.get('recent',[]);
 teams=teams.map(t=>{const members=Array.isArray(t.members)?t.members:[];const memberShiny=Array.isArray(t.memberShiny)?t.memberShiny.slice(0,members.length):[];while(memberShiny.length<members.length)memberShiny.push(false);return {...t,members,memberShiny}});
 const cap=s=>s? s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):''; const pad=n=>String(n).padStart(4,'0');
@@ -53,10 +54,20 @@ function regionOf(id){return REGIONS.find(r=>id>=r[1]&&id<=r[2])?.[0]||'—'}
 function sprite(id,shiny=false){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shiny?'shiny/':''}${id}.png`}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
 function safe(fn){try{return fn()}catch(e){console.error(e);toast('Algo deu errado, mas o restante do site continua funcionando.')}}
-function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
+function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('rouletteShiny',rouletteShiny),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
 function go(page){$$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
-function setupSelects(){const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');$('#regionFilter').innerHTML=opts;$('#rouletteRegion').innerHTML=opts;const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];$('#categoryFilters').innerHTML=cats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');$$('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;$$('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()})}
+function setupSelects(){
+  const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
+  $('#regionFilter').innerHTML=opts;$('#rouletteRegion').innerHTML=opts;
+  const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
+  $('#categoryFilters').innerHTML=cats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
+  $('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;$('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()});
+  $('#rouletteCategories').innerHTML=cats.map(([v,l])=>`<button data-roulette-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
+  $('[data-roulette-cat]').forEach(b=>b.onclick=()=>{$('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
+  $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
+  $('#rouletteShiny').checked=rouletteShiny;
+}
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
   const savedList=store.get('pokedexList',null);
@@ -88,7 +99,7 @@ async function initData(){
 }
 async function getDetail(id){if(state.details.has(id))return state.details.get(id);try{const p=await fetchJSON(`${API}/pokemon/${id}`,'pokemon_'+id);const d={id,name:p.name,types:p.types.sort((a,b)=>a.slot-b.slot).map(x=>x.type.name),forms:p.forms?.map(x=>x.name)||[]};state.details.set(id,d);return d}catch(e){console.warn('detail failed',id,e);return {id,name:state.list[id-1]?.name||`#${id}`,types:[],forms:[]}}}
 async function getSpecies(id){if(state.species.has(id))return state.species.get(id);try{const s=await fetchJSON(`${API}/pokemon-species/${id}`,'species_'+id);state.species.set(id,s);return s}catch(e){console.warn('species failed',id,e);return null}}
-async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id);if(id%25===0&&$('#pokedex').classList.contains('active'))renderDex();}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache';renderDex();renderPicker()}
+async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id);if(id%25===0){if($('#pokedex').classList.contains('active'))renderDex();if($('#roulette').classList.contains('active')&&$('#rouletteType')?.value!=='all')renderPicker();}}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache';renderDex();renderPicker()}
 function matchesSearch(p,q){if(!q)return true;q=q.trim().toLowerCase();const n=parseInt(q,10);return p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&p.id===n)}
 async function ensureCategoryFlags(ids){if(!['legendary','mythical'].includes(state.activeCategory))return;const missing=ids.filter(id=>!state.species.has(id));let i=0;async function w(){while(i<missing.length){await getSpecies(missing[i++])}}await Promise.allSettled(Array.from({length:8},w))}
 function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
@@ -202,12 +213,114 @@ function renderTeams(){
 }
 function addToTeam(id,shiny=false){if(!teams.length){toast('Crie uma equipe primeiro ⚔️');go('teams');return}const t=teams.find(x=>x.id===state.activeTeam)||teams[0];if(t.members.length>=6){toast(`${t.name} já tem 6 Pokémon.`);return}if(t.members.includes(id)&&!confirm(`${cap(state.list[id-1]?.name||'Pokémon')} já está nesta equipe. Deseja mesmo adicionar outra?`))return;t.memberShiny=Array.isArray(t.memberShiny)?t.memberShiny:[];while(t.memberShiny.length<t.members.length)t.memberShiny.push(false);t.members.push(id);t.memberShiny.push(!!shiny);save();toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''} adicionado a ${t.name}`)}
 $('#newTeam').onclick=createTeam;
-function rouletteFiltered(){const q=$('#rouletteSearch').value,reg=$('#rouletteRegion').value;return state.list.filter(p=>matchesSearch(p,q)&&(reg==='all'||regionOf(p.id)===reg))}
-function renderPicker(){const arr=rouletteFiltered();state.rouletteVisible=arr.map(x=>x.id);$('#rouletteCount').textContent=`${roulette.size} selecionados`;$('#probabilityText').textContent=roulette.size?`Cada Pokémon tem exatamente ${(100/roulette.size).toFixed(6).replace(/0+$/,'').replace(/\.$/,'')}% de chance (1/${roulette.size}).`:'Selecione Pokémon para começar.';$('#roulettePicker').innerHTML=arr.map(p=>`<div class="picker-row"><label><input type="checkbox" data-pick="${p.id}" ${roulette.has(p.id)?'checked':''}><img loading="lazy" src="${sprite(p.id)}"><span><b>#${pad(p.id)}</b> ${cap(p.name)}<br><small class="muted">${regionOf(p.id)}</small></span></label></div>`).join('');$$('[data-pick]').forEach(c=>c.onchange=()=>{c.checked?roulette.add(+c.dataset.pick):roulette.delete(+c.dataset.pick);save();$('#rouletteCount').textContent=`${roulette.size} selecionados`;drawWheel();renderProbability()})}
-function renderProbability(){$('#probabilityText').textContent=roulette.size?`Cada Pokémon tem exatamente ${(100/roulette.size).toFixed(6).replace(/0+$/,'').replace(/\.$/,'')}% de chance (1/${roulette.size}).`:'Selecione Pokémon para começar.'}
-function drawWheel(){const canvas=$('#wheel'),ctx=canvas.getContext('2d'),ids=[...roulette],n=ids.length,w=canvas.width,c=w/2,r=c-10;ctx.clearRect(0,0,w,w);if(!n){ctx.fillStyle='#172033';ctx.beginPath();ctx.arc(c,c,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9aa7bd';ctx.font='700 22px system-ui';ctx.textAlign='center';ctx.fillText('Selecione Pokémon',c,c);return}const visual=ids.length>60?ids.slice(0,60):ids;const vn=visual.length;for(let i=0;i<vn;i++){const a0=-Math.PI/2+i*2*Math.PI/vn,a1=-Math.PI/2+(i+1)*2*Math.PI/vn;ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,a0,a1);ctx.closePath();ctx.fillStyle=`hsl(${(i*360/vn)%360} 62% 48%)`;ctx.fill();ctx.strokeStyle='#0b1020';ctx.stroke();if(vn<=24){ctx.save();ctx.translate(c,c);ctx.rotate((a0+a1)/2);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='700 14px system-ui';ctx.fillText(cap(state.list[visual[i]-1]?.name||visual[i]),r-18,5);ctx.restore()}}ctx.beginPath();ctx.arc(c,c,42,0,Math.PI*2);ctx.fillStyle='#f5f7fb';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=10;ctx.stroke();if(ids.length>60){ctx.fillStyle='#101624';ctx.font='800 14px system-ui';ctx.textAlign='center';ctx.fillText(`${ids.length} opções`,c,c+5)}}
-let spinning=false,rotation=0;$('#spin').onclick=()=>{if(spinning)return;if(!roulette.size){toast('Selecione pelo menos 1 Pokémon.');return}spinning=true;const ids=[...roulette];const idx=Math.floor(Math.random()*ids.length),winner=ids[idx];const n=ids.length;let target;if(n<=60){const slice=360/n;target=360-(idx*slice+slice/2)}else target=Math.random()*360;rotation+=360*7+target;$('#wheel').style.transform=`rotate(${rotation}deg)`;$('#spinResult').innerHTML='<div class="result-box">🎡 Girando…</div>';setTimeout(()=>{spinning=false;const p=state.list[winner-1]||{name:`#${winner}`};$('#spinResult').innerHTML=`<div class="result-box"><b>🎉 RESULTADO</b><br><img src="${sprite(winner)}"><h2>${cap(p.name)}</h2><p>#${pad(winner)} • ${regionOf(winner)}<br>Chance: ${(100/n).toFixed(8).replace(/0+$/,'').replace(/\.$/,'')}% (1/${n})</p></div>`},4600)};
-$('#rouletteSearch').oninput=renderPicker;$('#rouletteRegion').onchange=renderPicker;$('#selectVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(id));save();renderPicker();drawWheel()};$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.delete(id));save();renderPicker();drawWheel()};$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
+const ROULETTE_TYPE_COLORS={normal:'#858b91',fire:'#e75d47',water:'#4d83cf',electric:'#d7b630',grass:'#4c9b5f',ice:'#68b9c3',fighting:'#b44a42',poison:'#9651a5',ground:'#b98555',flying:'#738fc5',psychic:'#d85d91',bug:'#7f9a35',rock:'#9e8b58',ghost:'#5e5d99',dragon:'#5e55b8',dark:'#4c4655',steel:'#6f8c9b',fairy:'#d77fb5'};
+const rouletteImages=new Map();
+function rouletteCategoryMatch(p,cat){
+  if(cat==='all')return true;
+  if(cat==='ub')return UB.has(p.id);
+  if(cat==='starter')return STARTERS.has(p.id);
+  if(cat==='mega')return MEGA.has(p.id);
+  if(cat==='gmax')return GMAX.has(p.id);
+  if(cat==='legendary')return LEGENDARY.has(p.id);
+  if(cat==='mythical')return MYTHICAL.has(p.id);
+  return true;
+}
+function rouletteFiltered(){
+  const q=$('#rouletteSearch').value,reg=$('#rouletteRegion').value,type=$('#rouletteType').value;
+  const cat=$('[data-roulette-cat].active')?.dataset.rouletteCat||'all';
+  return state.list.filter(p=>{
+    if(!matchesSearch(p,q))return false;
+    if(reg!=='all'&&regionOf(p.id)!==reg)return false;
+    if(!rouletteCategoryMatch(p,cat))return false;
+    if(type!=='all'){
+      const d=state.details.get(p.id);
+      if(!d?.types?.includes(type))return false;
+    }
+    return true;
+  });
+}
+function formatRouletteProbability(n){
+  if(!n)return 'Selecione Pokémon para começar.';
+  const pct=100/n;
+  const digits=pct>=10?2:pct>=1?3:4;
+  return `1 em ${n.toLocaleString('pt-BR')} — ${pct.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:digits})}% para cada Pokémon`;
+}
+function updateRouletteSummary(){
+  const n=roulette.size;
+  $('#rouletteCount').textContent=`${n.toLocaleString('pt-BR')} selecionado${n===1?'':'s'}`;
+  $('#probabilityText').textContent=formatRouletteProbability(n);
+  $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} Pokémon participando • chances exatamente iguais`:'';
+}
+function renderPicker(){
+  const arr=rouletteFiltered();
+  state.rouletteVisible=arr.map(x=>x.id);
+  updateRouletteSummary();
+  $('#roulettePicker').innerHTML=arr.length?arr.map(p=>{
+    const d=state.details.get(p.id),types=d?.types||[];
+    return `<div class="picker-row"><label><input type="checkbox" data-pick="${p.id}" ${roulette.has(p.id)?'checked':''}><img loading="lazy" src="${sprite(p.id,rouletteShiny)}"><span><b>#${pad(p.id)}</b> ${cap(p.name)}<br><small class="muted">${regionOf(p.id)}${types.length?' • '+types.map(t=>TYPE_PT[t]).join(' / '):''}</small></span></label></div>`;
+  }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
+  $$('[data-pick]').forEach(box=>box.onchange=()=>{box.checked?roulette.add(+box.dataset.pick):roulette.delete(+box.dataset.pick);save();updateRouletteSummary();drawWheel()});
+}
+function renderProbability(){updateRouletteSummary()}
+function roulettePrimaryType(id){return state.details.get(id)?.types?.[0]||'normal'}
+function getRouletteImage(id,shiny){
+  const key=`${id}_${shiny?'s':'n'}`;
+  if(rouletteImages.has(key))return rouletteImages.get(key);
+  const img=new Image();img.crossOrigin='anonymous';img.src=sprite(id,shiny);img.onload=()=>{if(!spinning)drawWheel()};rouletteImages.set(key,img);return img;
+}
+function drawWheel(){
+  const canvas=$('#wheel'),ctx=canvas.getContext('2d'),ids=[...roulette],n=ids.length,w=canvas.width,c=w/2,r=c-10;
+  ctx.clearRect(0,0,w,w);
+  if(!n){ctx.fillStyle='#172033';ctx.beginPath();ctx.arc(c,c,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9aa7bd';ctx.font='700 22px system-ui';ctx.textAlign='center';ctx.fillText('Selecione Pokémon',c,c);return}
+  const visual=n>72?ids.slice(0,72):ids,vn=visual.length;
+  for(let i=0;i<vn;i++){
+    const id=visual[i],a0=-Math.PI/2+i*2*Math.PI/vn,a1=-Math.PI/2+(i+1)*2*Math.PI/vn,mid=(a0+a1)/2;
+    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,a0,a1);ctx.closePath();
+    ctx.fillStyle=ROULETTE_TYPE_COLORS[roulettePrimaryType(id)]||'#56627a';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=2;ctx.stroke();
+    if(vn<=12){
+      const img=getRouletteImage(id,rouletteShiny);
+      if(img.complete&&img.naturalWidth){ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.drawImage(img,r*.54,-28,56,56);ctx.restore()}
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 13px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(cap(state.list[id-1]?.name||id),r-12,5);ctx.restore();
+    }else if(vn<=36){
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 11px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(cap(state.list[id-1]?.name||id),r-10,4);ctx.restore();
+    }
+  }
+  ctx.beginPath();ctx.arc(c,c,48,0,Math.PI*2);ctx.fillStyle='#f5f7fb';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=10;ctx.stroke();
+  ctx.fillStyle='#101624';ctx.textAlign='center';ctx.font='800 14px system-ui';
+  ctx.fillText(n>72?`${n.toLocaleString('pt-BR')} opções`:`${n} opção${n===1?'':'ões'}`,c,c+5);
+}
+let spinning=false,rotation=0;
+$('#spin').onclick=()=>{
+  if(spinning)return;
+  if(!roulette.size){toast('Selecione pelo menos 1 Pokémon.');return}
+  spinning=true;$('#spin').disabled=true;$('#spin').textContent='GIRANDO…';
+  const ids=[...roulette],idx=Math.floor(Math.random()*ids.length),winner=ids[idx],n=ids.length;
+  let target;if(n<=72){const slice=360/Math.min(n,72);target=360-((idx%Math.min(n,72))*slice+slice/2)}else target=Math.random()*360;
+  rotation+=360*7+target;$('#wheel').style.transform=`rotate(${rotation}deg)`;
+  $('#spinResult').innerHTML='<div class="result-box">🎡 Girando…</div>';
+  setTimeout(async()=>{
+    spinning=false;$('#spin').disabled=false;$('#spin').textContent='GIRAR ROLETA';
+    const p=state.list[winner-1]||{name:`#${winner}`},d=await getDetail(winner);
+    $('#spinResult').innerHTML=`<div class="result-box roulette-result">
+      <b>🎉 RESULTADO</b>
+      <img src="${sprite(winner,rouletteShiny)}">
+      <h2>${cap(p.name)}${rouletteShiny?' ✨':''}</h2>
+      <div class="types">${(d.types||[]).map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div>
+      <p>#${pad(winner)} • ${regionOf(winner)}<br>${formatRouletteProbability(n)}</p>
+      <div class="result-actions"><button id="rouletteViewDex">📖 Ver na Pokédex</button><button id="rouletteFav">⭐ Favoritar</button><button id="rouletteAddTeam">⚔️ Adicionar ao time</button></div>
+    </div>`;
+    $('#rouletteViewDex').onclick=()=>{go('pokedex');openPokemon(winner,rouletteShiny)};
+    $('#rouletteFav').onclick=()=>{if(!favs.has(winner))toggleFav(winner,rouletteShiny);else toast('Este Pokémon já está nos Desejos ⭐')};
+    $('#rouletteAddTeam').onclick=()=>addToTeam(winner,rouletteShiny);
+  },4600);
+};
+$('#rouletteSearch').oninput=renderPicker;
+$('#rouletteRegion').onchange=renderPicker;
+$('#rouletteType').onchange=renderPicker;
+$('#rouletteShiny').onchange=()=>{rouletteShiny=$('#rouletteShiny').checked;save();renderPicker();drawWheel()};
+$('#selectVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(id));save();renderPicker();drawWheel()};
+$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.delete(id));save();renderPicker();drawWheel()};
+$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
