@@ -250,13 +250,13 @@ function teamAnalysisHTML(t){
     </div>
 
     <div class="analysis-section offensive-section">
-      <div class="coverage-head"><h4>🎯 Cobertura ofensiva por elemental</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
+      <div class="coverage-head"><h4>🎯 Cobertura elemental</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
       <p class="muted">Mostra contra quais tipos a combinação elemental natural do time oferece vantagem geral.</p>
       <div class="coverage-block"><span class="coverage-label">Super efetivo contra</span><div class="analysis-pills">${covered.map(x=>typeBadge(x.type,'coverage')).join('')}</div></div>
       <div class="coverage-block"><span class="coverage-label">Sem cobertura elemental</span><div class="analysis-pills">${uncovered.length?uncovered.map(x=>typeBadge(x.type,'uncovered')).join(''):'<span class="muted">Cobertura completa dos 18 tipos.</span>'}</div></div>
     </div>
 
-    <div class="analysis-section"><h4>⚔️ Tipos elemental disponíveis</h4>
+    <div class="analysis-section"><h4>⚔️ Tipos elementais disponíveis</h4>
       <div class="analysis-pills">${elementTypes.map(type=>typeBadge(type,'elemental')).join('')}</div>
     </div>
 
