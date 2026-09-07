@@ -125,13 +125,13 @@ function teamMetricsFromTypes(typeSets){
   if(!typeSets.length)return {score:0,covered:[],uncovered:TYPES.slice(),shared:[],defensiveCovered:0};
   const rows=TYPES.map(type=>{const values=typeSets.map(types=>defensiveMultiplier(type,types));return {type,weak:values.filter(v=>v>1).length,resist:values.filter(v=>v>0&&v<1).length,immune:values.filter(v=>v===0).length,max:Math.max(...values)}});
   const shared=rows.filter(x=>x.weak>=2).sort((a,b)=>b.weak-a.weak||b.max-a.max);
-  const stabTypes=[...new Set(typeSets.flat())];
-  const covered=TYPES.filter(defType=>stabTypes.some(atk=>(TYPE_CHART[atk]?.[defType]??1)>1));
+  const elementTypes=[...new Set(typeSets.flat())];
+  const covered=TYPES.filter(defType=>elementTypes.some(atk=>(TYPE_CHART[atk]?.[defType]??1)>1));
   const uncovered=TYPES.filter(type=>!covered.includes(type));
   const defensiveCovered=rows.filter(x=>x.resist>0||x.immune>0).length;
   const sharedBurden=shared.reduce((sum,x)=>sum+(x.weak-1),0);
   const score=Math.max(0,Math.min(100,Math.round((covered.length/TYPES.length)*50+(defensiveCovered/TYPES.length)*30+Math.max(0,20-Math.min(20,sharedBurden*4)))));
-  return {score,covered,uncovered,shared,defensiveCovered,rows,stabTypes};
+  return {score,covered,uncovered,shared,defensiveCovered,rows,elementTypes};
 }
 function recommendationFilterMatch(p,filter){
   if(filter==='all')return true;
@@ -140,6 +140,13 @@ function recommendationFilterMatch(p,filter){
   if(filter==='mythical')return MYTHICAL.has(p.id);
   if(filter.startsWith('region:'))return regionOf(p.id)===filter.slice(7);
   return true;
+}
+function synergyLabel(gain,newCoverage,resists,immunes){
+  const value=gain+newCoverage.length*2+resists.length*2+immunes.length*3;
+  if(value>=18)return 'Excelente';
+  if(value>=10)return 'Muito boa';
+  if(value>=5)return 'Boa';
+  return 'Complementar';
 }
 function computeTeamRecommendations(t,filter='all',limit=8){
   if(t.members.length>=6)return [];
@@ -152,11 +159,13 @@ function computeTeamRecommendations(t,filter='all',limit=8){
     const next=teamMetricsFromTypes([...currentTypes,types]);
     const newCoverage=next.covered.filter(x=>!base.covered.includes(x));
     const fixedWeaknesses=base.shared.filter(w=>!next.shared.some(n=>n.type===w.type&&n.weak>=w.weak));
-    const resistsWeaknesses=base.shared.filter(w=>defensiveMultiplier(w.type,types)<1);
+    const resistsWeaknesses=base.shared.filter(w=>defensiveMultiplier(w.type,types)>0&&defensiveMultiplier(w.type,types)<1);
     const immunesWeaknesses=base.shared.filter(w=>defensiveMultiplier(w.type,types)===0);
     const gain=next.score-base.score;
-    const utility=gain*100+newCoverage.length*12+fixedWeaknesses.length*10+resistsWeaknesses.length*5+immunesWeaknesses.length*8;
-    return {p,types,nextScore:next.score,gain,newCoverage,fixedWeaknesses,resistsWeaknesses,immunesWeaknesses,utility};
+    const diversityGain=new Set([...base.elementTypes,...types]).size-base.elementTypes.length;
+    const utility=gain*100+newCoverage.length*16+fixedWeaknesses.length*14+resistsWeaknesses.length*8+immunesWeaknesses.length*12+diversityGain*6;
+    const synergy=synergyLabel(gain,newCoverage,resistsWeaknesses,immunesWeaknesses);
+    return {p,types,nextScore:next.score,gain,newCoverage,fixedWeaknesses,resistsWeaknesses,immunesWeaknesses,diversityGain,synergy,utility};
   }).sort((a,b)=>b.utility-a.utility||b.nextScore-a.nextScore||a.p.id-b.p.id).slice(0,limit);
 }
 function teamRecommendationsHTML(t){
@@ -170,16 +179,17 @@ function teamRecommendationsHTML(t){
     <div class="recommendations-head"><div><span class="eyebrow">ASSISTENTE DE EQUIPE</span><h3>💡 Recomendações para o próximo membro</h3></div>
       <select id="teamRecFilter"><option value="no-legend" ${filter==='no-legend'?'selected':''}>Sem Lendários/Míticos</option><option value="all" ${filter==='all'?'selected':''}>Todos</option><option value="legendary" ${filter==='legendary'?'selected':''}>Lendários</option><option value="mythical" ${filter==='mythical'?'selected':''}>Míticos</option>${regionOptions}</select>
     </div>
-    <p class="muted">Prioriza candidatos que aumentam a nota, ampliam cobertura STAB e ajudam contra fraquezas compartilhadas.</p>
+    <p class="muted">Base universal: considera apenas tipos elementais, fraquezas, resistências, imunidades, diversidade e complementaridade entre Pokémon.</p>
     <div class="recommendation-grid">${recs.length?recs.map(r=>{
       const reasons=[];
-      if(r.gain>0)reasons.push(`+${r.gain} equilíbrio`);
-      if(r.newCoverage.length)reasons.push(`+${r.newCoverage.length} cobertura`);
-      if(r.immunesWeaknesses.length)reasons.push(`imune a ${r.immunesWeaknesses.map(x=>TYPE_PT[x.type]).join(', ')}`);
+      if(r.immunesWeaknesses.length)reasons.push(`anula ${r.immunesWeaknesses.map(x=>TYPE_PT[x.type]).join(', ')}`);
       else if(r.resistsWeaknesses.length)reasons.push(`resiste a ${r.resistsWeaknesses.map(x=>TYPE_PT[x.type]).join(', ')}`);
-      return `<article class="recommendation-card"><img src="${sprite(r.p.id,false)}"><div class="rec-main"><b>#${pad(r.p.id)} ${cap(r.p.name)}</b><div class="types">${r.types.map(type=>`<span class="type ${type}">${TYPE_PT[type]}</span>`).join('')}</div><small>${reasons.slice(0,2).join(' • ')||'Melhora a composição geral'}</small></div><div class="rec-score"><span>Nova nota</span><strong>${r.nextScore}/100</strong><button data-rec-add="${r.p.id}">Adicionar</button></div></article>`;
+      if(r.newCoverage.length)reasons.push(`cobre +${r.newCoverage.length} tipos`);
+      if(r.diversityGain>0)reasons.push('aumenta diversidade elemental');
+      if(!reasons.length&&r.gain>0)reasons.push(`+${r.gain} equilíbrio`);
+      return `<article class="recommendation-card"><img src="${sprite(r.p.id,false)}"><div class="rec-main"><b>#${pad(r.p.id)} ${cap(r.p.name)}</b><div class="types">${r.types.map(type=>`<span class="type ${type}">${TYPE_PT[type]}</span>`).join('')}</div><small>${reasons.slice(0,2).join(' • ')||'Complementa os tipos atuais'}</small><span class="synergy-badge">Sinergia: ${r.synergy}</span></div><div class="rec-score"><span>Nova nota</span><strong>${r.nextScore}/100</strong><button data-rec-add="${r.p.id}">Adicionar</button></div></article>`;
     }).join(''):'<div class="empty-state">Nenhum candidato disponível com este filtro.</div>'}</div>
-    <p class="analysis-note">Recomendações atuais são baseadas em tipagem e STAB. Moves, abilities, stats, itens e funções competitivas serão considerados em versões futuras.</p>
+    <p class="analysis-note">Base universal do PokéTeam: somente tipagem elemental, fraquezas, resistências, imunidades, cobertura e sinergia. Moves, Nature, EVs/IVs, abilities, itens e mecânicas específicas não entram nas recomendações.</p>
   </div>`;
 }
 function teamAnalysisHTML(t){
@@ -196,9 +206,9 @@ function teamAnalysisHTML(t){
   const immunities=rows.filter(x=>x.immune>0).sort((a,b)=>b.immune-a.immune);
   const resistances=rows.filter(x=>x.resist>0).sort((a,b)=>b.resist-a.resist);
 
-  const stabTypes=[...new Set(members.flatMap(d=>d.types))];
+  const elementTypes=[...new Set(members.flatMap(d=>d.types))];
   const offensive=TYPES.map(defType=>{
-    const attackers=stabTypes.filter(atk=>(TYPE_CHART[atk]?.[defType]??1)>1);
+    const attackers=elementTypes.filter(atk=>(TYPE_CHART[atk]?.[defType]??1)>1);
     return {type:defType,attackers};
   });
   const covered=offensive.filter(x=>x.attackers.length);
@@ -224,7 +234,7 @@ function teamAnalysisHTML(t){
     <div class="balance-card">
       <div><span class="eyebrow">EQUILÍBRIO</span><strong>${balanceScore}/100</strong><small>${scoreLabel}</small></div>
       <div class="balance-bar"><span style="width:${balanceScore}%"></span></div>
-      <p>Indicador heurístico baseado em cobertura STAB, resistências/imunidades e fraquezas compartilhadas.</p>
+      <p>Indicador heurístico baseado em cobertura elemental, resistências/imunidades e fraquezas compartilhadas.</p>
     </div>
 
     <div class="analysis-section"><h4>⚠️ Fraquezas compartilhadas</h4>
@@ -240,17 +250,17 @@ function teamAnalysisHTML(t){
     </div>
 
     <div class="analysis-section offensive-section">
-      <div class="coverage-head"><h4>🎯 Cobertura ofensiva por STAB</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
-      <p class="muted">Considera os tipos naturais dos Pokémon como ataques STAB; golpes escolhidos ainda não entram no cálculo.</p>
+      <div class="coverage-head"><h4>🎯 Cobertura ofensiva por elemental</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
+      <p class="muted">Mostra contra quais tipos a combinação elemental natural do time oferece vantagem geral.</p>
       <div class="coverage-block"><span class="coverage-label">Super efetivo contra</span><div class="analysis-pills">${covered.map(x=>typeBadge(x.type,'coverage')).join('')}</div></div>
-      <div class="coverage-block"><span class="coverage-label">Sem cobertura STAB</span><div class="analysis-pills">${uncovered.length?uncovered.map(x=>typeBadge(x.type,'uncovered')).join(''):'<span class="muted">Cobertura completa dos 18 tipos.</span>'}</div></div>
+      <div class="coverage-block"><span class="coverage-label">Sem cobertura elemental</span><div class="analysis-pills">${uncovered.length?uncovered.map(x=>typeBadge(x.type,'uncovered')).join(''):'<span class="muted">Cobertura completa dos 18 tipos.</span>'}</div></div>
     </div>
 
-    <div class="analysis-section"><h4>⚔️ Tipos STAB disponíveis</h4>
-      <div class="analysis-pills">${stabTypes.map(type=>typeBadge(type,'stab')).join('')}</div>
+    <div class="analysis-section"><h4>⚔️ Tipos elemental disponíveis</h4>
+      <div class="analysis-pills">${elementTypes.map(type=>typeBadge(type,'elemental')).join('')}</div>
     </div>
 
-    <p class="analysis-note">A defesa usa a combinação dos tipos atuais de cada Pokémon. Habilidades, itens, Terastalização, golpes reais e outras mecânicas ainda não entram neste cálculo.</p>
+    <p class="analysis-note">Base universal do PokéTeam: esta análise usa apenas tipos elementais, fraquezas, resistências, imunidades e complementaridade. Mecânicas específicas de jogos são ignoradas.</p>
   </div>`;
 }
 function ensureTeamDetails(t){
