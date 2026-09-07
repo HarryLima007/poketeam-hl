@@ -957,3 +957,14 @@ body[data-page="pokedex"] nav button.active{
 @media (prefers-reduced-motion:reduce){
   #modal.pokemon-rgb .modal-card{animation:none}
 }
+
+/* Roleta — regiões sempre abertas, sem "Abrir catálogo" */
+#roulette .roulette-region-static{border-bottom:1px solid #202c42}
+#roulette .roulette-region-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 18px;background:#17132f;border-bottom:1px solid #2a2247;
+}
+#roulette .roulette-region-header span{display:flex;align-items:baseline;gap:8px}
+#roulette .roulette-region-header b{font-size:15px;color:#fff}
+#roulette .roulette-region-header small{color:var(--muted)}
+#roulette .roulette-region-header em{font-style:normal;color:#a88cff;font-size:11px}
