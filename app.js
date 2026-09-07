@@ -521,8 +521,8 @@ function renderPicker(){
       }).join('')}</div>
     </details>`;
   }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
-  $('[data-catalog-pokemon]').forEach(card=>card.onclick=()=>toggleCatalogPokemon(Number(card.dataset.catalogPokemon)));
-  $('.roulette-region-group>summary').forEach(summary=>{
+  document.querySelectorAll('[data-catalog-pokemon]').forEach(card=>card.onclick=()=>toggleCatalogPokemon(Number(card.dataset.catalogPokemon)));
+  document.querySelectorAll('.roulette-region-group>summary').forEach(summary=>{
     summary.onclick=e=>{
       e.preventDefault();
       const details=summary.parentElement;
