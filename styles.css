@@ -50,3 +50,32 @@
 .roulette-result h2{margin:8px 0}
 #spin:disabled{opacity:.7;cursor:not-allowed}
 @media(max-width:900px){.roulette-toolbar{grid-template-columns:1fr}}
+
+.roulette-help{margin:10px 0 0;color:var(--muted);font-size:13px}
+.variant-row{display:grid;grid-template-columns:minmax(230px,1fr) auto auto;gap:10px;align-items:center}
+.picker-pokemon{display:flex;align-items:center;gap:10px;min-width:0}
+.picker-pokemon img{width:52px;height:52px;object-fit:contain;flex:0 0 auto}
+.picker-pokemon span{min-width:0}
+.variant-choice{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid #2a3852;border-radius:11px;background:#121d30;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+.variant-choice input{accent-color:#6ea8ff}
+.shiny-choice{border-color:#5d4d24;background:#241f12}
+.shiny-choice input{accent-color:#ffd34d}
+.team-chooser-card{width:min(620px,100%)}
+.team-chooser-head{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;margin-bottom:18px}
+.team-chooser-head img{width:110px;height:110px;object-fit:contain}
+.team-chooser-head h2{margin:3px 0 4px;font-size:28px}
+.team-chooser-head p{margin:0;color:var(--muted)}
+.team-choice-list{display:grid;gap:8px;margin:12px 0 16px}
+.team-choice{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:13px 14px;text-align:left}
+.team-choice span{display:flex;flex-direction:column;gap:3px}
+.team-choice small{color:var(--muted)}
+.team-choice.full{opacity:.55;cursor:not-allowed}
+.team-choice strong{color:#b9c8df}
+#chooserCreateTeam{width:100%}
+@media(max-width:800px){
+  .variant-row{grid-template-columns:1fr 1fr}
+  .picker-pokemon{grid-column:1/-1}
+  .variant-choice{justify-content:center}
+  .team-chooser-head{grid-template-columns:80px 1fr}
+  .team-chooser-head img{width:80px;height:80px}
+}
