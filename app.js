@@ -577,6 +577,10 @@ function activeRouletteVariants(){
 function selectedVariantCount(id){
   return [rouletteKey(id,false,false),rouletteKey(id,false,true),rouletteKey(id,true,false),rouletteKey(id,true,true)].filter(k=>roulette.has(k)).length;
 }
+function rouletteCatalogPreviewShiny(){
+  const variants=activeRouletteVariants();
+  return variants.length>0&&variants.every(v=>v.shiny);
+}
 function toggleCatalogPokemon(id){
   const variants=activeRouletteVariants();
   if(!variants.length){toast('Escolha pelo menos uma variante.');return}
@@ -586,7 +590,7 @@ function toggleCatalogPokemon(id){
   save();renderPicker();drawWheel();
 }
 function renderPicker(){
-  const arr=rouletteFiltered();
+  const arr=rouletteFiltered(),previewShiny=rouletteCatalogPreviewShiny();
   state.rouletteVisible=arr.map(x=>x.id);
   updateRouletteSummary();
   const grouped=REGIONS.map(([region])=>[region,arr.filter(p=>regionOf(p.id)===region)]).filter(([,items])=>items.length);
@@ -603,7 +607,7 @@ function renderPicker(){
           roulette.has(rouletteKey(p.id,true,true))?'<i>✨💯</i>':''
         ].filter(Boolean).join('');
         return `<button class="roulette-poke-card ${count?'selected':''}" data-catalog-pokemon="${p.id}" title="Adicionar ou remover variantes ativas">
-          <img loading="lazy" src="${sprite(p.id,false)}" alt="${cap(name)}">
+          <img loading="lazy" src="${sprite(p.id,previewShiny)}" alt="${cap(name)}${previewShiny?' Shiny':''}">
           <span class="catalog-poke-num">#${pad(p.id)}</span>
           <strong>${cap(name)}</strong>
           <small>${types.length?types.map(t=>TYPE_PT[t]).join(' / '):region}</small>
