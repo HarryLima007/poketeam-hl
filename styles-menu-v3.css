@@ -1375,3 +1375,38 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
  .profile-button{display:none!important}
  .topbar nav button{font-size:12px!important;gap:5px!important}
 }
+
+/* Menu v4 — escala e proporções da referência 1648px */
+@media(min-width:1200px){
+  .topbar{height:68px!important;min-height:68px!important}
+  .topbar-inner{
+    width:min(1404px,calc(100% - 72px))!important;
+    max-width:1404px!important;
+    grid-template-columns:270px 1fr 365px!important;
+    gap:20px!important;
+  }
+  .topbar .brand{font-size:19px!important;gap:10px!important;justify-self:start!important}
+  .topbar .brand .ball{width:32px!important;height:32px!important;flex-basis:32px!important}
+  .topbar #nav{gap:12px!important;justify-self:center!important}
+  .topbar #nav button{
+    height:48px!important;min-height:48px!important;
+    padding:0 15px!important;
+    border-radius:17px!important;
+    font-size:15px!important;
+    gap:9px!important;
+  }
+  .topbar #nav button .nav-icon{font-size:18px!important}
+  .topbar-tools{width:365px!important;justify-content:flex-end!important;gap:10px!important}
+  .global-search{width:244px!important;height:43px!important;border-radius:17px!important;padding:0 14px!important}
+  .global-search input{font-size:13px!important}
+  .topbar-arrow{width:32px!important;height:42px!important;font-size:27px!important}
+  .profile-button{width:43px!important;height:43px!important;font-size:18px!important}
+}
+@media(min-width:1600px){
+  .topbar{height:70px!important;min-height:70px!important}
+  .topbar-inner{width:min(1420px,calc(100% - 96px))!important;max-width:1420px!important;grid-template-columns:285px 1fr 375px!important}
+  .topbar .brand{font-size:20px!important}
+  .topbar #nav{gap:14px!important}
+  .topbar #nav button{font-size:15.5px!important;padding:0 16px!important}
+  .global-search{width:250px!important}
+}
