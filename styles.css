@@ -1235,3 +1235,143 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
  #home .hero-copy{z-index:3}
  #home .quick-grid{grid-template-columns:1fr 1fr!important}
 }
+
+/* Menu global v2 — referência Home premium */
+.topbar{
+  height:78px!important;
+  padding:0!important;
+  background:rgba(2,8,22,.94)!important;
+  border-bottom:1px solid rgba(82,151,235,.18)!important;
+  box-shadow:0 10px 34px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+}
+.topbar-inner{
+  width:min(1480px,calc(100% - 44px));
+  height:100%;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:28px;
+}
+.topbar .brand{
+  display:flex!important;
+  align-items:center!important;
+  gap:11px!important;
+  padding:7px 0!important;
+  color:#fff!important;
+  font-size:22px!important;
+  white-space:nowrap;
+}
+.topbar .brand .ball{width:30px;height:30px;flex:0 0 30px}
+.topbar nav{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  min-width:0;
+}
+.topbar nav button{
+  min-height:46px!important;
+  padding:0 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  border:1px solid transparent!important;
+  border-radius:15px!important;
+  background:transparent!important;
+  color:#d2dced!important;
+  font-weight:760!important;
+  font-size:14px!important;
+  box-shadow:none!important;
+  white-space:nowrap;
+}
+.topbar nav button .nav-icon{font-size:16px;line-height:1}
+.topbar nav button:hover{
+  transform:translateY(-1px)!important;
+  color:#fff!important;
+  background:rgba(15,38,73,.66)!important;
+  border-color:rgba(75,146,234,.28)!important;
+}
+.topbar nav button.active{
+  color:#fff!important;
+  background:linear-gradient(135deg,rgba(17,62,105,.96),rgba(10,42,82,.96))!important;
+  border-color:rgba(52,179,255,.68)!important;
+  box-shadow:0 0 24px rgba(35,155,255,.13),inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+.topbar-tools{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.global-search{
+  width:245px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:0 13px;
+  border:1px solid rgba(80,140,218,.40);
+  border-radius:16px;
+  background:rgba(4,16,38,.82);
+  color:#9db1cc;
+  transition:.2s;
+}
+.global-search:focus-within{
+  border-color:#3eaaf7;
+  box-shadow:0 0 0 3px rgba(48,157,240,.08),0 0 24px rgba(44,151,244,.08);
+}
+.global-search>span{font-size:21px;line-height:1;transform:rotate(-16deg)}
+.global-search input{
+  width:100%;
+  min-width:0;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  font-size:13px!important;
+}
+.global-search input::placeholder{color:#879bb7}
+.topbar-arrow,.profile-button{
+  width:42px!important;
+  height:42px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:50%!important;
+  background:rgba(10,27,57,.86)!important;
+  border:1px solid rgba(80,140,218,.38)!important;
+  color:#dceaff!important;
+  box-shadow:none!important;
+}
+.topbar-arrow{background:transparent!important;border-color:transparent!important;font-size:29px!important;color:#8ba2c2!important}
+.profile-button{font-size:17px!important}
+.topbar-arrow:hover,.profile-button:hover{
+  transform:translateY(-1px)!important;
+  border-color:#3c9ee9!important;
+  color:#fff!important;
+}
+@media(max-width:1120px){
+ .topbar-inner{width:calc(100% - 24px);gap:12px}
+ .topbar nav{gap:3px!important}
+ .topbar nav button{padding:0 10px!important}
+ .global-search{width:190px}
+}
+@media(max-width:900px){
+ .topbar{height:auto!important;min-height:68px!important}
+ .topbar-inner{grid-template-columns:auto 1fr;gap:8px 12px;padding:10px 0}
+ .topbar .brand b{display:block!important}
+ .topbar nav{grid-column:1/-1;grid-row:2;justify-content:flex-start!important;overflow-x:auto;padding-bottom:2px}
+ .topbar nav button{min-height:40px!important;padding:0 12px!important}
+ .topbar-tools{justify-self:end}
+ .global-search{width:min(240px,38vw)}
+}
+@media(max-width:560px){
+ .topbar .brand b{font-size:17px}
+ .topbar .brand .ball{width:25px;height:25px;flex-basis:25px}
+ .global-search{width:160px}
+ .profile-button{display:none!important}
+ .topbar nav button{font-size:12px!important;gap:5px!important}
+}
