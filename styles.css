@@ -275,3 +275,125 @@ nav button:hover,nav button.active{background:#111d34;border-color:#29436b;color
 #home .quick-grid button b{font-size:22px}
 #home .quick-grid button span{font-size:16px;font-weight:900}
 #home .quick-grid button small{color:#8fa5c4}
+
+
+/* IMAGE-MATCHED STRUCTURAL REDESIGN */
+body[data-page="home"]{background:
+ radial-gradient(circle at 73% 16%,rgba(30,126,255,.18),transparent 25%),
+ linear-gradient(180deg,#040914,#07101e 62%,#050914)}
+body[data-page="pokedex"]{background:linear-gradient(180deg,#edf6ff 0%,#f8fbff 40%,#eaf2fa 100%);color:#10233c}
+body[data-page="teams"]{background:linear-gradient(180deg,#eef7f0 0%,#f9fbf8 45%,#e8f0ea 100%);color:#10261e}
+body[data-page="roulette"]{background:
+ radial-gradient(circle at 70% 12%,rgba(139,71,255,.25),transparent 24%),
+ radial-gradient(circle at 20% 70%,rgba(224,62,190,.13),transparent 30%),
+ linear-gradient(180deg,#0a0720 0%,#12092e 52%,#080719 100%)}
+body[data-page="wishes"]{background:
+ radial-gradient(circle at 65% 10%,rgba(226,176,58,.11),transparent 26%),
+ linear-gradient(180deg,#080808,#111214 58%,#090a0c)}
+
+body[data-page="pokedex"] .topbar,body[data-page="teams"] .topbar{
+ background:rgba(250,253,255,.88);border-bottom-color:rgba(23,60,94,.10);box-shadow:0 8px 30px rgba(43,72,98,.08)
+}
+body[data-page="pokedex"] .brand,body[data-page="teams"] .brand{color:#10233c!important}
+body[data-page="pokedex"] nav button,body[data-page="teams"] nav button{color:#536b82}
+body[data-page="pokedex"] nav button:hover,body[data-page="pokedex"] nav button.active,
+body[data-page="teams"] nav button:hover,body[data-page="teams"] nav button.active{
+ color:#15314d;background:#e8f2fb;border-color:#d3e5f3;box-shadow:none
+}
+
+.home-hero{position:relative;grid-template-columns:.9fr 1.1fr;min-height:560px}
+.hero-copy{position:relative;z-index:2}
+.hero-art{position:relative;min-height:420px;display:grid;place-items:center}
+.hero-art img{position:relative;z-index:2;width:min(92%,430px);filter:drop-shadow(0 30px 60px rgba(0,0,0,.45))}
+.hero-glow{position:absolute;width:390px;height:390px;border-radius:50%;background:radial-gradient(circle,rgba(38,148,255,.28),rgba(38,148,255,.06) 45%,transparent 70%);filter:blur(4px)}
+.hero-art blockquote{position:absolute;right:18px;bottom:10px;z-index:3;width:180px;margin:0;color:#bfd3ee;font-family:Georgia,serif;font-size:16px;font-style:italic;line-height:1.4}
+#home .quick-grid{margin-top:-22px;position:relative;z-index:3;padding:0 26px}
+#home .quick-grid button{backdrop-filter:blur(14px);border-radius:16px}
+
+.feature-banner{position:relative;min-height:260px;border-radius:30px;margin-bottom:24px;padding:36px 42px;display:grid;grid-template-columns:1fr 320px;align-items:center;overflow:hidden}
+.feature-banner h1{font-size:clamp(36px,5vw,62px);line-height:1;margin:7px 0 12px;letter-spacing:-2.5px}
+.feature-banner p{max-width:560px;font-size:16px;line-height:1.55;margin:0}
+.feature-banner img{justify-self:end;width:280px;height:230px;object-fit:contain;filter:drop-shadow(0 24px 30px rgba(0,0,0,.18))}
+.compact-head{margin:0 0 14px;padding:0}
+.compact-head h2{margin:0;font-size:24px}
+
+.pokedex-banner{
+ background:
+ radial-gradient(circle at 79% 30%,rgba(119,189,255,.24),transparent 28%),
+ linear-gradient(135deg,#ffffff 0%,#edf7ff 58%,#dbeeff 100%);
+ border:1px solid #d8e8f5;box-shadow:0 24px 60px rgba(40,91,132,.10)
+}
+.pokedex-banner .eyebrow{color:#4790c8}.pokedex-banner p{color:#56728a}
+#pokedex{background:none}
+#pokedex .compact-head,#pokedex .region-title{color:#17314a}
+#pokedex .status,#pokedex .region-title span{color:#6c8498}
+#pokedex .toolbar{background:#fff;border-color:#d8e6f1;box-shadow:0 14px 35px rgba(53,91,122,.06)}
+#pokedex .toolbar input,#pokedex .toolbar select{background:#f8fbfe;color:#17314a;border-color:#d5e3ee}
+#pokedex .chips button{background:#fff;color:#405a70;border-color:#d4e2ec}
+#pokedex .chips button.active{color:#fff}
+#pokedex .poke-card{background:#fff;border-color:#dce7ef;color:#183149;box-shadow:0 10px 30px rgba(45,74,100,.07)}
+#pokedex .poke-card .num,#pokedex .muted{color:#6f879b}
+#pokedex .poke-card .card-actions button{background:#f3f8fc;color:#183149;border-color:#dbe7f0}
+
+.teams-banner{
+ background:
+ radial-gradient(circle at 80% 20%,rgba(68,165,114,.18),transparent 28%),
+ linear-gradient(135deg,#fbfdf9 0%,#eff8f0 62%,#dcecdf 100%);
+ border:1px solid #d5e4d8;box-shadow:0 24px 60px rgba(47,92,63,.09)
+}
+.teams-banner .eyebrow{color:#36845d}.teams-banner p{color:#567362}
+#teams{background:none}
+#teams .compact-head{color:#173327}
+#teams .chips button{background:#fff;color:#315846;border-color:#d3e2d7}
+#teams .chips button.active{background:#176b4b;color:#fff;border-color:#176b4b}
+#teams .team-card,#teams .team-analysis,#teams .team-recommendations{background:#fff;color:#183328;border-color:#d6e3d9;box-shadow:0 18px 50px rgba(48,85,61,.08)}
+#teams .team-head button,#teams .slot button,#teams .recommendation-card button{color:#183328}
+#teams .slot{border-color:#cbded1;color:#6d8274}
+#teams .slot.filled{background:#f5faf6;color:#183328}
+#teams .analysis-count,#teams .balance-card,#teams .analysis-pill,#teams .recommendation-card{background:#f6faf7;color:#183328;border-color:#d8e6dc}
+#teams .analysis-note,#teams .coverage-label,#teams .rec-main small{color:#698071}
+
+.roulette-banner{
+ background:
+ radial-gradient(circle at 78% 38%,rgba(209,82,255,.24),transparent 26%),
+ linear-gradient(135deg,#170d39,#271057 58%,#3a1468);
+ border:1px solid #53328d;box-shadow:0 24px 70px rgba(76,25,143,.30)
+}
+.roulette-banner h1{font-size:58px}.roulette-banner p{color:#d7c7f1}
+.roulette-hero-orb{justify-self:end;width:210px;height:210px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#6de6ff,#7b67ff,#d25aff,#f24994,#ffc94e,#6de6ff);box-shadow:0 0 55px rgba(185,76,255,.45);border:10px solid #31135c}
+.roulette-hero-orb:after{content:"";position:absolute;width:74px;height:74px;border-radius:50%;background:#fff;border:18px solid #22123d}
+.roulette-hero-orb span{font-size:54px;z-index:2}
+#roulette{background:none}
+#roulette .compact-head{color:#fff}
+#roulette .roulette-controls{border-radius:22px}
+#roulette .roulette-layout{grid-template-columns:minmax(360px,1fr) minmax(420px,1fr)}
+#roulette .wheel-panel{background:linear-gradient(160deg,#171036,#0d0a22)}
+#roulette .roulette-catalog{background:linear-gradient(160deg,#171035,#0d0a21)}
+#roulette .roulette-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.wishes-banner{
+ background:
+ radial-gradient(circle at 78% 40%,rgba(225,178,61,.16),transparent 25%),
+ linear-gradient(135deg,#101010,#1c1d20 58%,#24211a);
+ border:1px solid #39352a;box-shadow:0 24px 70px rgba(0,0,0,.26)
+}
+.wishes-banner .eyebrow{color:#e2bc56}.wishes-banner h1{color:#fff}.wishes-banner p{color:#bdb8aa}
+#wishes{background:none}
+#wishes .compact-head{color:#fff}
+#wishes .toolbar{background:#111214;border-color:#36332a}
+#wishes .toolbar input{background:#0d0e10;color:#fff;border-color:#39352a}
+#wishes .poke-card{background:linear-gradient(155deg,#17181a,#0f1012);border-color:#353229;color:#f5f5f2}
+#wishes .poke-card:hover{border-color:#9e8239;box-shadow:0 16px 42px rgba(204,159,47,.10)}
+#wishes .poke-card .num,#wishes .muted{color:#9a9485}
+
+@media(max-width:900px){
+ .home-hero,.feature-banner{grid-template-columns:1fr}
+ .hero-art{min-height:300px}.hero-art blockquote{display:none}
+ .feature-banner img{justify-self:center;width:230px;height:190px}
+ .roulette-hero-orb{justify-self:center;margin-top:20px}
+}
+@media(max-width:600px){
+ .feature-banner{padding:26px 22px;border-radius:22px}
+ .feature-banner h1{font-size:38px}
+ #home .quick-grid{margin-top:14px;padding:0}
+}
