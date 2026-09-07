@@ -991,3 +991,11 @@ body[data-page="pokedex"] nav button.active{
 
 /* Scroll stability: dynamic catalogs must never move the document viewport */
 #dexResults,#roulettePicker{overflow-anchor:none}
+
+/* Browser canvas fallback: prevent white bands/gaps when dynamic lists shrink */
+html{background:#0b1622}
+html:has(body[data-page="pokedex"]){background:#4b687f}
+html:has(body[data-page="roulette"]){background:#100822}
+html:has(body[data-page="teams"]){background:#dfe9e1}
+html:has(body[data-page="wishes"]){background:#090a0c}
+body,.page{min-height:100vh}
