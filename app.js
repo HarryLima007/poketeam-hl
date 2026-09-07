@@ -34,11 +34,14 @@ const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',ac
 const specialArt=new Map();
 const $=s=>document.querySelector(s); const qsa=s=>[...document.querySelectorAll(s)];
 function stableScrollY(){return window.scrollY||document.documentElement.scrollTop||0}
+function maxScrollY(){
+  return Math.max(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)-window.innerHeight);
+}
 function restoreScroll(y){
   if(!Number.isFinite(y))return;
-  const root=document.documentElement,prev=root.style.scrollBehavior;
+  const root=document.documentElement,prev=root.style.scrollBehavior,target=Math.min(Math.max(0,y),maxScrollY());
   root.style.scrollBehavior='auto';
-  window.scrollTo(0,y);
+  window.scrollTo(0,target);
   root.style.scrollBehavior=prev;
 }
 function preserveViewportDuring(renderFn){
@@ -49,9 +52,10 @@ function preserveViewportDuring(renderFn){
   root.style.overflowAnchor='none';
   try{return renderFn(y)}
   finally{
-    restoreScroll(y);
     body.style.minHeight=prevMin;
     root.style.overflowAnchor=prevAnchor;
+    void root.offsetHeight;
+    restoreScroll(y);
   }
 }
 // Dados do usuário ficam no localStorage; cache da PokéAPI fica apenas na sessão.
@@ -186,7 +190,7 @@ function go(page){
   if(page==='teams')renderTeams();
   if(page==='roulette'){renderPicker();drawWheel()}
   if(page==='home')updateHome();
-  restoreScroll(pageScrollPositions[page]||0);
+  restoreScroll(Math.min(pageScrollPositions[page]||0,maxScrollY()));
 }
 qsa('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){
