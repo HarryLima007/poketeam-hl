@@ -999,3 +999,31 @@ html:has(body[data-page="roulette"]){background:#100822}
 html:has(body[data-page="teams"]){background:#dfe9e1}
 html:has(body[data-page="wishes"]){background:#090a0c}
 body,.page{min-height:100vh}
+
+/* Desejos — wallpaper personalizado */
+body[data-page="wishes"]{
+  background:
+    linear-gradient(rgba(4,10,31,.38),rgba(12,7,36,.48)),
+    url("desejos-wallpaper.png") center 42% / cover fixed no-repeat !important;
+  color:#f7f4ff;
+}
+body[data-page="wishes"]::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:linear-gradient(90deg,rgba(5,10,28,.16),rgba(21,12,52,.04) 48%,rgba(5,10,28,.16));
+}
+body[data-page="wishes"] #wishes{
+  background:transparent !important;
+}
+body[data-page="wishes"] .wish-sidebar,
+body[data-page="wishes"] .wish-head,
+body[data-page="wishes"] .poke-card{
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+html:has(body[data-page="wishes"]){
+  background:#080d28;
+}
