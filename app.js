@@ -254,21 +254,21 @@ function cardHTML(p,shiny=false,special=null){
 function bindCards(root){root.querySelectorAll('.poke-card').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;openPokemon(+c.dataset.id,c.dataset.shiny==='1',c.dataset.specialCategory||null,Number(c.dataset.specialIndex||0))});root.querySelectorAll('[data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');toggleFav(+b.dataset.fav,card?.dataset.shiny==='1');b.classList.toggle('on',favs.has(+b.dataset.fav))});root.querySelectorAll('[data-add]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');addToTeam(+b.dataset.add,card?.dataset.shiny==='1')})}
 function toggleFav(id,shiny=false){if(favs.has(id)){favs.delete(id);delete favShiny[id]}else{favs.add(id);favShiny[id]=!!shiny}save();toast(favs.has(id)?'Adicionado aos desejos ⭐':'Removido dos desejos')}
 function lockPageScroll(y=stableScrollY()){
-  const body=document.body;
+  const body=document.body,root=document.documentElement;
   if(body.dataset.scrollLocked==='1')return;
   body.dataset.scrollLocked='1';
   body.dataset.lockedScroll=String(y);
-  body.style.position='fixed';
-  body.style.top=`-${y}px`;
-  body.style.left='0';
-  body.style.right='0';
-  body.style.width='100%';
+  body.dataset.prevOverflow=body.style.overflow||'';
+  root.dataset.prevOverflow=root.style.overflow||'';
+  body.style.overflow='hidden';
+  root.style.overflow='hidden';
 }
 function unlockPageScroll(){
-  const body=document.body,y=Number(body.dataset.lockedScroll||0);
+  const body=document.body,root=document.documentElement,y=Number(body.dataset.lockedScroll||0);
   if(body.dataset.scrollLocked!=='1')return y;
-  body.style.position='';body.style.top='';body.style.left='';body.style.right='';body.style.width='';
-  delete body.dataset.scrollLocked;delete body.dataset.lockedScroll;
+  body.style.overflow=body.dataset.prevOverflow||'';
+  root.style.overflow=root.dataset.prevOverflow||'';
+  delete body.dataset.scrollLocked;delete body.dataset.lockedScroll;delete body.dataset.prevOverflow;delete root.dataset.prevOverflow;
   restoreScroll(y);
   return y;
 }
