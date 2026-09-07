@@ -91,4 +91,11 @@ let spinning=false,rotation=0;$('#spin').onclick=()=>{if(spinning)return;if(!rou
 $('#rouletteSearch').oninput=renderPicker;$('#rouletteRegion').onchange=renderPicker;$('#selectVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(id));save();renderPicker();drawWheel()};$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.delete(id));save();renderPicker();drawWheel()};$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
-setupSelects();updateHome();renderTeams();drawWheel();initData();
+// Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
+(async function boot(){
+  try{setupSelects()}catch(e){console.error('setupSelects failed',e)}
+  try{await initData()}catch(e){console.error('initData failed',e);state.list=Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));try{renderDex()}catch(err){console.error(err)}}
+  try{updateHome()}catch(e){console.error('updateHome failed',e)}
+  try{renderTeams()}catch(e){console.error('renderTeams failed',e)}
+  try{drawWheel()}catch(e){console.error('drawWheel failed',e)}
+})();
