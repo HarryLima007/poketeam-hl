@@ -936,50 +936,24 @@ body[data-page="pokedex"] nav button.active{
 }
 
 
-/* Charmander-only animated RGB border test — robust version */
-#modal.charmander-rgb .modal-card{
+/* Animated Pokemon modal border — palette follows Pokemon elemental type(s) */
+#modal.pokemon-rgb .modal-card{
   border:4px solid transparent;
   background:
     linear-gradient(155deg,#101c30,#091322) padding-box,
-    linear-gradient(
-      90deg,
-      #ff3b16 0%,
-      #ff7a18 14%,
-      #ffd84a 28%,
-      #ff9b22 42%,
-      #ff4b1f 57%,
-      #ffcc3a 71%,
-      #ff6a16 86%,
-      #ff3b16 100%
-    ) border-box;
+    linear-gradient(90deg,var(--poke-c1),var(--poke-c2),var(--poke-c3),var(--poke-c4),var(--poke-c1)) border-box;
   background-size:100% 100%,300% 300%;
-  box-shadow:
-    0 0 14px rgba(255,103,24,.86),
-    0 0 30px rgba(255,68,20,.50),
-    0 0 60px rgba(255,190,42,.26),
-    0 35px 100px #000a;
-  animation:charmander-border-flow 2.2s linear infinite,charmander-glow-pulse 1.5s ease-in-out infinite alternate;
+  box-shadow:0 0 14px color-mix(in srgb,var(--poke-glow) 82%,transparent),0 0 32px color-mix(in srgb,var(--poke-glow) 48%,transparent),0 0 62px color-mix(in srgb,var(--poke-c2) 25%,transparent),0 35px 100px #000a;
+  animation:pokemon-border-flow 2.2s linear infinite,pokemon-glow-pulse 1.5s ease-in-out infinite alternate;
 }
-@keyframes charmander-border-flow{
+@keyframes pokemon-border-flow{
   0%{background-position:0 0,0% 50%}
   100%{background-position:0 0,300% 50%}
 }
-@keyframes charmander-glow-pulse{
-  from{
-    box-shadow:
-      0 0 10px rgba(255,92,20,.60),
-      0 0 22px rgba(255,66,16,.35),
-      0 0 42px rgba(255,190,42,.17),
-      0 35px 100px #000a;
-  }
-  to{
-    box-shadow:
-      0 0 18px rgba(255,126,22,.98),
-      0 0 38px rgba(255,66,16,.62),
-      0 0 72px rgba(255,204,48,.32),
-      0 35px 100px #000a;
-  }
+@keyframes pokemon-glow-pulse{
+  from{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--poke-glow) 40%,transparent))}
+  to{filter:drop-shadow(0 0 10px color-mix(in srgb,var(--poke-c2) 75%,transparent))}
 }
 @media (prefers-reduced-motion:reduce){
-  #modal.charmander-rgb .modal-card{animation:none}
+  #modal.pokemon-rgb .modal-card{animation:none}
 }
