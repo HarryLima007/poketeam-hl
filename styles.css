@@ -139,3 +139,69 @@
 @media(max-width:1150px){.roulette-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-hint{display:none}}
 @media(max-width:800px){.roulette-catalog{max-height:none}.catalog-head,.variant-toolbar{position:static}.catalog-head{flex-direction:column}.variant-toolbar{align-items:stretch}.variant-filter{flex:1 1 45%}.catalog-actions{flex-wrap:wrap}.roulette-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.roulette-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.roulette-poke-card img{width:66px;height:66px}.catalog-actions button{flex:1}}
+
+
+/* PokéTeam Visual Refresh — Aurora / Galaxy inspired */
+:root{
+ --bg:#050914;--surface:#0b1324;--surface2:#111d34;--line:#203454;
+ --text:#f7f9ff;--muted:#8ea3c3;--red:#ff4f6d;--yellow:#ffd447;
+ --blue:#278cff;--cyan:#24d3ee;--purple:#8a55ff;--radius:20px
+}
+body{
+ background:
+ radial-gradient(circle at 82% 8%,rgba(39,140,255,.16),transparent 25%),
+ radial-gradient(circle at 12% 75%,rgba(138,85,255,.08),transparent 28%),
+ linear-gradient(180deg,#050914 0%,#070d19 55%,#050914 100%);
+ min-height:100vh
+}
+.topbar{
+ height:68px;background:rgba(5,9,20,.82);border-bottom:1px solid rgba(90,150,235,.13);
+ box-shadow:0 10px 35px rgba(0,0,0,.18)
+}
+.brand{font-weight:900;letter-spacing:-.4px}
+nav button{background:transparent;border-color:transparent;color:#b7c5db;font-weight:700}
+nav button:hover,nav button.active{background:#111d34;border-color:#29436b;color:#fff;box-shadow:0 0 22px rgba(39,140,255,.08)}
+.page{max-width:1320px;padding-top:46px}
+.eyebrow{color:#63b3ff;letter-spacing:2.3px}
+.hero{
+ min-height:510px;border-color:#21395e;border-radius:30px;padding:58px;
+ background:
+ radial-gradient(circle at 80% 40%,rgba(39,140,255,.20),transparent 25%),
+ linear-gradient(120deg,#0c172a 0%,#08101e 62%,#07111f 100%);
+ box-shadow:0 30px 90px rgba(0,0,0,.25)
+}
+.hero h1{font-size:clamp(48px,6vw,82px);letter-spacing:-4px}
+.hero h1 em{color:#48a7ff}
+.hero p{max-width:560px}
+.primary{background:linear-gradient(135deg,#287eff,#28b7f2);box-shadow:0 8px 24px rgba(39,140,255,.18)}
+.quick-grid{gap:12px;margin:16px 0 22px}
+.quick-grid button,.panel,.team-card,.team-analysis,.team-recommendations{
+ background:linear-gradient(155deg,rgba(15,27,48,.94),rgba(8,16,30,.96));
+ border-color:#203654;box-shadow:0 16px 45px rgba(0,0,0,.12)
+}
+.quick-grid button:hover{border-color:#3f70a8;background:#12213a}
+.pokeball-big{box-shadow:0 0 90px rgba(39,140,255,.18),0 30px 80px #0008}
+.page-head{padding:8px 0 10px}
+.page-head h1{font-size:52px;letter-spacing:-2.5px}
+.toolbar input,.toolbar select{background:#091426;border-color:#223b60}
+.chips button{background:#0d192d;border-color:#203758}
+.chips button.active{background:linear-gradient(135deg,#287eff,#4c9fff);border-color:#65adff;color:#fff}
+.poke-card{
+ background:linear-gradient(160deg,#0e1a2e,#091322);border-color:#203857;
+ box-shadow:0 10px 28px rgba(0,0,0,.13)
+}
+.poke-card:hover{border-color:#4383c3;box-shadow:0 16px 38px rgba(14,79,145,.16)}
+.roulette-layout{gap:22px}
+.wheel-panel,.roulette-catalog{border-color:#263d61}
+.roulette-catalog{background:linear-gradient(160deg,#0b1527,#08111f)}
+.catalog-head{background:rgba(9,19,35,.97)}
+.variant-toolbar{background:rgba(7,15,29,.98)}
+.roulette-poke-card{background:#0b1628;border-color:#1c3453}
+.roulette-poke-card:hover{background:#10213a;border-color:#3b6d9f}
+.roulette-poke-card.selected{background:#102a46;border-color:#398ee2;box-shadow:inset 0 0 0 1px rgba(77,164,255,.2),0 0 20px rgba(39,140,255,.08)}
+.modal{background:rgba(1,4,10,.86);backdrop-filter:blur(8px)}
+.modal-card{background:linear-gradient(155deg,#101c30,#091322);border-color:#2b466c;box-shadow:0 35px 100px #000a}
+.toast{background:#eaf4ff;color:#07111f}
+@media(max-width:800px){
+ .hero{padding:34px}.hero h1{letter-spacing:-2.5px}.page-head h1{font-size:40px}
+}
