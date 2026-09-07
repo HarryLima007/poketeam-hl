@@ -31,21 +31,24 @@
 }
 </style><style id="roulette-scenic-style">
 body[data-page="roulette"]{
-  background:
-    linear-gradient(rgba(9,5,24,.68),rgba(12,6,30,.76)),
-    url("roleta-banner.png?v=0f211af7") center center / cover fixed no-repeat!important;
-}
-body[data-page="roulette"]::before{
-  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:rgba(20,8,46,.16);
-  backdrop-filter:blur(2px);
+  background-image:
+    linear-gradient(rgba(18,8,42,.30),rgba(11,6,28,.42)),
+    url("https://raw.githubusercontent.com/HarryLima007/poketeam-hl/main/roleta-banner.png?v=0f211af7")!important;
+  background-size:cover!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+  background-color:#100822!important;
 }
 body[data-page="roulette"] #roulette{
   background:transparent!important;
 }
+body[data-page="roulette"] main{
+  background:transparent!important;
+}
 @media(max-width:800px){
   body[data-page="roulette"]{
-    background-position:center center!important;
+    background-position:center top!important;
     background-attachment:scroll!important;
   }
 }
