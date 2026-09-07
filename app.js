@@ -474,22 +474,54 @@ function updateRouletteSummary(){
   $('#probabilityText').textContent=formatRouletteProbability(n);
   $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} entradas participando • Normal, 100% IV, Shiny e Shiny 100% IV contam separadamente • chances iguais`:'';
 }
+function activeRouletteVariants(){
+  const defs=[
+    ['variantNormal',false,false],
+    ['variantNormal100',false,true],
+    ['variantShiny',true,false],
+    ['variantShiny100',true,true]
+  ];
+  return defs.filter(([id])=>$('#'+id)?.checked).map(([,shiny,iv100])=>({shiny,iv100}));
+}
+function selectedVariantCount(id){
+  return [rouletteKey(id,false,false),rouletteKey(id,false,true),rouletteKey(id,true,false),rouletteKey(id,true,true)].filter(k=>roulette.has(k)).length;
+}
+function toggleCatalogPokemon(id){
+  const variants=activeRouletteVariants();
+  if(!variants.length){toast('Escolha pelo menos uma variante.');return}
+  const keys=variants.map(v=>rouletteKey(id,v.shiny,v.iv100));
+  const allSelected=keys.every(k=>roulette.has(k));
+  keys.forEach(k=>allSelected?roulette.delete(k):roulette.add(k));
+  save();renderPicker();drawWheel();
+}
 function renderPicker(){
   const arr=rouletteFiltered();
   state.rouletteVisible=arr.map(x=>x.id);
   updateRouletteSummary();
-  $('#roulettePicker').innerHTML=arr.length?arr.map(p=>{
-    const d=state.details.get(p.id),types=d?.types||[];
-    const normalKey=rouletteKey(p.id,false,false),normal100Key=rouletteKey(p.id,false,true),shinyKey=rouletteKey(p.id,true,false),shiny100Key=rouletteKey(p.id,true,true);
-    return `<div class="picker-row variant-row iv-variant-row">
-      <div class="picker-pokemon"><img loading="lazy" src="${sprite(p.id,false)}"><span><b>#${pad(p.id)} ${cap(p.name)}</b><br><small class="muted">${regionOf(p.id)}${types.length?' • '+types.map(t=>TYPE_PT[t]).join(' / '):''}</small></span></div>
-      <label class="variant-choice normal-choice"><input type="checkbox" data-pick-key="${normalKey}" ${roulette.has(normalKey)?'checked':''}><span>Normal</span></label>
-      <label class="variant-choice iv100-choice"><input type="checkbox" data-pick-key="${normal100Key}" ${roulette.has(normal100Key)?'checked':''}><span>💯 100% IV</span></label>
-      <label class="variant-choice shiny-choice"><input type="checkbox" data-pick-key="${shinyKey}" ${roulette.has(shinyKey)?'checked':''}><span>✨ Shiny</span></label>
-      <label class="variant-choice shiny100-choice"><input type="checkbox" data-pick-key="${shiny100Key}" ${roulette.has(shiny100Key)?'checked':''}><span>✨💯 Shiny 100%</span></label>
-    </div>`;
+  const grouped=REGIONS.map(([region])=>[region,arr.filter(p=>regionOf(p.id)===region)]).filter(([,items])=>items.length);
+  $('#roulettePicker').innerHTML=grouped.length?grouped.map(([region,items],groupIndex)=>{
+    const selected=items.reduce((sum,p)=>sum+selectedVariantCount(p.id),0);
+    return `<details class="roulette-region-group" ${groupIndex===0?'open':''}>
+      <summary><span><b>${region}</b><small>${items.length} Pokémon</small></span><em>${selected?selected+' opções escolhidas':'Abrir catálogo'}</em></summary>
+      <div class="roulette-card-grid">${items.map(p=>{
+        const d=state.details.get(p.id),types=d?.types||[],count=selectedVariantCount(p.id);
+        const badges=[
+          roulette.has(rouletteKey(p.id,false,false))?'<i>Normal</i>':'',
+          roulette.has(rouletteKey(p.id,false,true))?'<i>💯</i>':'',
+          roulette.has(rouletteKey(p.id,true,false))?'<i>✨</i>':'',
+          roulette.has(rouletteKey(p.id,true,true))?'<i>✨💯</i>':''
+        ].filter(Boolean).join('');
+        return `<button class="roulette-poke-card ${count?'selected':''}" data-catalog-pokemon="${p.id}" title="Adicionar ou remover variantes ativas">
+          <img loading="lazy" src="${sprite(p.id,false)}" alt="">
+          <span class="catalog-poke-num">#${pad(p.id)}</span>
+          <strong>${cap(p.name)}</strong>
+          <small>${types.length?types.map(t=>TYPE_PT[t]).join(' / '):region}</small>
+          <span class="catalog-selected-badges">${badges||'<i class="add-mark">＋ Adicionar</i>'}</span>
+        </button>`;
+      }).join('')}</div>
+    </details>`;
   }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
-  $$('[data-pick-key]').forEach(box=>box.onchange=()=>{box.checked?roulette.add(box.dataset.pickKey):roulette.delete(box.dataset.pickKey);save();updateRouletteSummary();drawWheel()});
+  $$('[data-catalog-pokemon]').forEach(card=>card.onclick=()=>toggleCatalogPokemon(Number(card.dataset.catalogPokemon)));
 }
 function renderProbability(){updateRouletteSummary()}
 function roulettePrimaryType(id){return state.details.get(id)?.types?.[0]||'normal'}
@@ -542,10 +574,15 @@ $('#spin').onclick=()=>{
 $('#rouletteSearch').oninput=renderPicker;
 $('#rouletteRegion').onchange=renderPicker;
 $('#rouletteType').onchange=renderPicker;
-$('#selectVisibleNormal').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false,false)));save();renderPicker();drawWheel()};
-$('#selectVisibleNormal100').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false,true)));save();renderPicker();drawWheel()};
-$('#selectVisibleShiny').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true,false)));save();renderPicker();drawWheel()};
-$('#selectVisibleShiny100').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true,true)));save();renderPicker();drawWheel()};
+['variantNormal','variantNormal100','variantShiny','variantShiny100'].forEach(id=>{
+  $('#'+id).onchange=()=>renderPicker();
+});
+$('#addVisibleVariants').onclick=()=>{
+  const variants=activeRouletteVariants();
+  if(!variants.length){toast('Escolha pelo menos uma variante.');return}
+  state.rouletteVisible.forEach(id=>variants.forEach(v=>roulette.add(rouletteKey(id,v.shiny,v.iv100))));
+  save();renderPicker();drawWheel();
+};
 $('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{
   roulette.delete(rouletteKey(id,false,false));roulette.delete(rouletteKey(id,false,true));
   roulette.delete(rouletteKey(id,true,false));roulette.delete(rouletteKey(id,true,true));
