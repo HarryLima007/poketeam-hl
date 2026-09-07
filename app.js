@@ -45,28 +45,34 @@ const cache={
 let favs=new Set(store.get('favs',[])),
     favShiny=store.get('favShiny',{}),
     teams=store.get('teams',[]),
-    roulette=new Set(store.get('roulette',[])),
-    rouletteShiny=!!store.get('rouletteShiny',false),
+    rouletteRaw=store.get('roulette',[]),
     recent=store.get('recent',[]);
+const roulette=new Set((Array.isArray(rouletteRaw)?rouletteRaw:[]).map(v=>{
+  if(typeof v==='number')return `${v}:n`;
+  const s=String(v);
+  if(/^\d+:[ns]$/.test(s))return s;
+  if(/^\d+$/.test(s))return `${s}:n`;
+  return null;
+}).filter(Boolean));
 teams=teams.map(t=>{const members=Array.isArray(t.members)?t.members:[];const memberShiny=Array.isArray(t.memberShiny)?t.memberShiny.slice(0,members.length):[];while(memberShiny.length<members.length)memberShiny.push(false);return {...t,members,memberShiny}});
 const cap=s=>s? s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):''; const pad=n=>String(n).padStart(4,'0');
 function regionOf(id){return REGIONS.find(r=>id>=r[1]&&id<=r[2])?.[0]||'—'}
 function sprite(id,shiny=false){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shiny?'shiny/':''}${id}.png`}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
 function safe(fn){try{return fn()}catch(e){console.error(e);toast('Algo deu errado, mas o restante do site continua funcionando.')}}
-function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('rouletteShiny',rouletteShiny),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
+function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
 function go(page){$$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
-  $('#regionFilter').innerHTML=opts;$('#rouletteRegion').innerHTML=opts;
+  $('#regionFilter').innerHTML=opts;
+  $('#rouletteRegion').innerHTML=opts;
   const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
   $('#categoryFilters').innerHTML=cats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
-  $('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;$('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()});
+  $$('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;$$('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()});
   $('#rouletteCategories').innerHTML=cats.map(([v,l])=>`<button data-roulette-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
-  $('[data-roulette-cat]').forEach(b=>b.onclick=()=>{$('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
+  $$('[data-roulette-cat]').forEach(b=>b.onclick=()=>{$$('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
   $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
-  $('#rouletteShiny').checked=rouletteShiny;
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
@@ -112,109 +118,58 @@ $('#closeModal').onclick=()=>$('#modal').classList.add('hidden');$('#modal').onc
 function updateHome(){ $('#homeFavs').textContent=favs.size;$('#homeTeams').textContent=teams.length;$('#homeRoulette').textContent=roulette.size;const box=$('#recentList');if(!recent.length){box.className='mini-list empty-state';box.textContent='Nenhum Pokémon pesquisado ainda.';return}box.className='mini-list';box.innerHTML=recent.map(id=>{const p=state.list[id-1]||{name:`#${id}`};return `<button class="mini-poke" data-recent="${id}"><img src="${sprite(id)}">${cap(p.name)}</button>`}).join('');$$('[data-recent]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.recent))}
 function renderFavs(){const q=$('#favSearch').value.toLowerCase();const arr=[...favs].sort((a,b)=>a-b).map(id=>state.list[id-1]||{id,name:`pokemon-${id}`}).filter(p=>matchesSearch(p,q));$('#favResults').innerHTML=arr.length?arr.map(p=>cardHTML(p,!!favShiny[p.id])).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';bindCards($('#favResults'))}
 $('#clearFavs').onclick=()=>{if(favs.size&&confirm('Remover todos os favoritos?')){favs.clear();save();renderFavs()}};$('#favSearch').oninput=renderFavs;
-function createTeam(){const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));if(!name)return;const id=Date.now();teams.push({id,name:name.trim().slice(0,40),members:[]});state.activeTeam=id;save();renderTeams()}
-function defensiveMultiplier(attackType,defenderTypes){
-  return defenderTypes.reduce((m,t)=>m*(TYPE_CHART[attackType]?.[t]??1),1);
+function createTeamNamed(name){
+  const clean=(name||'').trim().slice(0,40);
+  if(!clean)return null;
+  const team={id:Date.now()+Math.floor(Math.random()*1000),name:clean,members:[],memberShiny:[]};
+  teams.push(team);state.activeTeam=team.id;save();renderTeams();return team;
 }
-function teamAnalysisHTML(t){
-  if(!t.members.length)return '<div class="team-analysis empty-analysis"><h3>🛡️ Análise de tipos</h3><p>Adicione Pokémon para analisar defesa, cobertura ofensiva e equilíbrio do time.</p></div>';
-  const missing=t.members.filter(id=>!state.details.get(id)?.types?.length);
-  if(missing.length)return '<div class="team-analysis"><h3>🛡️ Análise de tipos</h3><p class="muted">Carregando tipos dos Pokémon…</p></div>';
-
-  const members=t.members.map(id=>state.details.get(id));
-  const rows=TYPES.map(type=>{
-    const values=members.map(d=>defensiveMultiplier(type,d.types));
-    return {type,weak:values.filter(v=>v>1).length,resist:values.filter(v=>v>0&&v<1).length,immune:values.filter(v=>v===0).length,max:Math.max(...values)};
-  });
-  const shared=rows.filter(x=>x.weak>=2).sort((a,b)=>b.weak-a.weak||b.max-a.max);
-  const immunities=rows.filter(x=>x.immune>0).sort((a,b)=>b.immune-a.immune);
-  const resistances=rows.filter(x=>x.resist>0).sort((a,b)=>b.resist-a.resist);
-
-  const stabTypes=[...new Set(members.flatMap(d=>d.types))];
-  const offensive=TYPES.map(defType=>{
-    const attackers=stabTypes.filter(atk=>(TYPE_CHART[atk]?.[defType]??1)>1);
-    return {type:defType,attackers};
-  });
-  const covered=offensive.filter(x=>x.attackers.length);
-  const uncovered=offensive.filter(x=>!x.attackers.length);
-  const defensiveCovered=rows.filter(x=>x.resist>0||x.immune>0).length;
-  const sharedBurden=shared.reduce((sum,x)=>sum+(x.weak-1),0);
-
-  const offensiveScore=(covered.length/TYPES.length)*50;
-  const defensiveScore=(defensiveCovered/TYPES.length)*30;
-  const weaknessScore=Math.max(0,20-Math.min(20,sharedBurden*4));
-  const balanceScore=Math.max(0,Math.min(100,Math.round(offensiveScore+defensiveScore+weaknessScore)));
-
-  const badge=(x,kind,count)=>`<span class="analysis-pill ${kind}"><span class="type ${x.type}">${TYPE_PT[x.type]}</span><b>${count}</b></span>`;
-  const typeBadge=(type,kind='coverage')=>`<span class="analysis-pill ${kind}"><span class="type ${type}">${TYPE_PT[type]}</span></span>`;
-  const scoreLabel=balanceScore>=80?'Muito equilibrado':balanceScore>=65?'Bom equilíbrio':balanceScore>=50?'Equilíbrio médio':'Precisa de ajustes';
-
-  return `<div class="team-analysis">
-    <div class="analysis-head">
-      <div><span class="eyebrow">VISÃO GERAL DO TIME</span><h3>⚔️ Análise do time</h3></div>
-      <span class="analysis-count">${t.members.length}/6 Pokémon</span>
-    </div>
-
-    <div class="balance-card">
-      <div><span class="eyebrow">EQUILÍBRIO</span><strong>${balanceScore}/100</strong><small>${scoreLabel}</small></div>
-      <div class="balance-bar"><span style="width:${balanceScore}%"></span></div>
-      <p>Indicador heurístico baseado em cobertura STAB, resistências/imunidades e fraquezas compartilhadas.</p>
-    </div>
-
-    <div class="analysis-section"><h4>⚠️ Fraquezas compartilhadas</h4>
-      <div class="analysis-pills">${shared.length?shared.map(x=>badge(x,'weak',x.weak+' vulneráveis')).join(''):'<span class="muted">Nenhuma fraqueza compartilhada por 2 ou mais membros.</span>'}</div>
-    </div>
-
-    <div class="analysis-section"><h4>🚫 Imunidades</h4>
-      <div class="analysis-pills">${immunities.length?immunities.map(x=>badge(x,'immune',x.immune+' imune'+(x.immune>1?'s':''))).join(''):'<span class="muted">Nenhuma imunidade no time.</span>'}</div>
-    </div>
-
-    <div class="analysis-section"><h4>🛡️ Resistências</h4>
-      <div class="analysis-pills">${resistances.length?resistances.map(x=>badge(x,'resist',x.resist+' resistente'+(x.resist>1?'s':''))).join(''):'<span class="muted">Nenhuma resistência identificada.</span>'}</div>
-    </div>
-
-    <div class="analysis-section offensive-section">
-      <div class="coverage-head"><h4>🎯 Cobertura ofensiva por STAB</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
-      <p class="muted">Considera os tipos naturais dos Pokémon como ataques STAB; golpes escolhidos ainda não entram no cálculo.</p>
-      <div class="coverage-block"><span class="coverage-label">Super efetivo contra</span><div class="analysis-pills">${covered.map(x=>typeBadge(x.type,'coverage')).join('')}</div></div>
-      <div class="coverage-block"><span class="coverage-label">Sem cobertura STAB</span><div class="analysis-pills">${uncovered.length?uncovered.map(x=>typeBadge(x.type,'uncovered')).join(''):'<span class="muted">Cobertura completa dos 18 tipos.</span>'}</div></div>
-    </div>
-
-    <div class="analysis-section"><h4>⚔️ Tipos STAB disponíveis</h4>
-      <div class="analysis-pills">${stabTypes.map(type=>typeBadge(type,'stab')).join('')}</div>
-    </div>
-
-    <p class="analysis-note">A defesa usa a combinação dos tipos atuais de cada Pokémon. Habilidades, itens, Terastalização, golpes reais e outras mecânicas ainda não entram neste cálculo.</p>
-  </div>`;
+function createTeam(){
+  const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));
+  if(!name)return null;
+  return createTeamNamed(name);
 }
-function ensureTeamDetails(t){
-  const missing=[...new Set(t.members.filter(id=>!state.details.get(id)?.types?.length))];
-  if(!missing.length)return;
-  Promise.allSettled(missing.map(getDetail)).then(()=>{if(state.activeTeam===t.id&&$('#teams').classList.contains('active'))renderTeams()});
+function commitAddToTeam(team,id,shiny=false){
+  if(!team)return false;
+  if(team.members.length>=6){toast(`${team.name} está cheia (6/6).`);return false}
+  const already=team.members.some((memberId,i)=>memberId===id&&!!team.memberShiny?.[i]===!!shiny);
+  if(already&&!confirm(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' Shiny':''} já está nesta equipe. Deseja mesmo adicionar outra cópia?`))return false;
+  team.memberShiny=Array.isArray(team.memberShiny)?team.memberShiny:[];
+  while(team.memberShiny.length<team.members.length)team.memberShiny.push(false);
+  team.members.push(id);team.memberShiny.push(!!shiny);state.activeTeam=team.id;save();renderTeams();
+  toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''} adicionado a ${team.name}`);
+  return true;
 }
-function renderTeams(){
-  if(!teams.length){$('#teamTabs').innerHTML='';$('#teamArea').innerHTML='<div class="panel empty-state">Você ainda não criou equipes. Clique em “+ Criar equipe”.</div>';return}
-  if(!teams.some(t=>t.id===state.activeTeam))state.activeTeam=teams[0].id;
-  $('#teamTabs').innerHTML=teams.map(t=>`<button data-team="${t.id}" class="${t.id===state.activeTeam?'active':''}">${t.name}</button>`).join('');
-  $$('[data-team]').forEach(b=>b.onclick=()=>{state.activeTeam=+b.dataset.team;renderTeams()});
-  const t=teams.find(x=>x.id===state.activeTeam);
-  const slots=Array.from({length:6},(_,i)=>{
-    const id=t.members[i];
-    if(!id)return '<div class="slot">Espaço vazio</div>';
-    const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
-    return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`
-  }).join('');
-  $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}</div>`;
-  $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});
-  $('#renameTeam').onclick=()=>{const n=prompt('Novo nome:',t.name);if(n){t.name=n.trim().slice(0,40);save();renderTeams()}};
-  $('#clearTeam').onclick=()=>{if(confirm('Limpar esta equipe?')){t.members=[];t.memberShiny=[];save();renderTeams()}};
-  $('#deleteTeam').onclick=()=>{if(confirm('Excluir esta equipe?')){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
-  ensureTeamDetails(t);
+function closeTeamChooser(){const el=$('#teamChooser');if(el)el.classList.add('hidden')}
+function openTeamChooser(id,shiny=false){
+  const modal=$('#teamChooser'),content=$('#teamChooserContent');
+  if(!modal||!content){const fallback=teams.find(t=>t.members.length<6);if(fallback)return commitAddToTeam(fallback,id,shiny);toast('Não foi possível abrir o seletor de equipes.');return false}
+  const p=state.list[id-1]||{name:`#${id}`};
+  const list=teams.length?teams.map(t=>{
+    const full=t.members.length>=6;
+    return `<button class="team-choice ${full?'full':''}" data-team-choice="${t.id}" ${full?'disabled':''}>
+      <span><b>${t.name}</b><small>${t.members.length}/6 Pokémon${full?' • equipe cheia':''}</small></span>
+      <strong>${full?'Cheia':'Adicionar'}</strong>
+    </button>`;
+  }).join(''):'<div class="empty-state">Você ainda não criou nenhuma equipe.</div>';
+  content.innerHTML=`<div class="team-chooser-head"><img src="${sprite(id,shiny)}"><div><span class="eyebrow">ADICIONAR AO TIME</span><h2>${cap(p.name)}${shiny?' ✨':''}</h2><p>Escolha uma equipe ou crie uma nova.</p></div></div><div class="team-choice-list">${list}</div><button id="chooserCreateTeam" class="primary">＋ Criar nova equipe</button>`;
+  modal.classList.remove('hidden');
+  $$('[data-team-choice]').forEach(b=>b.onclick=()=>{const t=teams.find(x=>x.id===+b.dataset.teamChoice);if(commitAddToTeam(t,id,shiny))closeTeamChooser()});
+  $('#chooserCreateTeam').onclick=()=>{const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));if(!name)return;const t=createTeamNamed(name);if(t&&commitAddToTeam(t,id,shiny))closeTeamChooser()};
+  return true;
 }
-function addToTeam(id,shiny=false){if(!teams.length){toast('Crie uma equipe primeiro ⚔️');go('teams');return}const t=teams.find(x=>x.id===state.activeTeam)||teams[0];if(t.members.length>=6){toast(`${t.name} já tem 6 Pokémon.`);return}if(t.members.includes(id)&&!confirm(`${cap(state.list[id-1]?.name||'Pokémon')} já está nesta equipe. Deseja mesmo adicionar outra?`))return;t.memberShiny=Array.isArray(t.memberShiny)?t.memberShiny:[];while(t.memberShiny.length<t.members.length)t.memberShiny.push(false);t.members.push(id);t.memberShiny.push(!!shiny);save();toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''} adicionado a ${t.name}`)}
+function addToTeam(id,shiny=false){return openTeamChooser(id,shiny)}
 $('#newTeam').onclick=createTeam;
+$('#closeTeamChooser').onclick=closeTeamChooser;
+$('#teamChooser').onclick=e=>{if(e.target.id==='teamChooser')closeTeamChooser()};
+
 const ROULETTE_TYPE_COLORS={normal:'#858b91',fire:'#e75d47',water:'#4d83cf',electric:'#d7b630',grass:'#4c9b5f',ice:'#68b9c3',fighting:'#b44a42',poison:'#9651a5',ground:'#b98555',flying:'#738fc5',psychic:'#d85d91',bug:'#7f9a35',rock:'#9e8b58',ghost:'#5e5d99',dragon:'#5e55b8',dark:'#4c4655',steel:'#6f8c9b',fairy:'#d77fb5'};
 const rouletteImages=new Map();
+const rouletteKey=(id,shiny=false)=>`${id}:${shiny?'s':'n'}`;
+function parseRouletteKey(key){
+  const m=String(key).match(/^(\d+):([ns])$/);
+  return m?{id:+m[1],shiny:m[2]==='s'}:null;
+}
 function rouletteCategoryMatch(p,cat){
   if(cat==='all')return true;
   if(cat==='ub')return UB.has(p.id);
@@ -241,86 +196,84 @@ function rouletteFiltered(){
 }
 function formatRouletteProbability(n){
   if(!n)return 'Selecione Pokémon para começar.';
-  const pct=100/n;
-  const digits=pct>=10?2:pct>=1?3:4;
-  return `1 em ${n.toLocaleString('pt-BR')} — ${pct.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:digits})}% para cada Pokémon`;
+  const pct=100/n,digits=pct>=10?2:pct>=1?3:4;
+  return `1 em ${n.toLocaleString('pt-BR')} — ${pct.toLocaleString('pt-BR',{maximumFractionDigits:digits})}% para cada opção`;
 }
 function updateRouletteSummary(){
   const n=roulette.size;
-  $('#rouletteCount').textContent=`${n.toLocaleString('pt-BR')} selecionado${n===1?'':'s'}`;
+  $('#rouletteCount').textContent=`${n.toLocaleString('pt-BR')} opção${n===1?'':'ões'} selecionada${n===1?'':'s'}`;
   $('#probabilityText').textContent=formatRouletteProbability(n);
-  $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} Pokémon participando • chances exatamente iguais`:'';
+  $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} entradas participando • normal e Shiny contam separadamente • chances iguais`:'';
 }
 function renderPicker(){
   const arr=rouletteFiltered();
   state.rouletteVisible=arr.map(x=>x.id);
   updateRouletteSummary();
   $('#roulettePicker').innerHTML=arr.length?arr.map(p=>{
-    const d=state.details.get(p.id),types=d?.types||[];
-    return `<div class="picker-row"><label><input type="checkbox" data-pick="${p.id}" ${roulette.has(p.id)?'checked':''}><img loading="lazy" src="${sprite(p.id,rouletteShiny)}"><span><b>#${pad(p.id)}</b> ${cap(p.name)}<br><small class="muted">${regionOf(p.id)}${types.length?' • '+types.map(t=>TYPE_PT[t]).join(' / '):''}</small></span></label></div>`;
+    const d=state.details.get(p.id),types=d?.types||[],normalKey=rouletteKey(p.id,false),shinyKey=rouletteKey(p.id,true);
+    return `<div class="picker-row variant-row">
+      <div class="picker-pokemon"><img loading="lazy" src="${sprite(p.id,false)}"><span><b>#${pad(p.id)} ${cap(p.name)}</b><br><small class="muted">${regionOf(p.id)}${types.length?' • '+types.map(t=>TYPE_PT[t]).join(' / '):''}</small></span></div>
+      <label class="variant-choice normal-choice"><input type="checkbox" data-pick-key="${normalKey}" ${roulette.has(normalKey)?'checked':''}><span>Normal</span></label>
+      <label class="variant-choice shiny-choice"><input type="checkbox" data-pick-key="${shinyKey}" ${roulette.has(shinyKey)?'checked':''}><span>✨ Shiny</span></label>
+    </div>`;
   }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
-  $$('[data-pick]').forEach(box=>box.onchange=()=>{box.checked?roulette.add(+box.dataset.pick):roulette.delete(+box.dataset.pick);save();updateRouletteSummary();drawWheel()});
+  $$('[data-pick-key]').forEach(box=>box.onchange=()=>{box.checked?roulette.add(box.dataset.pickKey):roulette.delete(box.dataset.pickKey);save();updateRouletteSummary();drawWheel()});
 }
 function renderProbability(){updateRouletteSummary()}
 function roulettePrimaryType(id){return state.details.get(id)?.types?.[0]||'normal'}
 function getRouletteImage(id,shiny){
-  const key=`${id}_${shiny?'s':'n'}`;
+  const key=rouletteKey(id,shiny);
   if(rouletteImages.has(key))return rouletteImages.get(key);
   const img=new Image();img.crossOrigin='anonymous';img.src=sprite(id,shiny);img.onload=()=>{if(!spinning)drawWheel()};rouletteImages.set(key,img);return img;
 }
 function drawWheel(){
-  const canvas=$('#wheel'),ctx=canvas.getContext('2d'),ids=[...roulette],n=ids.length,w=canvas.width,c=w/2,r=c-10;
+  const canvas=$('#wheel');if(!canvas)return;
+  const ctx=canvas.getContext('2d'),entries=[...roulette].map(parseRouletteKey).filter(Boolean),n=entries.length,w=canvas.width,c=w/2,r=c-10;
   ctx.clearRect(0,0,w,w);
   if(!n){ctx.fillStyle='#172033';ctx.beginPath();ctx.arc(c,c,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9aa7bd';ctx.font='700 22px system-ui';ctx.textAlign='center';ctx.fillText('Selecione Pokémon',c,c);return}
-  const visual=n>72?ids.slice(0,72):ids,vn=visual.length;
+  const visual=n>72?entries.slice(0,72):entries,vn=visual.length;
   for(let i=0;i<vn;i++){
-    const id=visual[i],a0=-Math.PI/2+i*2*Math.PI/vn,a1=-Math.PI/2+(i+1)*2*Math.PI/vn,mid=(a0+a1)/2;
-    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,a0,a1);ctx.closePath();
-    ctx.fillStyle=ROULETTE_TYPE_COLORS[roulettePrimaryType(id)]||'#56627a';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=2;ctx.stroke();
+    const entry=visual[i],id=entry.id,a0=-Math.PI/2+i*2*Math.PI/vn,a1=-Math.PI/2+(i+1)*2*Math.PI/vn,mid=(a0+a1)/2;
+    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,a0,a1);ctx.closePath();ctx.fillStyle=ROULETTE_TYPE_COLORS[roulettePrimaryType(id)]||'#56627a';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=2;ctx.stroke();
     if(vn<=12){
-      const img=getRouletteImage(id,rouletteShiny);
-      if(img.complete&&img.naturalWidth){ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.drawImage(img,r*.54,-28,56,56);ctx.restore()}
-      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 13px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(cap(state.list[id-1]?.name||id),r-12,5);ctx.restore();
-    }else if(vn<=36){
-      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 11px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(cap(state.list[id-1]?.name||id),r-10,4);ctx.restore();
+      const img=getRouletteImage(id,entry.shiny);
+      if(img.complete&&img.naturalWidth){ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.drawImage(img,r*.54,-27,54,54);ctx.restore()}
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 12px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}`,r-10,4);ctx.restore();
+    }else if(vn<=30){
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 10px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}`,r-8,3);ctx.restore();
     }
   }
-  ctx.beginPath();ctx.arc(c,c,48,0,Math.PI*2);ctx.fillStyle='#f5f7fb';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=10;ctx.stroke();
-  ctx.fillStyle='#101624';ctx.textAlign='center';ctx.font='800 14px system-ui';
-  ctx.fillText(n>72?`${n.toLocaleString('pt-BR')} opções`:`${n} opção${n===1?'':'ões'}`,c,c+5);
+  ctx.beginPath();ctx.arc(c,c,48,0,Math.PI*2);ctx.fillStyle='#f5f7fb';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=10;ctx.stroke();ctx.fillStyle='#101624';ctx.textAlign='center';ctx.font='800 14px system-ui';ctx.fillText(n>72?`${n.toLocaleString('pt-BR')} opções`:`${n} opção${n===1?'':'ões'}`,c,c+5);
 }
-let spinning=false,rotation=0;
+let spinning=false,rotation=0,spinTimer=null;
+function resetSpinState(){spinning=false;const btn=$('#spin');if(btn){btn.disabled=false;btn.textContent='GIRAR ROLETA'}}
 $('#spin').onclick=()=>{
   if(spinning)return;
-  if(!roulette.size){toast('Selecione pelo menos 1 Pokémon.');return}
+  const entries=[...roulette].map(parseRouletteKey).filter(Boolean);
+  if(!entries.length){toast('Selecione pelo menos 1 opção.');return}
   spinning=true;$('#spin').disabled=true;$('#spin').textContent='GIRANDO…';
-  const ids=[...roulette],idx=Math.floor(Math.random()*ids.length),winner=ids[idx],n=ids.length;
-  let target;if(n<=72){const slice=360/Math.min(n,72);target=360-((idx%Math.min(n,72))*slice+slice/2)}else target=Math.random()*360;
-  rotation+=360*7+target;$('#wheel').style.transform=`rotate(${rotation}deg)`;
-  $('#spinResult').innerHTML='<div class="result-box">🎡 Girando…</div>';
-  setTimeout(async()=>{
-    spinning=false;$('#spin').disabled=false;$('#spin').textContent='GIRAR ROLETA';
-    const p=state.list[winner-1]||{name:`#${winner}`},d=await getDetail(winner);
-    $('#spinResult').innerHTML=`<div class="result-box roulette-result">
-      <b>🎉 RESULTADO</b>
-      <img src="${sprite(winner,rouletteShiny)}">
-      <h2>${cap(p.name)}${rouletteShiny?' ✨':''}</h2>
-      <div class="types">${(d.types||[]).map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div>
-      <p>#${pad(winner)} • ${regionOf(winner)}<br>${formatRouletteProbability(n)}</p>
-      <div class="result-actions"><button id="rouletteViewDex">📖 Ver na Pokédex</button><button id="rouletteFav">⭐ Favoritar</button><button id="rouletteAddTeam">⚔️ Adicionar ao time</button></div>
-    </div>`;
-    $('#rouletteViewDex').onclick=()=>{go('pokedex');openPokemon(winner,rouletteShiny)};
-    $('#rouletteFav').onclick=()=>{if(!favs.has(winner))toggleFav(winner,rouletteShiny);else toast('Este Pokémon já está nos Desejos ⭐')};
-    $('#rouletteAddTeam').onclick=()=>addToTeam(winner,rouletteShiny);
+  const idx=Math.floor(Math.random()*entries.length),winner=entries[idx],n=entries.length;
+  let target;if(n<=72){const slice=360/n;target=360-(idx*slice+slice/2)}else target=Math.random()*360;
+  rotation+=360*7+target;$('#wheel').style.transform=`rotate(${rotation}deg)`;$('#spinResult').innerHTML='<div class="result-box">🎡 Girando…</div>';
+  clearTimeout(spinTimer);
+  spinTimer=setTimeout(async()=>{
+    resetSpinState();
+    try{
+      const p=state.list[winner.id-1]||{name:`#${winner.id}`},d=await getDetail(winner.id);
+      $('#spinResult').innerHTML=`<div class="result-box roulette-result"><b>🎉 RESULTADO</b><img src="${sprite(winner.id,winner.shiny)}"><h2>${cap(p.name)}${winner.shiny?' ✨':''}</h2><div class="types">${(d.types||[]).map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div><p>#${pad(winner.id)} • ${regionOf(winner.id)}<br>${formatRouletteProbability(n)}</p><div class="result-actions"><button id="rouletteViewDex">📖 Ver na Pokédex</button><button id="rouletteFav">⭐ Favoritar</button><button id="rouletteAddTeam">⚔️ Adicionar ao time</button></div></div>`;
+      $('#rouletteViewDex').onclick=()=>{go('pokedex');openPokemon(winner.id,winner.shiny)};
+      $('#rouletteFav').onclick=()=>{if(!favs.has(winner.id)){toggleFav(winner.id,winner.shiny)}else if(!!favShiny[winner.id]!==winner.shiny){favs.delete(winner.id);delete favShiny[winner.id];toggleFav(winner.id,winner.shiny);toast('Variante dos Desejos atualizada ⭐')}else toast('Esta variante já está nos Desejos ⭐')};
+      $('#rouletteAddTeam').onclick=()=>openTeamChooser(winner.id,winner.shiny);
+    }catch(e){console.error('roulette result failed',e);$('#spinResult').innerHTML='<div class="result-box">O resultado foi sorteado, mas houve erro ao carregar os detalhes. Você pode girar novamente.</div>'}
   },4600);
 };
 $('#rouletteSearch').oninput=renderPicker;
 $('#rouletteRegion').onchange=renderPicker;
 $('#rouletteType').onchange=renderPicker;
-$('#rouletteShiny').onchange=()=>{rouletteShiny=$('#rouletteShiny').checked;save();renderPicker();drawWheel()};
-$('#selectVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(id));save();renderPicker();drawWheel()};
-$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.delete(id));save();renderPicker();drawWheel()};
-$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
+$('#selectVisibleNormal').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false)));save();renderPicker();drawWheel()};
+$('#selectVisibleShiny').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true)));save();renderPicker();drawWheel()};
+$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{roulette.delete(rouletteKey(id,false));roulette.delete(rouletteKey(id,true))});save();renderPicker();drawWheel()};
+$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML='';resetSpinState()};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
