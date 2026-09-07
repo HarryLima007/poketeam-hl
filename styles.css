@@ -79,3 +79,11 @@
   .team-chooser-head{grid-template-columns:80px 1fr}
   .team-chooser-head img{width:80px;height:80px}
 }
+
+.team-create-form{display:grid;gap:12px}
+.team-create-form h2{margin:0 0 4px}
+.team-create-form label{font-size:13px;font-weight:800;color:#cbd7e9}
+.team-create-form input{width:100%;padding:12px 13px;border-radius:12px;border:1px solid #31425f;background:#0f1728;color:#fff;font:inherit;outline:none}
+.team-create-form input:focus{border-color:#6ea8ff;box-shadow:0 0 0 3px rgba(110,168,255,.14)}
+.team-create-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+@media(max-width:600px){.team-create-actions{flex-direction:column-reverse}.team-create-actions button{width:100%}}
