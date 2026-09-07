@@ -490,3 +490,254 @@ body[data-page="pokedex"] .topbar,body[data-page="teams"] .topbar{background:rgb
 #pokedex .toolbar input,#pokedex .toolbar select{background:#f3f7fa}
 #teams .workspace-head,#teams .team-card,#teams .team-analysis,#teams .team-recommendations{background:#edf3ee}
 #teams .slot.filled,#teams .analysis-count,#teams .balance-card,#teams .analysis-pill,#teams .recommendation-card{background:#e6eee8}
+
+
+/* === TIMES ↔ DESEJOS VISUAL SWAP — approved mockup === */
+
+/* TIMES: premium black + gold */
+body[data-page="teams"]{
+  background:
+    radial-gradient(circle at 78% 10%,rgba(223,171,46,.10),transparent 24%),
+    linear-gradient(180deg,#080a0d 0%,#0c0d10 55%,#08090b 100%);
+  color:#f7f2e7;
+}
+body[data-page="teams"] .topbar{
+  background:rgba(7,9,13,.95);
+  border-bottom-color:#2d2a22;
+  box-shadow:0 10px 32px rgba(0,0,0,.35);
+}
+body[data-page="teams"] .brand{color:#fff!important}
+body[data-page="teams"] nav button{color:#c6c0b2}
+body[data-page="teams"] nav button:hover,
+body[data-page="teams"] nav button.active{
+  color:#ffe083;
+  background:#171610;
+  border-color:#8f6b17;
+  box-shadow:0 0 0 1px rgba(228,176,44,.08),0 8px 24px rgba(0,0,0,.22);
+}
+#teams{color:#f7f2e7;background:none}
+#teams .eyebrow{color:#f2c54b}
+.teams-shell{grid-template-columns:300px minmax(0,1fr);gap:22px}
+.teams-side{
+  background:
+    radial-gradient(circle at 50% 86%,rgba(217,169,49,.07),transparent 23%),
+    linear-gradient(180deg,#12130f 0%,#0b0d0e 100%);
+  border:1px solid #5b481a;
+  color:#fff7df;
+  box-shadow:0 28px 78px rgba(0,0,0,.35);
+}
+.teams-side h1{color:#fff7df;font-size:46px}
+.teams-side p{color:#d3c8aa}
+.teams-side .primary{
+  background:linear-gradient(135deg,#e4ab22,#f4cb50);
+  border:1px solid #f0c84d;
+  color:#181207;
+  box-shadow:0 8px 24px rgba(225,169,37,.22);
+}
+.teams-side-label{color:#d6ab3d}
+.teams-side .vertical-chips button{
+  background:#11151b;
+  color:#f0eadc;
+  border-color:#292d33;
+}
+.teams-side .vertical-chips button:hover{border-color:#7b6223}
+.teams-side .vertical-chips button.active{
+  color:#fff6d4;
+  background:linear-gradient(135deg,#42320e,#7a5c16);
+  border-color:#d9a72d;
+  box-shadow:inset 0 0 0 1px rgba(255,216,105,.10);
+}
+.teams-mascot{
+  width:250px;
+  right:18px;
+  bottom:40px;
+  opacity:.82;
+  filter:drop-shadow(0 25px 25px rgba(0,0,0,.45));
+}
+.teams-side::after{
+  content:"“Grandes jornadas\A começam com boas escolhas.”";
+  white-space:pre-line;
+  position:absolute;
+  left:28px;right:28px;bottom:26px;
+  text-align:center;
+  color:#d9ccb0;
+  font-family:Georgia,serif;
+  font-style:italic;
+  font-size:13px;
+  line-height:1.45;
+}
+.teams-workspace{min-width:0}
+.workspace-head{
+  position:relative;
+  overflow:hidden;
+  min-height:178px;
+  padding:34px 34px;
+  color:#fff6d8;
+  background:
+    radial-gradient(circle at 79% 44%,rgba(242,183,45,.25),transparent 13%),
+    linear-gradient(115deg,#17140d 0%,#201a0d 55%,#0d0e10 100%);
+  border:1px solid #5b481a;
+  box-shadow:0 22px 56px rgba(0,0,0,.25);
+}
+.workspace-head::before{
+  content:"";
+  position:absolute;inset:auto 0 0 44%;
+  height:58%;
+  opacity:.26;
+  background:
+    linear-gradient(145deg,transparent 0 28%,#020303 29% 39%,transparent 40% 49%,#020303 50% 65%,transparent 66%),
+    linear-gradient(25deg,transparent 0 36%,#020303 37% 54%,transparent 55%);
+}
+.workspace-head::after{
+  content:"";
+  position:absolute;right:28px;bottom:22px;
+  width:64px;height:64px;border-radius:50%;
+  border:4px solid #9c7419;
+  background:
+    linear-gradient(transparent 45%,#9c7419 46% 54%,transparent 55%);
+  opacity:.85;
+}
+.workspace-head h2{position:relative;z-index:2;color:#fff3c4;font-size:38px}
+.workspace-head .eyebrow{position:relative;z-index:2}
+.workspace-mark{display:none}
+
+#teams .team-card,
+#teams .team-analysis,
+#teams .team-recommendations{
+  background:linear-gradient(160deg,#131410,#0c0e0e);
+  color:#f7f0dc;
+  border:1px solid #5a471a;
+  box-shadow:0 20px 58px rgba(0,0,0,.28);
+}
+#teams .team-card{padding:22px}
+#teams .team-head h2{color:#fff6d7}
+#teams .team-head button{
+  background:#141610;
+  color:#f3d77f;
+  border-color:#67511b;
+}
+#teams .team-head .danger{color:#ff7171;border-color:#6c2929}
+#teams .team-slots{gap:10px}
+#teams .slot{
+  min-height:215px;
+  background:#10120f;
+  border-color:#65521f;
+  color:#bfae7c;
+  border-radius:16px;
+}
+#teams .slot.filled{
+  background:linear-gradient(180deg,#151711,#0d0f0e);
+  color:#fff;
+  border-color:#5e4b1e;
+}
+#teams .slot.filled img{filter:drop-shadow(0 13px 13px rgba(0,0,0,.45))}
+#teams .slot button{
+  background:#0e100f;
+  color:#f0cf6a;
+  border-color:#765b18;
+}
+#teams .empty-slot{border-style:dashed}
+#teams .empty-plus{
+  width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid #735a20;
+  color:#e0b641;
+  font-size:24px;
+  margin-bottom:6px;
+}
+#teams .analysis-count,
+#teams .balance-card,
+#teams .analysis-pill,
+#teams .recommendation-card{
+  background:#151711;
+  color:#f3ecd8;
+  border-color:#493b18;
+}
+#teams .team-analysis{margin-top:16px}
+#teams .analysis-section{border-color:#41371e}
+#teams .analysis-section h4,
+#teams .coverage-label,
+#teams .coverage-head h4{color:#f0c955}
+#teams .analysis-note,
+#teams .muted,
+#teams .rec-main small{color:#bfb59a}
+#teams .balance-track{background:#111827}
+#teams .recommendation-card:hover{border-color:#9a7525}
+#teams .recommendation-card button{
+  background:#17180f;
+  color:#f0c955;
+  border-color:#6d551d;
+}
+
+/* DESEJOS: receives the softer green / strategic visual language */
+body[data-page="wishes"]{
+  background:
+    radial-gradient(circle at 78% 8%,rgba(72,165,110,.09),transparent 24%),
+    linear-gradient(180deg,#dfe9e1 0%,#eaf1eb 45%,#dce7df 100%);
+  color:#173327;
+}
+body[data-page="wishes"] .topbar{
+  background:rgba(235,243,237,.95);
+  border-bottom-color:#cbd9ce;
+  box-shadow:0 8px 28px rgba(42,75,53,.08);
+}
+body[data-page="wishes"] .brand{color:#173327!important}
+body[data-page="wishes"] nav button{color:#536f5f}
+body[data-page="wishes"] nav button:hover,
+body[data-page="wishes"] nav button.active{
+  color:#174d35;
+  background:#e3eee6;
+  border-color:#bfd3c5;
+  box-shadow:none;
+}
+#wishes{color:#173327;background:none}
+#wishes .eyebrow{color:#36845d}
+.wishes-hero{
+  background:
+    radial-gradient(circle at 52% 64%,rgba(63,148,97,.12),transparent 26%),
+    linear-gradient(160deg,#0e3c2d,#0d2d27);
+  border-color:#305b45;
+  box-shadow:0 26px 70px rgba(35,76,50,.15);
+}
+.wishes-hero h1{color:#f7fff9}
+.wishes-hero p{color:#c2d9ca}
+.wishes-hero img{opacity:.82}
+.wishes-gallery{min-width:0}
+.gallery-toolbar{
+  background:#edf3ee;
+  border-color:#ceddd1;
+  box-shadow:0 16px 42px rgba(43,82,57,.06);
+}
+.gallery-toolbar h2{color:#173327}
+.gallery-actions input{
+  background:#f5f8f5;
+  color:#173327;
+  border-color:#cddbd0;
+}
+#wishes #clearFavs{
+  background:#e8eeea;
+  color:#9a3c4b;
+  border-color:#d8c2c7;
+}
+#wishes .poke-card{
+  background:#edf3ee;
+  color:#173327;
+  border-color:#d2dfd5;
+  box-shadow:0 12px 34px rgba(46,82,58,.07);
+}
+#wishes .poke-card:hover{
+  border-color:#6eaa84;
+  box-shadow:0 16px 42px rgba(48,108,69,.10);
+}
+#wishes .poke-card .num,
+#wishes .muted{color:#6b8172}
+#wishes .poke-card .card-actions button{
+  background:#e6eee8;
+  color:#173327;
+  border-color:#cddbd0;
+}
+
+@media(max-width:1000px){
+  .teams-mascot{display:none}
+  .teams-side::after{display:none}
+}
