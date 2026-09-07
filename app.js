@@ -36,7 +36,10 @@ const $=s=>document.querySelector(s); const qsa=s=>[...document.querySelectorAll
 function stableScrollY(){return window.scrollY||document.documentElement.scrollTop||0}
 function restoreScroll(y){
   if(!Number.isFinite(y))return;
-  window.scrollTo({top:y,left:0,behavior:'auto'});
+  const root=document.documentElement,prev=root.style.scrollBehavior;
+  root.style.scrollBehavior='auto';
+  window.scrollTo(0,y);
+  root.style.scrollBehavior=prev;
 }
 function preserveViewportDuring(renderFn){
   const y=stableScrollY(),root=document.documentElement,body=document.body;
