@@ -442,3 +442,39 @@ body[data-page="teams"] nav button:hover,body[data-page="teams"] nav button.acti
  .gallery-actions{display:grid}.gallery-actions input{min-width:0}
  .wishes-hero img{opacity:.35}
 }
+
+/* Home overlap + theme state fix */
+body[data-page="home"] .topbar{
+  background:rgba(5,9,20,.92);
+  border-bottom-color:rgba(90,150,235,.13);
+  box-shadow:0 10px 35px rgba(0,0,0,.18);
+}
+body[data-page="home"] .brand{color:#fff!important}
+body[data-page="home"] nav button{color:#b7c5db}
+body[data-page="home"] nav button:hover,
+body[data-page="home"] nav button.active{
+  background:#111d34;border-color:#29436b;color:#fff
+}
+#home{color:#f7f9ff}
+#home .home-hero{margin-bottom:22px}
+#home .hero-copy h1{color:#f7f9ff}
+#home .hero-copy h1 em{color:#48a7ff}
+#home .hero-copy p{color:#b8c9df}
+#home .quick-grid{
+  margin:0 0 22px;
+  padding:0;
+  position:relative;
+  z-index:1;
+  gap:14px;
+}
+#home .quick-grid button{
+  min-height:132px;
+  backdrop-filter:none;
+  border-radius:18px;
+}
+#home>.panel{margin-top:0;color:#f7f9ff}
+#home>.panel .section-title h2{color:#f7f9ff}
+@media(max-width:800px){
+  #home .home-hero{margin-bottom:16px}
+  #home .quick-grid{margin:0 0 18px;padding:0}
+}
