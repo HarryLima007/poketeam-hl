@@ -1155,3 +1155,20 @@ body[data-page="wishes"]{
   padding:0!important;
   background-position:center center!important;
 }
+
+/* Desejos v6 — fundo panorâmico 16:9 da página */
+body[data-page="wishes"]{
+  background:
+    linear-gradient(rgba(239,237,255,.58),rgba(239,235,251,.70)),
+    url("./desejos-background.png?v=660af8d2") center top / cover fixed no-repeat !important;
+  background-color:#e9e6f7!important;
+}
+body[data-page="wishes"]::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(233,228,248,.18));
+}
+#wishes{background:transparent!important}
