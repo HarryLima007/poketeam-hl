@@ -320,7 +320,7 @@ $('#rouletteType').onchange=renderPicker;
 $('#rouletteShiny').onchange=()=>{rouletteShiny=$('#rouletteShiny').checked;save();renderPicker();drawWheel()};
 $('#selectVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(id));save();renderPicker();drawWheel()};
 $('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.delete(id));save();renderPicker();drawWheel()};
-$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
+$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML=''};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
