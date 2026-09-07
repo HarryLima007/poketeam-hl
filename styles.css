@@ -1144,3 +1144,14 @@ body[data-page="wishes"]{
     url("desejos-wallpaper.png?v=3") center center / cover no-repeat !important;
 }
 #wishes .wishes-hero > img{display:none!important}
+
+/* Desejos v4 — remover texto duplicado sobre o wallpaper */
+#wishes .wishes-hero > .eyebrow,
+#wishes .wishes-hero > h1,
+#wishes .wishes-hero > p{
+  display:none!important;
+}
+#wishes .wishes-hero{
+  padding:0!important;
+  background-position:center center!important;
+}
