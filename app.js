@@ -222,10 +222,38 @@ function createTeamNamed(name){
   const team={id:Date.now()+Math.floor(Math.random()*1000),name:clean,members:[],memberShiny:[]};
   teams.push(team);state.activeTeam=team.id;save();renderTeams();return team;
 }
+function teamNameFormHTML(title='Criar nova equipe'){
+  return `<div class="team-create-form">
+    <span class="eyebrow">TEAM BUILDER</span>
+    <h2>${title}</h2>
+    <label for="teamNameInput">Nome da equipe</label>
+    <input id="teamNameInput" type="text" maxlength="40" value="Equipe ${teams.length+1}" autocomplete="off">
+    <div class="team-create-actions">
+      <button id="cancelTeamCreate">Cancelar</button>
+      <button id="confirmTeamCreate" class="primary">Criar equipe</button>
+    </div>
+  </div>`;
+}
+function bindTeamNameForm(onCreated){
+  const input=$('#teamNameInput');
+  const submit=()=>{
+    const name=input?.value?.trim();
+    if(!name){toast('Digite um nome para a equipe.');input?.focus();return}
+    const t=createTeamNamed(name);
+    if(t)onCreated?.(t);
+  };
+  $('#confirmTeamCreate').onclick=submit;
+  $('#cancelTeamCreate').onclick=closeTeamChooser;
+  input?.focus();input?.select();
+  input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit()}});
+}
 function createTeam(){
-  const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));
-  if(!name)return null;
-  return createTeamNamed(name);
+  const modal=$('#teamChooser'),content=$('#teamChooserContent');
+  if(!modal||!content){toast('Não foi possível abrir o criador de equipe.');return null}
+  content.innerHTML=teamNameFormHTML();
+  modal.classList.remove('hidden');
+  bindTeamNameForm(()=>closeTeamChooser());
+  return null;
 }
 function commitAddToTeam(team,id,shiny=false){
   if(!team)return false;
@@ -253,7 +281,10 @@ function openTeamChooser(id,shiny=false){
   content.innerHTML=`<div class="team-chooser-head"><img src="${sprite(id,shiny)}"><div><span class="eyebrow">ADICIONAR AO TIME</span><h2>${cap(p.name)}${shiny?' ✨':''}</h2><p>Escolha uma equipe ou crie uma nova.</p></div></div><div class="team-choice-list">${list}</div><button id="chooserCreateTeam" class="primary">＋ Criar nova equipe</button>`;
   modal.classList.remove('hidden');
   $$('[data-team-choice]').forEach(b=>b.onclick=()=>{const t=teams.find(x=>x.id===+b.dataset.teamChoice);if(commitAddToTeam(t,id,shiny))closeTeamChooser()});
-  $('#chooserCreateTeam').onclick=()=>{const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));if(!name)return;const t=createTeamNamed(name);if(t&&commitAddToTeam(t,id,shiny))closeTeamChooser()};
+  $('#chooserCreateTeam').onclick=()=>{
+    content.innerHTML=teamNameFormHTML('Criar equipe para '+cap(p.name));
+    bindTeamNameForm(t=>{if(commitAddToTeam(t,id,shiny))closeTeamChooser()});
+  };
   return true;
 }
 function addToTeam(id,shiny=false){return openTeamChooser(id,shiny)}
