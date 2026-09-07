@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>PokéTeam</title><link rel="stylesheet" href="styles.css?v=menu-v2-72060535"><style id="dex-scenic-style">
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>PokéTeam</title><link rel="stylesheet" href="styles.css?v=menu-final-20260907"><style id="dex-scenic-style">
 #pokedex .dex-scenic-banner{
   position:relative;
   min-height:260px;
@@ -69,6 +69,23 @@ body[data-page="wishes"]{
   #wishes .wishes-hero{position:relative!important;top:auto!important;min-height:420px!important}
 }
 @media(max-width:680px){#wishes .wishes-hero{min-height:360px!important}}
+</style><style id="menu-final-style">
+.topbar{height:78px!important;padding:0!important;background:rgba(2,8,22,.96)!important;border-bottom:1px solid rgba(82,151,235,.20)!important;box-shadow:0 10px 34px rgba(0,0,0,.22)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important}
+.topbar-inner{width:min(1480px,calc(100% - 44px))!important;height:100%!important;margin:0 auto!important;display:grid!important;grid-template-columns:auto 1fr auto!important;align-items:center!important;gap:28px!important}
+.topbar .brand{display:flex!important;align-items:center!important;gap:11px!important;padding:7px 0!important;color:#fff!important;font-size:22px!important;white-space:nowrap!important}
+.topbar .brand b{display:block!important;color:#fff!important}
+.topbar .brand .ball{width:30px!important;height:30px!important;flex:0 0 30px!important}
+.topbar #nav{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-width:0!important}
+.topbar #nav button{min-height:46px!important;padding:0 16px!important;display:flex!important;align-items:center!important;gap:8px!important;border:1px solid transparent!important;border-radius:15px!important;background:transparent!important;color:#d2dced!important;font-weight:760!important;font-size:14px!important;box-shadow:none!important;white-space:nowrap!important}
+.topbar #nav button:hover{transform:translateY(-1px)!important;color:#fff!important;background:rgba(15,38,73,.66)!important;border-color:rgba(75,146,234,.28)!important}
+.topbar #nav button.active{color:#fff!important;background:linear-gradient(135deg,rgba(17,62,105,.98),rgba(10,42,82,.98))!important;border-color:rgba(52,179,255,.72)!important;box-shadow:0 0 24px rgba(35,155,255,.14),inset 0 1px 0 rgba(255,255,255,.05)!important}
+.topbar-tools{display:flex!important;align-items:center!important;gap:8px!important}
+.global-search{width:245px!important;height:42px!important;display:flex!important;align-items:center!important;gap:9px!important;padding:0 13px!important;border:1px solid rgba(80,140,218,.40)!important;border-radius:16px!important;background:rgba(4,16,38,.86)!important;color:#9db1cc!important}
+.global-search input{width:100%!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;background:transparent!important;color:#fff!important;font-size:13px!important}
+.topbar-arrow,.profile-button{width:42px!important;height:42px!important;padding:0!important;display:grid!important;place-items:center!important;border-radius:50%!important;background:rgba(10,27,57,.86)!important;border:1px solid rgba(80,140,218,.38)!important;color:#dceaff!important}
+.topbar-arrow{background:transparent!important;border-color:transparent!important;font-size:29px!important;color:#8ba2c2!important}
+@media(max-width:1120px){.topbar-inner{width:calc(100% - 24px)!important;gap:12px!important}.topbar #nav{gap:3px!important}.topbar #nav button{padding:0 10px!important}.global-search{width:190px!important}}
+@media(max-width:900px){.topbar{height:auto!important;min-height:68px!important}.topbar-inner{grid-template-columns:auto 1fr!important;gap:8px 12px!important;padding:10px 0!important}.topbar-tools{justify-self:end!important}.topbar #nav{grid-column:1/-1!important;grid-row:2!important;justify-content:flex-start!important;overflow-x:auto!important}.global-search{width:min(240px,38vw)!important}}
 </style></head><body data-page="home">
 <header class="topbar">
   <div class="topbar-inner">
@@ -143,4 +160,4 @@ body[data-page="wishes"]{
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><button id="closeModal" class="modal-close">×</button><div id="modalContent"></div></div></div>
 <div id="teamChooser" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card team-chooser-card"><button id="closeTeamChooser" class="modal-close">×</button><div id="teamChooserContent"></div></div></div>
 <div id="siteDialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="siteDialogTitle"><div class="modal-card site-dialog-card"><div id="siteDialogIcon" class="site-dialog-icon">⚠️</div><div><span class="eyebrow">POKÉTEAM</span><h2 id="siteDialogTitle">Confirmar ação</h2><p id="siteDialogMessage"></p></div><div class="site-dialog-actions"><button id="siteDialogCancel">Cancelar</button><button id="siteDialogConfirm" class="primary">Confirmar</button></div></div></div>
-<div id="toast" class="toast"></div><script src="app.js?v=menu-v2-e88d72fe"></script></body></html>
+<div id="toast" class="toast"></div><script src="app.js?v=menu-final-20260907"></script></body></html>
