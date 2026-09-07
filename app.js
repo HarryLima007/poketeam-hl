@@ -50,11 +50,18 @@ let favs=new Set(store.get('favs',[])),
 const roulette=new Set((Array.isArray(rouletteRaw)?rouletteRaw:[]).map(v=>{
   if(typeof v==='number')return `${v}:n`;
   const s=String(v);
-  if(/^\d+:[ns]$/.test(s))return s;
+  if(/^\d+:(?:n|s|n100|s100)$/.test(s))return s;
   if(/^\d+$/.test(s))return `${s}:n`;
   return null;
 }).filter(Boolean));
-teams=teams.map(t=>{const members=Array.isArray(t.members)?t.members:[];const memberShiny=Array.isArray(t.memberShiny)?t.memberShiny.slice(0,members.length):[];while(memberShiny.length<members.length)memberShiny.push(false);return {...t,members,memberShiny}});
+teams=teams.map(t=>{
+  const members=Array.isArray(t.members)?t.members:[];
+  const memberShiny=Array.isArray(t.memberShiny)?t.memberShiny.slice(0,members.length):[];
+  const memberIV100=Array.isArray(t.memberIV100)?t.memberIV100.slice(0,members.length):[];
+  while(memberShiny.length<members.length)memberShiny.push(false);
+  while(memberIV100.length<members.length)memberIV100.push(false);
+  return {...t,members,memberShiny,memberIV100};
+});
 const cap=s=>s? s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):''; const pad=n=>String(n).padStart(4,'0');
 function regionOf(id){return REGIONS.find(r=>id>=r[1]&&id<=r[2])?.[0]||'—'}
 function sprite(id,shiny=false){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shiny?'shiny/':''}${id}.png`}
@@ -419,10 +426,14 @@ $('#teamChooser').onclick=async e=>{
 
 const ROULETTE_TYPE_COLORS={normal:'#858b91',fire:'#e75d47',water:'#4d83cf',electric:'#d7b630',grass:'#4c9b5f',ice:'#68b9c3',fighting:'#b44a42',poison:'#9651a5',ground:'#b98555',flying:'#738fc5',psychic:'#d85d91',bug:'#7f9a35',rock:'#9e8b58',ghost:'#5e5d99',dragon:'#5e55b8',dark:'#4c4655',steel:'#6f8c9b',fairy:'#d77fb5'};
 const rouletteImages=new Map();
-const rouletteKey=(id,shiny=false)=>`${id}:${shiny?'s':'n'}`;
+const rouletteKey=(id,shiny=false,iv100=false)=>`${id}:${shiny?(iv100?'s100':'s'):(iv100?'n100':'n')}`;
 function parseRouletteKey(key){
-  const m=String(key).match(/^(\d+):([ns])$/);
-  return m?{id:+m[1],shiny:m[2]==='s'}:null;
+  const m=String(key).match(/^(\d+):(n|s|n100|s100)$/);
+  if(!m)return null;
+  return {id:+m[1],shiny:m[2][0]==='s',iv100:m[2].endsWith('100')};
+}
+function rouletteVariantLabel(entry){
+  return `${entry.shiny?'✨ Shiny':'Normal'}${entry.iv100?' 💯 IV 100%':''}`;
 }
 function rouletteCategoryMatch(p,cat){
   if(cat==='all')return true;
@@ -457,26 +468,29 @@ function updateRouletteSummary(){
   const n=roulette.size;
   $('#rouletteCount').textContent=`${n.toLocaleString('pt-BR')} opção${n===1?'':'ões'} selecionada${n===1?'':'s'}`;
   $('#probabilityText').textContent=formatRouletteProbability(n);
-  $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} entradas participando • normal e Shiny contam separadamente • chances iguais`:'';
+  $('#rouletteSummary').textContent=n?`${n.toLocaleString('pt-BR')} entradas participando • Normal, 100% IV, Shiny e Shiny 100% IV contam separadamente • chances iguais`:'';
 }
 function renderPicker(){
   const arr=rouletteFiltered();
   state.rouletteVisible=arr.map(x=>x.id);
   updateRouletteSummary();
   $('#roulettePicker').innerHTML=arr.length?arr.map(p=>{
-    const d=state.details.get(p.id),types=d?.types||[],normalKey=rouletteKey(p.id,false),shinyKey=rouletteKey(p.id,true);
-    return `<div class="picker-row variant-row">
+    const d=state.details.get(p.id),types=d?.types||[];
+    const normalKey=rouletteKey(p.id,false,false),normal100Key=rouletteKey(p.id,false,true),shinyKey=rouletteKey(p.id,true,false),shiny100Key=rouletteKey(p.id,true,true);
+    return `<div class="picker-row variant-row iv-variant-row">
       <div class="picker-pokemon"><img loading="lazy" src="${sprite(p.id,false)}"><span><b>#${pad(p.id)} ${cap(p.name)}</b><br><small class="muted">${regionOf(p.id)}${types.length?' • '+types.map(t=>TYPE_PT[t]).join(' / '):''}</small></span></div>
       <label class="variant-choice normal-choice"><input type="checkbox" data-pick-key="${normalKey}" ${roulette.has(normalKey)?'checked':''}><span>Normal</span></label>
+      <label class="variant-choice iv100-choice"><input type="checkbox" data-pick-key="${normal100Key}" ${roulette.has(normal100Key)?'checked':''}><span>💯 100% IV</span></label>
       <label class="variant-choice shiny-choice"><input type="checkbox" data-pick-key="${shinyKey}" ${roulette.has(shinyKey)?'checked':''}><span>✨ Shiny</span></label>
+      <label class="variant-choice shiny100-choice"><input type="checkbox" data-pick-key="${shiny100Key}" ${roulette.has(shiny100Key)?'checked':''}><span>✨💯 Shiny 100%</span></label>
     </div>`;
   }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
   $$('[data-pick-key]').forEach(box=>box.onchange=()=>{box.checked?roulette.add(box.dataset.pickKey):roulette.delete(box.dataset.pickKey);save();updateRouletteSummary();drawWheel()});
 }
 function renderProbability(){updateRouletteSummary()}
 function roulettePrimaryType(id){return state.details.get(id)?.types?.[0]||'normal'}
-function getRouletteImage(id,shiny){
-  const key=rouletteKey(id,shiny);
+function getRouletteImage(id,shiny,iv100=false){
+  const key=rouletteKey(id,shiny,iv100);
   if(rouletteImages.has(key))return rouletteImages.get(key);
   const img=new Image();img.crossOrigin='anonymous';img.src=sprite(id,shiny);img.onload=()=>{if(!spinning)drawWheel()};rouletteImages.set(key,img);return img;
 }
@@ -490,11 +504,11 @@ function drawWheel(){
     const entry=visual[i],id=entry.id,a0=-Math.PI/2+i*2*Math.PI/vn,a1=-Math.PI/2+(i+1)*2*Math.PI/vn,mid=(a0+a1)/2;
     ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,a0,a1);ctx.closePath();ctx.fillStyle=ROULETTE_TYPE_COLORS[roulettePrimaryType(id)]||'#56627a';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=2;ctx.stroke();
     if(vn<=12){
-      const img=getRouletteImage(id,entry.shiny);
+      const img=getRouletteImage(id,entry.shiny,entry.iv100);
       if(img.complete&&img.naturalWidth){ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.drawImage(img,r*.54,-27,54,54);ctx.restore()}
-      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 12px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}`,r-10,4);ctx.restore();
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 12px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}${entry.iv100?' 💯':''}`,r-10,4);ctx.restore();
     }else if(vn<=30){
-      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 10px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}`,r-8,3);ctx.restore();
+      ctx.save();ctx.translate(c,c);ctx.rotate(mid);ctx.textAlign='right';ctx.fillStyle='white';ctx.font='800 10px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(`${cap(state.list[id-1]?.name||id)}${entry.shiny?' ✨':''}${entry.iv100?' 💯':''}`,r-8,3);ctx.restore();
     }
   }
   ctx.beginPath();ctx.arc(c,c,48,0,Math.PI*2);ctx.fillStyle='#f5f7fb';ctx.fill();ctx.strokeStyle='#0b1020';ctx.lineWidth=10;ctx.stroke();ctx.fillStyle='#101624';ctx.textAlign='center';ctx.font='800 14px system-ui';ctx.fillText(n>72?`${n.toLocaleString('pt-BR')} opções`:`${n} opção${n===1?'':'ões'}`,c,c+5);
@@ -514,19 +528,24 @@ $('#spin').onclick=()=>{
     resetSpinState();
     try{
       const p=state.list[winner.id-1]||{name:`#${winner.id}`},d=await getDetail(winner.id);
-      $('#spinResult').innerHTML=`<div class="result-box roulette-result"><b>🎉 RESULTADO</b><img src="${sprite(winner.id,winner.shiny)}"><h2>${cap(p.name)}${winner.shiny?' ✨':''}</h2><div class="types">${(d.types||[]).map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div><p>#${pad(winner.id)} • ${regionOf(winner.id)}<br>${formatRouletteProbability(n)}</p><div class="result-actions"><button id="rouletteViewDex">📖 Ver na Pokédex</button><button id="rouletteFav">⭐ Favoritar</button><button id="rouletteAddTeam">⚔️ Adicionar ao time</button></div></div>`;
+      $('#spinResult').innerHTML=`<div class="result-box roulette-result"><b>🎉 RESULTADO</b><img src="${sprite(winner.id,winner.shiny)}"><h2>${cap(p.name)}${winner.shiny?' ✨':''}${winner.iv100?' 💯':''}</h2><div class="roulette-variant-badge">${rouletteVariantLabel(winner)}</div><div class="types">${(d.types||[]).map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div><p>#${pad(winner.id)} • ${regionOf(winner.id)}<br>${formatRouletteProbability(n)}</p><div class="result-actions"><button id="rouletteViewDex">📖 Ver na Pokédex</button><button id="rouletteFav">⭐ Favoritar</button><button id="rouletteAddTeam">⚔️ Adicionar ao time</button></div></div>`;
       $('#rouletteViewDex').onclick=()=>{go('pokedex');openPokemon(winner.id,winner.shiny)};
       $('#rouletteFav').onclick=()=>{if(!favs.has(winner.id)){toggleFav(winner.id,winner.shiny)}else if(!!favShiny[winner.id]!==winner.shiny){favs.delete(winner.id);delete favShiny[winner.id];toggleFav(winner.id,winner.shiny);toast('Variante dos Desejos atualizada ⭐')}else toast('Esta variante já está nos Desejos ⭐')};
-      $('#rouletteAddTeam').onclick=()=>openTeamChooser(winner.id,winner.shiny);
+      $('#rouletteAddTeam').onclick=()=>openTeamChooser(winner.id,winner.shiny,winner.iv100);
     }catch(e){console.error('roulette result failed',e);$('#spinResult').innerHTML='<div class="result-box">O resultado foi sorteado, mas houve erro ao carregar os detalhes. Você pode girar novamente.</div>'}
   },4600);
 };
 $('#rouletteSearch').oninput=renderPicker;
 $('#rouletteRegion').onchange=renderPicker;
 $('#rouletteType').onchange=renderPicker;
-$('#selectVisibleNormal').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false)));save();renderPicker();drawWheel()};
-$('#selectVisibleShiny').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true)));save();renderPicker();drawWheel()};
-$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{roulette.delete(rouletteKey(id,false));roulette.delete(rouletteKey(id,true))});save();renderPicker();drawWheel()};
+$('#selectVisibleNormal').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false,false)));save();renderPicker();drawWheel()};
+$('#selectVisibleNormal100').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,false,true)));save();renderPicker();drawWheel()};
+$('#selectVisibleShiny').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true,false)));save();renderPicker();drawWheel()};
+$('#selectVisibleShiny100').onclick=()=>{state.rouletteVisible.forEach(id=>roulette.add(rouletteKey(id,true,true)));save();renderPicker();drawWheel()};
+$('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{
+  roulette.delete(rouletteKey(id,false,false));roulette.delete(rouletteKey(id,false,true));
+  roulette.delete(rouletteKey(id,true,false));roulette.delete(rouletteKey(id,true,true));
+});save();renderPicker();drawWheel()};
 $('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML='';resetSpinState()};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
