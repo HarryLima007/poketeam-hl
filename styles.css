@@ -38,3 +38,15 @@
   .balance-card p{grid-column:auto}
   .coverage-head{align-items:flex-start;flex-direction:column}
 }
+
+.roulette-controls{margin-bottom:18px}
+.roulette-toolbar{display:grid;grid-template-columns:minmax(280px,1fr) minmax(180px,.35fr) minmax(160px,.3fr);gap:10px}
+.roulette-categories{margin-top:10px}
+.shiny-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#111a2b;font-weight:800;cursor:pointer}
+.shiny-toggle input{accent-color:#ffd34d}
+.roulette-summary{margin-top:6px;color:#9fb0ca;font-size:12px}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.roulette-result .types{justify-content:center}
+.roulette-result h2{margin:8px 0}
+#spin:disabled{opacity:.7;cursor:not-allowed}
+@media(max-width:900px){.roulette-toolbar{grid-template-columns:1fr}}
