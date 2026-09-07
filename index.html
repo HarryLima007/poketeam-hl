@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>PokéTeam</title><link rel="stylesheet" href="styles.css?v=wishes-v3-fix"><style id="dex-scenic-style">
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>PokéTeam</title><link rel="stylesheet" href="styles.css?v=wishes-final1"><style id="dex-scenic-style">
 #pokedex .dex-scenic-banner{
   position:relative;
   min-height:260px;
@@ -52,6 +52,25 @@ body[data-page="roulette"] main{
     background-attachment:scroll!important;
   }
 }
+</style><style id="wishes-final-style">
+body[data-page="wishes"]{
+  background:radial-gradient(circle at 82% 8%,rgba(157,136,235,.18),transparent 30%),linear-gradient(180deg,#e8e9f7 0%,#f1edf8 48%,#e8e4f2 100%)!important;
+  color:#1c2450!important;
+}
+#wishes{background:transparent!important;color:#1c2450!important}
+#wishes .wishes-hero{
+  position:sticky!important;top:92px!important;min-height:620px!important;
+  padding:34px 28px!important;border-radius:30px!important;overflow:hidden!important;color:#fff!important;
+  background-image:linear-gradient(180deg,rgba(7,13,46,.10),rgba(12,8,48,.20)),url("./desejos-wallpaper.png?v=final1")!important;
+  background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;
+  border:1px solid rgba(148,134,255,.38)!important;box-shadow:0 28px 70px rgba(41,36,104,.24)!important;
+}
+#wishes .wishes-hero>img{display:none!important}
+#wishes .wishes-hero h1{color:#fff!important;text-shadow:0 2px 16px rgba(0,0,40,.28)!important}
+#wishes .wishes-hero p{color:#f2efff!important;text-shadow:0 2px 12px rgba(0,0,40,.36)!important}
+#wishes .wishes-hero .eyebrow{color:#c8c0ff!important}
+@media(max-width:1000px){#wishes .wishes-hero{position:relative!important;top:auto!important;min-height:420px!important}}
+@media(max-width:680px){#wishes .wishes-hero{min-height:360px!important}}
 </style></head><body data-page="home">
 <header class="topbar"><button class="brand" data-page="home" aria-label="Início"><span class="ball"></span><b>PokéTeam</b></button><nav id="nav"><button data-page="home">Início</button><button data-page="pokedex">📖 Pokédex</button><button data-page="roulette">🎡 Roleta</button><button data-page="teams">⚔️ Times</button><button data-page="wishes">⭐ Desejos</button></nav></header>
 <main>
@@ -61,7 +80,7 @@ body[data-page="roulette"] main{
 
 <section id="pokedex" class="page"><div class="pokedex-shell"><aside class="pokedex-side"><div class="side-brand">📖</div><span class="eyebrow">NATIONAL DEX</span><h1>Pokédex</h1><p>Explore espécies, regiões e categorias em um catálogo organizado.</p><div class="side-search"><input id="dexSearch" type="search" placeholder="Buscar Pokémon..."><select id="regionFilter"></select></div><div id="categoryFilters" class="chips vertical-chips"></div><button id="dexShinyToggle" class="dex-shiny-toggle" type="button" aria-pressed="false"><span>✨</span><b>Pokédex Shiny</b><em>OFF</em></button><div class="status" id="loadStatus">Preparando Pokédex…</div></aside><main class="pokedex-content"><div class="content-banner dex-scenic-banner" aria-label="Pikachu em uma paisagem de montanhas"><img class="dex-user-banner" src="pokedex-banner.png?v=75ec05cf" alt="Pikachu observando uma paisagem de montanhas e lago"></div><div id="dexMessage" class="notice hidden"></div><div id="dexResults"></div></main></div></section>
 
-<section id="wishes" class="page"><div class="wishes-shell"><div class="wishes-hero"><span class="eyebrow">SUA COLEÇÃO</span><h1>Desejos</h1><p>Uma galeria premium para os Pokémon que você mais gosta.</p><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/493.png" alt=""></div><div class="wishes-gallery"><div class="gallery-toolbar"><div><span class="eyebrow">FAVORITOS</span><h2>Sua coleção</h2></div><div class="gallery-actions"><input id="favSearch" type="search" placeholder="Buscar nos favoritos"><button id="clearFavs" class="danger">Limpar favoritos</button></div></div><div id="favResults" class="card-grid"></div></div></div></section>
+<section id="wishes" class="page"><div class="wishes-shell"><div class="wishes-hero"><span class="eyebrow">SUA COLEÇÃO</span><h1>Desejos</h1><p>Uma galeria premium para os Pokémon que você mais gosta.</p></div><div class="wishes-gallery"><div class="gallery-toolbar"><div><span class="eyebrow">FAVORITOS</span><h2>Sua coleção</h2></div><div class="gallery-actions"><input id="favSearch" type="search" placeholder="Buscar nos favoritos"><button id="clearFavs" class="danger">Limpar favoritos</button></div></div><div id="favResults" class="card-grid"></div></div></div></section>
 
 <section id="teams" class="page"><div class="teams-shell"><aside class="teams-side"><span class="eyebrow">TEAM BUILDER</span><h1>Times</h1><p>Monte composições equilibradas e acompanhe a sinergia elemental.</p><button id="newTeam" class="primary">+ Criar equipe</button><div class="teams-side-label">SUAS EQUIPES</div><div id="teamTabs" class="chips vertical-chips"></div><img class="teams-mascot" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/493.png" alt=""></aside><main class="teams-workspace"><div class="workspace-head"><div><span class="eyebrow">ESTRATÉGIA</span><h2>Construa sua composição</h2></div><div class="workspace-mark">⚔️</div></div><div id="teamArea"></div></main></div></section>
 
