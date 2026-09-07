@@ -193,6 +193,20 @@ function go(page){
   restoreScroll(Math.min(pageScrollPositions[page]||0,maxScrollY()));
 }
 qsa('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+function runGlobalSearch(){
+  const input=$('#globalSearch'),q=input?.value.trim();
+  if(!q)return;
+  const dex=$('#dexSearch');if(dex)dex.value=q;
+  state.activeRegion='all';state.activeCategory='all';
+  const region=$('#regionFilter');if(region)region.value='all';
+  qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='all'));
+  pageScrollPositions.pokedex=0;
+  go('pokedex');
+  renderDex();
+}
+$('#globalSearchGo').onclick=runGlobalSearch;
+$('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runGlobalSearch()}});
+$('#profileButton').onclick=()=>toast('Perfil em breve.');
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
   $('#regionFilter').innerHTML=opts;
