@@ -309,7 +309,7 @@ function renderTeams(){
   const t=teams.find(x=>x.id===state.activeTeam);
   const slots=Array.from({length:6},(_,i)=>{
     const id=t.members[i];
-    if(!id)return '<div class="slot">Espaço vazio</div>';
+    if(!id)return '<div class="slot empty-slot"><span class="empty-plus">＋</span><span>Adicionar<br>Pokémon</span></div>';
     const shiny=!!t.memberShiny?.[i],iv100=!!t.memberIV100?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
     return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}${iv100?' 💯':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}${iv100?' • IV 100%':''}</small><button data-remove-member="${i}">Remover</button></div>`
   }).join('');
