@@ -501,7 +501,7 @@ function renderPicker(){
   const grouped=REGIONS.map(([region])=>[region,arr.filter(p=>regionOf(p.id)===region)]).filter(([,items])=>items.length);
   $('#roulettePicker').innerHTML=grouped.length?grouped.map(([region,items],groupIndex)=>{
     const selected=items.reduce((sum,p)=>sum+selectedVariantCount(p.id),0);
-    return `<details class="roulette-region-group" ${groupIndex===0?'open':''}>
+    return `<details class="roulette-region-group" data-roulette-region="${region}" ${groupIndex===0?'open':''}>
       <summary><span><b>${region}</b><small>${items.length} Pokémon</small></span><em>${selected?selected+' opções escolhidas':'Abrir catálogo'}</em></summary>
       <div class="roulette-card-grid">${items.map(p=>{
         const d=state.details.get(p.id),types=d?.types||[],count=selectedVariantCount(p.id);
@@ -521,7 +521,21 @@ function renderPicker(){
       }).join('')}</div>
     </details>`;
   }).join(''):'<div class="empty-state">Nenhum Pokémon corresponde aos filtros atuais.</div>';
-  $$('[data-catalog-pokemon]').forEach(card=>card.onclick=()=>toggleCatalogPokemon(Number(card.dataset.catalogPokemon)));
+  $('[data-catalog-pokemon]').forEach(card=>card.onclick=()=>toggleCatalogPokemon(Number(card.dataset.catalogPokemon)));
+  $('.roulette-region-group>summary').forEach(summary=>{
+    summary.onclick=e=>{
+      e.preventDefault();
+      const details=summary.parentElement;
+      const pageY=window.scrollY;
+      const catalog=$('.roulette-catalog');
+      const catalogY=catalog?.scrollTop||0;
+      details.open=!details.open;
+      requestAnimationFrame(()=>{
+        window.scrollTo({top:pageY,left:0,behavior:'auto'});
+        if(catalog)catalog.scrollTop=catalogY;
+      });
+    };
+  });
 }
 function renderProbability(){updateRouletteSummary()}
 function roulettePrimaryType(id){return state.details.get(id)?.types?.[0]||'normal'}
