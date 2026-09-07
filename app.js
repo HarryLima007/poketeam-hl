@@ -310,11 +310,11 @@ function renderTeams(){
   const slots=Array.from({length:6},(_,i)=>{
     const id=t.members[i];
     if(!id)return '<div class="slot">Espaço vazio</div>';
-    const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
-    return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`
+    const shiny=!!t.memberShiny?.[i],iv100=!!t.memberIV100?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
+    return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}${iv100?' 💯':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}${iv100?' • IV 100%':''}</small><button data-remove-member="${i}">Remover</button></div>`
   }).join('');
   $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}${teamRecommendationsHTML(t)}</div>`;
-  $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});
+  $('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);t.memberIV100?.splice(i,1);save();renderTeams()});
   $('#renameTeam').onclick=()=>{
     const modal=$('#teamChooser'),content=$('#teamChooserContent');
     content.innerHTML=`<div class="team-create-form"><span class="eyebrow">TEAM BUILDER</span><h2>Renomear equipe</h2><label for="teamNameInput">Nome da equipe</label><input id="teamNameInput" type="text" maxlength="40" value="${t.name.replace(/"/g,'&quot;')}" autocomplete="off"><div class="team-create-actions"><button id="cancelTeamCreate">Cancelar</button><button id="confirmTeamCreate" class="primary">Salvar nome</button></div></div>`;
@@ -322,7 +322,7 @@ function renderTeams(){
     const input=$('#teamNameInput'),submit=()=>{const name=input.value.trim();if(!name){toast('Digite um nome para a equipe.');return}t.name=name.slice(0,40);save();closeTeamChooser();renderTeams()};
     $('#confirmTeamCreate').onclick=submit;$('#cancelTeamCreate').onclick=closeTeamChooser;input.focus();input.select();input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit()}};
   };
-  $('#clearTeam').onclick=async()=>{const ok=await siteConfirm(`Remover todos os Pokémon de "${t.name}"?`,{title:'Limpar equipe',confirmText:'Limpar equipe',icon:'🧹',danger:true});if(ok){t.members=[];t.memberShiny=[];save();renderTeams()}};
+  $('#clearTeam').onclick=async()=>{const ok=await siteConfirm(`Remover todos os Pokémon de "${t.name}"?`,{title:'Limpar equipe',confirmText:'Limpar equipe',icon:'🧹',danger:true});if(ok){t.members=[];t.memberShiny=[];t.memberIV100=[];save();renderTeams()}};
   $('#deleteTeam').onclick=async()=>{const ok=await siteConfirm(`Excluir definitivamente a equipe "${t.name}"?`,{title:'Excluir equipe',confirmText:'Excluir equipe',icon:'🗑️',danger:true});if(ok){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
   if($('#teamRecFilter'))$('#teamRecFilter').onchange=e=>{state.teamRecFilter=e.target.value;renderTeams()};
   $$('[data-rec-add]').forEach(b=>b.onclick=()=>openTeamChooser(+b.dataset.recAdd,false));
@@ -331,7 +331,7 @@ function renderTeams(){
 function createTeamNamed(name){
   const clean=(name||'').trim().slice(0,40);
   if(!clean)return null;
-  const team={id:Date.now()+Math.floor(Math.random()*1000),name:clean,members:[],memberShiny:[]};
+  const team={id:Date.now()+Math.floor(Math.random()*1000),name:clean,members:[],memberShiny:[],memberIV100:[]};
   teams.push(team);state.activeTeam=team.id;save();renderTeams();return team;
 }
 function teamNameFormHTML(title='Criar nova equipe'){
@@ -367,29 +367,32 @@ function createTeam(){
   bindTeamNameForm(()=>closeTeamChooser());
   return null;
 }
-async function commitAddToTeam(team,id,shiny=false){
+async function commitAddToTeam(team,id,shiny=false,iv100=false){
   if(!team)return false;
   if(team.members.length>=6){toast(`${team.name} está cheia (6/6).`);return false}
-  const already=team.members.some((memberId,i)=>memberId===id&&!!team.memberShiny?.[i]===!!shiny);
+  const already=team.members.some((memberId,i)=>memberId===id&&!!team.memberShiny?.[i]===!!shiny&&!!team.memberIV100?.[i]===!!iv100);
   if(already){
-    const name=`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' Shiny':''}`;
+    const name=`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' Shiny':''}${iv100?' 100% IV':''}`;
     const ok=await siteConfirm(`${name} já está nesta equipe. Deseja mesmo adicionar outra cópia?`,{title:'Pokémon repetido',confirmText:'Adicionar outra cópia',icon:'⚔️'});
     if(!ok)return false;
   }
   team.memberShiny=Array.isArray(team.memberShiny)?team.memberShiny:[];
+  team.memberIV100=Array.isArray(team.memberIV100)?team.memberIV100:[];
   while(team.memberShiny.length<team.members.length)team.memberShiny.push(false);
-  team.members.push(id);team.memberShiny.push(!!shiny);state.activeTeam=team.id;save();
+  while(team.memberIV100.length<team.members.length)team.memberIV100.push(false);
+  team.members.push(id);team.memberShiny.push(!!shiny);team.memberIV100.push(!!iv100);state.activeTeam=team.id;save();
   try{renderTeams()}catch(e){console.error('Falha ao atualizar a tela de Times após adicionar Pokémon',e)}
-  toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''} adicionado a ${team.name}`);
+  toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''}${iv100?' 💯':''} adicionado a ${team.name}`);
   return true;
 }
 function closeTeamChooser(){const el=$('#teamChooser');if(el)el.classList.add('hidden')}
-function openTeamChooser(id,shiny=false){
+function openTeamChooser(id,shiny=false,iv100=false){
   const modal=$('#teamChooser'),content=$('#teamChooserContent');
-  if(!modal||!content){const fallback=teams.find(t=>t.members.length<6);if(fallback)return commitAddToTeam(fallback,id,shiny);toast('Não foi possível abrir o seletor de equipes.');return false}
+  if(!modal||!content){const fallback=teams.find(t=>t.members.length<6);if(fallback)return commitAddToTeam(fallback,id,shiny,iv100);toast('Não foi possível abrir o seletor de equipes.');return false}
   const p=state.list[id-1]||{name:`#${id}`};
   modal.dataset.pendingPokemonId=String(id);
   modal.dataset.pendingShiny=shiny?'1':'0';
+  modal.dataset.pendingIV100=iv100?'1':'0';
   const list=teams.length?teams.map(t=>{
     const full=t.members.length>=6;
     return `<button class="team-choice ${full?'full':''}" data-team-choice="${t.id}" ${full?'disabled':''}>
@@ -397,15 +400,15 @@ function openTeamChooser(id,shiny=false){
       <strong>${full?'Cheia':'Adicionar'}</strong>
     </button>`;
   }).join(''):'<div class="empty-state">Você ainda não criou nenhuma equipe.</div>';
-  content.innerHTML=`<div class="team-chooser-head"><img src="${sprite(id,shiny)}"><div><span class="eyebrow">ADICIONAR AO TIME</span><h2>${cap(p.name)}${shiny?' ✨':''}</h2><p>Escolha uma equipe ou crie uma nova.</p></div></div><div class="team-choice-list">${list}</div><button id="chooserCreateTeam" class="primary">＋ Criar nova equipe</button>`;
+  content.innerHTML=`<div class="team-chooser-head"><img src="${sprite(id,shiny)}"><div><span class="eyebrow">ADICIONAR AO TIME</span><h2>${cap(p.name)}${shiny?' ✨':''}${iv100?' 💯':''}</h2><p>${iv100?'IV 100% • ':''}Escolha uma equipe ou crie uma nova.</p></div></div><div class="team-choice-list">${list}</div><button id="chooserCreateTeam" class="primary">＋ Criar nova equipe</button>`;
   modal.classList.remove('hidden');
   $('#chooserCreateTeam').onclick=()=>{
     content.innerHTML=teamNameFormHTML('Criar equipe para '+cap(p.name));
-    bindTeamNameForm(async t=>{if(await commitAddToTeam(t,id,shiny))closeTeamChooser()});
+    bindTeamNameForm(async t=>{if(await commitAddToTeam(t,id,shiny,iv100))closeTeamChooser()});
   };
   return true;
 }
-function addToTeam(id,shiny=false){return openTeamChooser(id,shiny)}
+function addToTeam(id,shiny=false,iv100=false){return openTeamChooser(id,shiny,iv100)}
 $('#newTeam').onclick=createTeam;
 $('#closeTeamChooser').onclick=closeTeamChooser;
 $('#teamChooser').onclick=async e=>{
@@ -415,10 +418,11 @@ $('#teamChooser').onclick=async e=>{
   const t=teams.find(x=>String(x.id)===String(choice.dataset.teamChoice));
   const id=+$('#teamChooser').dataset.pendingPokemonId;
   const shiny=$('#teamChooser').dataset.pendingShiny==='1';
+  const iv100=$('#teamChooser').dataset.pendingIV100==='1';
   if(!t||!id){toast('Não foi possível identificar a equipe ou o Pokémon.');return}
   choice.disabled=true;
   try{
-    if(await commitAddToTeam(t,id,shiny))closeTeamChooser();
+    if(await commitAddToTeam(t,id,shiny,iv100))closeTeamChooser();
   }finally{
     if(document.body.contains(choice))choice.disabled=t.members.length>=6;
   }
