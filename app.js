@@ -34,7 +34,34 @@ function go(page){$$('.page').forEach(x=>x.classList.toggle('active',x.id===page
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');$('#regionFilter').innerHTML=opts;$('#rouletteRegion').innerHTML=opts;const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];$('#categoryFilters').innerHTML=cats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');$$('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;$$('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()})}
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
-async function initData(){try{const data=await fetchJSON(`${API}/pokemon?limit=${MAX}&offset=0`,'list_v3');state.list=data.results.slice(0,MAX).map((p,i)=>({id:i+1,name:p.name}));$('#loadStatus').textContent=`${state.list.length} espécies carregadas • detalhes progressivos`;renderDex();renderPicker();progressiveDetails()}catch(e){console.error(e);state.list=Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));$('#dexMessage').classList.remove('hidden');$('#dexMessage').textContent='Não foi possível carregar os nomes da PokéAPI. A navegação continua disponível; verifique sua conexão e tente recarregar.';$('#loadStatus').textContent='PokéAPI indisponível';renderDex()}}
+async function initData(){
+  const savedList=store.get('pokedexList',null);
+  state.list=Array.isArray(savedList)&&savedList.length===MAX
+    ? savedList
+    : Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));
+  $('#loadStatus').textContent=Array.isArray(savedList)&&savedList.length===MAX
+    ? 'Pokédex carregada • atualizando dados…'
+    : 'Pokédex disponível • carregando nomes…';
+  renderDex();
+  renderPicker();
+  try{
+    const data=await fetchJSON(`${API}/pokemon?limit=${MAX}&offset=0`,'list_v3');
+    const fresh=data.results.slice(0,MAX).map((p,i)=>({id:i+1,name:p.name}));
+    if(fresh.length===MAX){
+      state.list=fresh;
+      store.set('pokedexList',fresh);
+      $('#loadStatus').textContent=`${state.list.length} espécies carregadas • detalhes progressivos`;
+      renderDex();
+      renderPicker();
+    }
+    progressiveDetails();
+  }catch(e){
+    console.error(e);
+    $('#dexMessage').classList.remove('hidden');
+    $('#dexMessage').textContent='A Pokédex está disponível com dados locais; a PokéAPI será tentada novamente ao recarregar.';
+    $('#loadStatus').textContent='Pokédex local disponível';
+  }
+}
 async function getDetail(id){if(state.details.has(id))return state.details.get(id);try{const p=await fetchJSON(`${API}/pokemon/${id}`,'pokemon_'+id);const d={id,name:p.name,types:p.types.sort((a,b)=>a.slot-b.slot).map(x=>x.type.name),forms:p.forms?.map(x=>x.name)||[]};state.details.set(id,d);return d}catch(e){console.warn('detail failed',id,e);return {id,name:state.list[id-1]?.name||`#${id}`,types:[],forms:[]}}}
 async function getSpecies(id){if(state.species.has(id))return state.species.get(id);try{const s=await fetchJSON(`${API}/pokemon-species/${id}`,'species_'+id);state.species.set(id,s);return s}catch(e){console.warn('species failed',id,e);return null}}
 async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id);if(id%25===0&&$('#pokedex').classList.contains('active'))renderDex();}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache';renderDex();renderPicker()}
