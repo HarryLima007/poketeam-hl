@@ -118,6 +118,104 @@ $('#closeModal').onclick=()=>$('#modal').classList.add('hidden');$('#modal').onc
 function updateHome(){ $('#homeFavs').textContent=favs.size;$('#homeTeams').textContent=teams.length;$('#homeRoulette').textContent=roulette.size;const box=$('#recentList');if(!recent.length){box.className='mini-list empty-state';box.textContent='Nenhum Pokémon pesquisado ainda.';return}box.className='mini-list';box.innerHTML=recent.map(id=>{const p=state.list[id-1]||{name:`#${id}`};return `<button class="mini-poke" data-recent="${id}"><img src="${sprite(id)}">${cap(p.name)}</button>`}).join('');$$('[data-recent]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.recent))}
 function renderFavs(){const q=$('#favSearch').value.toLowerCase();const arr=[...favs].sort((a,b)=>a-b).map(id=>state.list[id-1]||{id,name:`pokemon-${id}`}).filter(p=>matchesSearch(p,q));$('#favResults').innerHTML=arr.length?arr.map(p=>cardHTML(p,!!favShiny[p.id])).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';bindCards($('#favResults'))}
 $('#clearFavs').onclick=()=>{if(favs.size&&confirm('Remover todos os favoritos?')){favs.clear();save();renderFavs()}};$('#favSearch').oninput=renderFavs;
+function defensiveMultiplier(attackType,defenderTypes){
+  return defenderTypes.reduce((m,t)=>m*(TYPE_CHART[attackType]?.[t]??1),1);
+}
+function teamAnalysisHTML(t){
+  if(!t.members.length)return '<div class="team-analysis empty-analysis"><h3>🛡️ Análise de tipos</h3><p>Adicione Pokémon para analisar defesa, cobertura ofensiva e equilíbrio do time.</p></div>';
+  const missing=t.members.filter(id=>!state.details.get(id)?.types?.length);
+  if(missing.length)return '<div class="team-analysis"><h3>🛡️ Análise de tipos</h3><p class="muted">Carregando tipos dos Pokémon…</p></div>';
+
+  const members=t.members.map(id=>state.details.get(id));
+  const rows=TYPES.map(type=>{
+    const values=members.map(d=>defensiveMultiplier(type,d.types));
+    return {type,weak:values.filter(v=>v>1).length,resist:values.filter(v=>v>0&&v<1).length,immune:values.filter(v=>v===0).length,max:Math.max(...values)};
+  });
+  const shared=rows.filter(x=>x.weak>=2).sort((a,b)=>b.weak-a.weak||b.max-a.max);
+  const immunities=rows.filter(x=>x.immune>0).sort((a,b)=>b.immune-a.immune);
+  const resistances=rows.filter(x=>x.resist>0).sort((a,b)=>b.resist-a.resist);
+
+  const stabTypes=[...new Set(members.flatMap(d=>d.types))];
+  const offensive=TYPES.map(defType=>{
+    const attackers=stabTypes.filter(atk=>(TYPE_CHART[atk]?.[defType]??1)>1);
+    return {type:defType,attackers};
+  });
+  const covered=offensive.filter(x=>x.attackers.length);
+  const uncovered=offensive.filter(x=>!x.attackers.length);
+  const defensiveCovered=rows.filter(x=>x.resist>0||x.immune>0).length;
+  const sharedBurden=shared.reduce((sum,x)=>sum+(x.weak-1),0);
+
+  const offensiveScore=(covered.length/TYPES.length)*50;
+  const defensiveScore=(defensiveCovered/TYPES.length)*30;
+  const weaknessScore=Math.max(0,20-Math.min(20,sharedBurden*4));
+  const balanceScore=Math.max(0,Math.min(100,Math.round(offensiveScore+defensiveScore+weaknessScore)));
+
+  const badge=(x,kind,count)=>`<span class="analysis-pill ${kind}"><span class="type ${x.type}">${TYPE_PT[x.type]}</span><b>${count}</b></span>`;
+  const typeBadge=(type,kind='coverage')=>`<span class="analysis-pill ${kind}"><span class="type ${type}">${TYPE_PT[type]}</span></span>`;
+  const scoreLabel=balanceScore>=80?'Muito equilibrado':balanceScore>=65?'Bom equilíbrio':balanceScore>=50?'Equilíbrio médio':'Precisa de ajustes';
+
+  return `<div class="team-analysis">
+    <div class="analysis-head">
+      <div><span class="eyebrow">VISÃO GERAL DO TIME</span><h3>⚔️ Análise do time</h3></div>
+      <span class="analysis-count">${t.members.length}/6 Pokémon</span>
+    </div>
+
+    <div class="balance-card">
+      <div><span class="eyebrow">EQUILÍBRIO</span><strong>${balanceScore}/100</strong><small>${scoreLabel}</small></div>
+      <div class="balance-bar"><span style="width:${balanceScore}%"></span></div>
+      <p>Indicador heurístico baseado em cobertura STAB, resistências/imunidades e fraquezas compartilhadas.</p>
+    </div>
+
+    <div class="analysis-section"><h4>⚠️ Fraquezas compartilhadas</h4>
+      <div class="analysis-pills">${shared.length?shared.map(x=>badge(x,'weak',x.weak+' vulneráveis')).join(''):'<span class="muted">Nenhuma fraqueza compartilhada por 2 ou mais membros.</span>'}</div>
+    </div>
+
+    <div class="analysis-section"><h4>🚫 Imunidades</h4>
+      <div class="analysis-pills">${immunities.length?immunities.map(x=>badge(x,'immune',x.immune+' imune'+(x.immune>1?'s':''))).join(''):'<span class="muted">Nenhuma imunidade no time.</span>'}</div>
+    </div>
+
+    <div class="analysis-section"><h4>🛡️ Resistências</h4>
+      <div class="analysis-pills">${resistances.length?resistances.map(x=>badge(x,'resist',x.resist+' resistente'+(x.resist>1?'s':''))).join(''):'<span class="muted">Nenhuma resistência identificada.</span>'}</div>
+    </div>
+
+    <div class="analysis-section offensive-section">
+      <div class="coverage-head"><h4>🎯 Cobertura ofensiva por STAB</h4><b>${covered.length}/${TYPES.length} tipos</b></div>
+      <p class="muted">Considera os tipos naturais dos Pokémon como ataques STAB; golpes escolhidos ainda não entram no cálculo.</p>
+      <div class="coverage-block"><span class="coverage-label">Super efetivo contra</span><div class="analysis-pills">${covered.map(x=>typeBadge(x.type,'coverage')).join('')}</div></div>
+      <div class="coverage-block"><span class="coverage-label">Sem cobertura STAB</span><div class="analysis-pills">${uncovered.length?uncovered.map(x=>typeBadge(x.type,'uncovered')).join(''):'<span class="muted">Cobertura completa dos 18 tipos.</span>'}</div></div>
+    </div>
+
+    <div class="analysis-section"><h4>⚔️ Tipos STAB disponíveis</h4>
+      <div class="analysis-pills">${stabTypes.map(type=>typeBadge(type,'stab')).join('')}</div>
+    </div>
+
+    <p class="analysis-note">A defesa usa a combinação dos tipos atuais de cada Pokémon. Habilidades, itens, Terastalização, golpes reais e outras mecânicas ainda não entram neste cálculo.</p>
+  </div>`;
+}
+function ensureTeamDetails(t){
+  const missing=[...new Set(t.members.filter(id=>!state.details.get(id)?.types?.length))];
+  if(!missing.length)return;
+  Promise.allSettled(missing.map(getDetail)).then(()=>{if(state.activeTeam===t.id&&$('#teams').classList.contains('active'))renderTeams()});
+}
+function renderTeams(){
+  if(!teams.length){$('#teamTabs').innerHTML='';$('#teamArea').innerHTML='<div class="panel empty-state">Você ainda não criou equipes. Clique em “+ Criar equipe”.</div>';return}
+  if(!teams.some(t=>t.id===state.activeTeam))state.activeTeam=teams[0].id;
+  $('#teamTabs').innerHTML=teams.map(t=>`<button data-team="${t.id}" class="${t.id===state.activeTeam?'active':''}">${t.name}</button>`).join('');
+  $$('[data-team]').forEach(b=>b.onclick=()=>{state.activeTeam=+b.dataset.team;renderTeams()});
+  const t=teams.find(x=>x.id===state.activeTeam);
+  const slots=Array.from({length:6},(_,i)=>{
+    const id=t.members[i];
+    if(!id)return '<div class="slot">Espaço vazio</div>';
+    const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
+    return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`
+  }).join('');
+  $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}</div>`;
+  $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});
+  $('#renameTeam').onclick=()=>{const n=prompt('Novo nome:',t.name);if(n){t.name=n.trim().slice(0,40);save();renderTeams()}};
+  $('#clearTeam').onclick=()=>{if(confirm('Limpar esta equipe?')){t.members=[];t.memberShiny=[];save();renderTeams()}};
+  $('#deleteTeam').onclick=()=>{if(confirm('Excluir esta equipe?')){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
+  ensureTeamDetails(t);
+}
 function createTeamNamed(name){
   const clean=(name||'').trim().slice(0,40);
   if(!clean)return null;
