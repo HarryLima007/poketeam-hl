@@ -121,6 +121,67 @@ $('#clearFavs').onclick=()=>{if(favs.size&&confirm('Remover todos os favoritos?'
 function defensiveMultiplier(attackType,defenderTypes){
   return defenderTypes.reduce((m,t)=>m*(TYPE_CHART[attackType]?.[t]??1),1);
 }
+function teamMetricsFromTypes(typeSets){
+  if(!typeSets.length)return {score:0,covered:[],uncovered:TYPES.slice(),shared:[],defensiveCovered:0};
+  const rows=TYPES.map(type=>{const values=typeSets.map(types=>defensiveMultiplier(type,types));return {type,weak:values.filter(v=>v>1).length,resist:values.filter(v=>v>0&&v<1).length,immune:values.filter(v=>v===0).length,max:Math.max(...values)}});
+  const shared=rows.filter(x=>x.weak>=2).sort((a,b)=>b.weak-a.weak||b.max-a.max);
+  const stabTypes=[...new Set(typeSets.flat())];
+  const covered=TYPES.filter(defType=>stabTypes.some(atk=>(TYPE_CHART[atk]?.[defType]??1)>1));
+  const uncovered=TYPES.filter(type=>!covered.includes(type));
+  const defensiveCovered=rows.filter(x=>x.resist>0||x.immune>0).length;
+  const sharedBurden=shared.reduce((sum,x)=>sum+(x.weak-1),0);
+  const score=Math.max(0,Math.min(100,Math.round((covered.length/TYPES.length)*50+(defensiveCovered/TYPES.length)*30+Math.max(0,20-Math.min(20,sharedBurden*4)))));
+  return {score,covered,uncovered,shared,defensiveCovered,rows,stabTypes};
+}
+function recommendationFilterMatch(p,filter){
+  if(filter==='all')return true;
+  if(filter==='no-legend')return !LEGENDARY.has(p.id)&&!MYTHICAL.has(p.id);
+  if(filter==='legendary')return LEGENDARY.has(p.id);
+  if(filter==='mythical')return MYTHICAL.has(p.id);
+  if(filter.startsWith('region:'))return regionOf(p.id)===filter.slice(7);
+  return true;
+}
+function computeTeamRecommendations(t,filter='all',limit=8){
+  if(t.members.length>=6)return [];
+  const currentTypes=t.members.map(id=>state.details.get(id)?.types).filter(Boolean);
+  if(currentTypes.length!==t.members.length)return [];
+  const base=teamMetricsFromTypes(currentTypes);
+  const existing=new Set(t.members);
+  return state.list.filter(p=>!existing.has(p.id)&&recommendationFilterMatch(p,filter)&&state.details.get(p.id)?.types?.length).map(p=>{
+    const types=state.details.get(p.id).types;
+    const next=teamMetricsFromTypes([...currentTypes,types]);
+    const newCoverage=next.covered.filter(x=>!base.covered.includes(x));
+    const fixedWeaknesses=base.shared.filter(w=>!next.shared.some(n=>n.type===w.type&&n.weak>=w.weak));
+    const resistsWeaknesses=base.shared.filter(w=>defensiveMultiplier(w.type,types)<1);
+    const immunesWeaknesses=base.shared.filter(w=>defensiveMultiplier(w.type,types)===0);
+    const gain=next.score-base.score;
+    const utility=gain*100+newCoverage.length*12+fixedWeaknesses.length*10+resistsWeaknesses.length*5+immunesWeaknesses.length*8;
+    return {p,types,nextScore:next.score,gain,newCoverage,fixedWeaknesses,resistsWeaknesses,immunesWeaknesses,utility};
+  }).sort((a,b)=>b.utility-a.utility||b.nextScore-a.nextScore||a.p.id-b.p.id).slice(0,limit);
+}
+function teamRecommendationsHTML(t){
+  if(!t.members.length||t.members.length>=6)return '';
+  const missing=t.members.some(id=>!state.details.get(id)?.types?.length);
+  if(missing)return '<div class="team-recommendations"><h3>💡 Recomendações para o próximo membro</h3><p class="muted">Carregando dados para gerar recomendações…</p></div>';
+  const filter=state.teamRecFilter||'no-legend';
+  const recs=computeTeamRecommendations(t,filter,8);
+  const regionOptions=REGIONS.map(r=>`<option value="region:${r[0]}" ${filter===`region:${r[0]}`?'selected':''}>${r[0]}</option>`).join('');
+  return `<div class="team-recommendations">
+    <div class="recommendations-head"><div><span class="eyebrow">ASSISTENTE DE EQUIPE</span><h3>💡 Recomendações para o próximo membro</h3></div>
+      <select id="teamRecFilter"><option value="no-legend" ${filter==='no-legend'?'selected':''}>Sem Lendários/Míticos</option><option value="all" ${filter==='all'?'selected':''}>Todos</option><option value="legendary" ${filter==='legendary'?'selected':''}>Lendários</option><option value="mythical" ${filter==='mythical'?'selected':''}>Míticos</option>${regionOptions}</select>
+    </div>
+    <p class="muted">Prioriza candidatos que aumentam a nota, ampliam cobertura STAB e ajudam contra fraquezas compartilhadas.</p>
+    <div class="recommendation-grid">${recs.length?recs.map(r=>{
+      const reasons=[];
+      if(r.gain>0)reasons.push(`+${r.gain} equilíbrio`);
+      if(r.newCoverage.length)reasons.push(`+${r.newCoverage.length} cobertura`);
+      if(r.immunesWeaknesses.length)reasons.push(`imune a ${r.immunesWeaknesses.map(x=>TYPE_PT[x.type]).join(', ')}`);
+      else if(r.resistsWeaknesses.length)reasons.push(`resiste a ${r.resistsWeaknesses.map(x=>TYPE_PT[x.type]).join(', ')}`);
+      return `<article class="recommendation-card"><img src="${sprite(r.p.id,false)}"><div class="rec-main"><b>#${pad(r.p.id)} ${cap(r.p.name)}</b><div class="types">${r.types.map(type=>`<span class="type ${type}">${TYPE_PT[type]}</span>`).join('')}</div><small>${reasons.slice(0,2).join(' • ')||'Melhora a composição geral'}</small></div><div class="rec-score"><span>Nova nota</span><strong>${r.nextScore}/100</strong><button data-rec-add="${r.p.id}">Adicionar</button></div></article>`;
+    }).join(''):'<div class="empty-state">Nenhum candidato disponível com este filtro.</div>'}</div>
+    <p class="analysis-note">Recomendações atuais são baseadas em tipagem e STAB. Moves, abilities, stats, itens e funções competitivas serão considerados em versões futuras.</p>
+  </div>`;
+}
 function teamAnalysisHTML(t){
   if(!t.members.length)return '<div class="team-analysis empty-analysis"><h3>🛡️ Análise de tipos</h3><p>Adicione Pokémon para analisar defesa, cobertura ofensiva e equilíbrio do time.</p></div>';
   const missing=t.members.filter(id=>!state.details.get(id)?.types?.length);
@@ -209,11 +270,19 @@ function renderTeams(){
     const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
     return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`
   }).join('');
-  $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}</div>`;
+  $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}${teamRecommendationsHTML(t)}</div>`;
   $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});
-  $('#renameTeam').onclick=()=>{const n=prompt('Novo nome:',t.name);if(n){t.name=n.trim().slice(0,40);save();renderTeams()}};
+  $('#renameTeam').onclick=()=>{
+    const modal=$('#teamChooser'),content=$('#teamChooserContent');
+    content.innerHTML=`<div class="team-create-form"><span class="eyebrow">TEAM BUILDER</span><h2>Renomear equipe</h2><label for="teamNameInput">Nome da equipe</label><input id="teamNameInput" type="text" maxlength="40" value="${t.name.replace(/"/g,'&quot;')}" autocomplete="off"><div class="team-create-actions"><button id="cancelTeamCreate">Cancelar</button><button id="confirmTeamCreate" class="primary">Salvar nome</button></div></div>`;
+    modal.classList.remove('hidden');
+    const input=$('#teamNameInput'),submit=()=>{const name=input.value.trim();if(!name){toast('Digite um nome para a equipe.');return}t.name=name.slice(0,40);save();closeTeamChooser();renderTeams()};
+    $('#confirmTeamCreate').onclick=submit;$('#cancelTeamCreate').onclick=closeTeamChooser;input.focus();input.select();input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit()}};
+  };
   $('#clearTeam').onclick=()=>{if(confirm('Limpar esta equipe?')){t.members=[];t.memberShiny=[];save();renderTeams()}};
   $('#deleteTeam').onclick=()=>{if(confirm('Excluir esta equipe?')){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
+  if($('#teamRecFilter'))$('#teamRecFilter').onchange=e=>{state.teamRecFilter=e.target.value;renderTeams()};
+  $('[data-rec-add]').forEach(b=>b.onclick=()=>openTeamChooser(+b.dataset.recAdd,false));
   ensureTeamDetails(t);
 }
 function createTeamNamed(name){
