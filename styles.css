@@ -205,3 +205,73 @@ nav button:hover,nav button.active{background:#111d34;border-color:#29436b;color
 @media(max-width:800px){
  .hero{padding:34px}.hero h1{letter-spacing:-2.5px}.page-head h1{font-size:40px}
 }
+
+
+/* PokéTeam Page Identities v1 — same product, distinct atmospheres */
+#pokedex{
+ --page-accent:#38d6c7;--page-accent2:#5ea8ff;
+ background:radial-gradient(circle at 92% 3%,rgba(56,214,199,.10),transparent 28%);
+}
+#pokedex .eyebrow{color:#5fe0d2}
+#pokedex .page-head h1{background:linear-gradient(90deg,#fff,#9ff2e9);-webkit-background-clip:text;background-clip:text;color:transparent}
+#pokedex .toolbar{padding:14px;border:1px solid rgba(65,190,180,.16);border-radius:18px;background:rgba(8,23,34,.58)}
+#pokedex .toolbar input,#pokedex .toolbar select{border-color:#1f4b55}
+#pokedex .chips button.active{background:linear-gradient(135deg,#13a99c,#348eff);border-color:#5fe0d2}
+#pokedex .poke-card{background:linear-gradient(155deg,#0c1c29,#091522);border-color:#1c3d4b}
+#pokedex .poke-card:hover{border-color:#3dc9bd;box-shadow:0 16px 40px rgba(27,177,164,.10)}
+
+#wishes{
+ --page-accent:#f5c84b;
+ background:
+ radial-gradient(circle at 88% 4%,rgba(245,200,75,.12),transparent 25%),
+ radial-gradient(circle at 5% 60%,rgba(171,120,38,.06),transparent 28%);
+}
+#wishes .eyebrow{color:#f4ce68}
+#wishes .page-head h1{background:linear-gradient(90deg,#fff,#ffe59b);-webkit-background-clip:text;background-clip:text;color:transparent}
+#wishes .toolbar{padding:14px;border:1px solid rgba(245,200,75,.16);border-radius:18px;background:rgba(29,23,10,.28)}
+#wishes .toolbar input{border-color:#564a27}
+#wishes .poke-card{background:linear-gradient(155deg,#191a20,#10131b);border-color:#403a28}
+#wishes .poke-card:hover{border-color:#c69f38;box-shadow:0 16px 40px rgba(245,200,75,.09)}
+
+#teams{
+ --page-accent:#56d899;--page-accent2:#3f9cff;
+ background:
+ radial-gradient(circle at 90% 5%,rgba(71,218,150,.10),transparent 27%),
+ radial-gradient(circle at 4% 80%,rgba(39,140,255,.07),transparent 25%);
+}
+#teams .eyebrow{color:#6fe4ab}
+#teams .page-head h1{background:linear-gradient(90deg,#fff,#a8f3cc);-webkit-background-clip:text;background-clip:text;color:transparent}
+#teams .page-head .primary,#teams .recommendation-card button{background:linear-gradient(135deg,#159d67,#2b8ee8);border-color:#47d69a}
+#teams .team-card,#teams .team-analysis,#teams .team-recommendations{background:linear-gradient(155deg,rgba(10,30,34,.96),rgba(8,18,30,.96));border-color:#21483f}
+#teams .recommendation-card{background:linear-gradient(145deg,#10252b,#101c2d);border-color:#285044}
+#teams .recommendation-card:hover{border-color:#45b986}
+
+#roulette{
+ --page-accent:#9d68ff;--page-accent2:#f05ac8;
+ background:
+ radial-gradient(circle at 86% 2%,rgba(141,82,255,.16),transparent 28%),
+ radial-gradient(circle at 7% 68%,rgba(240,90,200,.07),transparent 27%);
+}
+#roulette .eyebrow{color:#b58aff}
+#roulette .page-head h1{background:linear-gradient(90deg,#fff,#c8a8ff,#ff9ddd);-webkit-background-clip:text;background-clip:text;color:transparent}
+#roulette .roulette-controls{background:linear-gradient(155deg,rgba(24,16,48,.94),rgba(10,15,31,.96));border-color:#3a2a62}
+#roulette .toolbar input,#roulette .toolbar select{border-color:#423267;background:#0e1224}
+#roulette .chips button.active{background:linear-gradient(135deg,#7748dc,#d64bb0);border-color:#b77bff}
+#roulette .wheel-panel{background:radial-gradient(circle at 50% 35%,rgba(135,80,255,.16),transparent 42%),linear-gradient(155deg,#12142b,#0a1020);border-color:#392c62}
+#roulette .spin.primary{background:linear-gradient(135deg,#7e50e9,#e654bd);box-shadow:0 10px 30px rgba(148,75,231,.22)}
+#roulette .roulette-catalog{background:linear-gradient(160deg,#131127,#0a1020);border-color:#3b2d60}
+#roulette .catalog-head{background:rgba(18,14,38,.97)}
+#roulette .variant-toolbar{background:rgba(13,11,30,.98)}
+#roulette .roulette-region-group summary{background:#121128}
+#roulette .roulette-region-group[open] summary{background:#1b1738}
+#roulette .roulette-poke-card{background:#111326;border-color:#30294b}
+#roulette .roulette-poke-card:hover{background:#1a1835;border-color:#7957b0}
+#roulette .roulette-poke-card.selected{background:#241b45;border-color:#9d68ff;box-shadow:inset 0 0 0 1px rgba(157,104,255,.2),0 0 22px rgba(157,104,255,.09)}
+
+#home .quick-grid button:nth-child(1){border-top-color:#38d6c7}
+#home .quick-grid button:nth-child(2){border-top-color:#9d68ff}
+#home .quick-grid button:nth-child(3){border-top-color:#56d899}
+#home .quick-grid button:nth-child(4){border-top-color:#f5c84b}
+#home .quick-grid button b{font-size:22px}
+#home .quick-grid button span{font-size:16px;font-weight:900}
+#home .quick-grid button small{color:#8fa5c4}
