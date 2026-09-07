@@ -478,3 +478,15 @@ body[data-page="home"] nav button.active{
   #home .home-hero{margin-bottom:16px}
   #home .quick-grid{margin:0 0 18px;padding:0}
 }
+
+/* Softer light themes — reduce glare */
+body[data-page="pokedex"]{background:linear-gradient(180deg,#dfeaf4 0%,#e9f1f7 42%,#dce7f0 100%);color:#15314a}
+body[data-page="teams"]{background:linear-gradient(180deg,#dfe9e1 0%,#eaf1eb 45%,#dde7df 100%);color:#173327}
+body[data-page="pokedex"] .topbar,body[data-page="teams"] .topbar{background:rgba(235,243,248,.94)}
+#pokedex .pokedex-content .content-banner{background:linear-gradient(135deg,#edf5fb,#dbeaf5);border-color:#c9dbe8}
+#pokedex .region-section{background:#eef4f8;border-color:#cfdee8}
+#pokedex .poke-card{background:#f2f6f9;border-color:#d1dee7}
+#pokedex .toolbar{background:#eaf1f6}
+#pokedex .toolbar input,#pokedex .toolbar select{background:#f3f7fa}
+#teams .workspace-head,#teams .team-card,#teams .team-analysis,#teams .team-recommendations{background:#edf3ee}
+#teams .slot.filled,#teams .analysis-count,#teams .balance-card,#teams .analysis-pill,#teams .recommendation-card{background:#e6eee8}
