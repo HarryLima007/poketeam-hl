@@ -218,7 +218,7 @@ async function initData(){
 }
 async function getDetail(id){if(state.details.has(id))return state.details.get(id);try{const p=await fetchJSON(`${API}/pokemon/${id}`,'pokemon_'+id);const d={id,name:p.name,types:p.types.sort((a,b)=>a.slot-b.slot).map(x=>x.type.name),forms:p.forms?.map(x=>x.name)||[]};state.details.set(id,d);return d}catch(e){console.warn('detail failed',id,e);return {id,name:state.list[id-1]?.name||`#${id}`,types:[],forms:[]}}}
 async function getSpecies(id){if(state.species.has(id))return state.species.get(id);try{const s=await fetchJSON(`${API}/pokemon-species/${id}`,'species_'+id);state.species.set(id,s);return s}catch(e){console.warn('species failed',id,e);return null}}
-async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id);if(id%25===0){if($('#pokedex').classList.contains('active'))renderDex();if($('#roulette').classList.contains('active')&&$('#rouletteType')?.value!=='all')renderPicker();}}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache';if($('#pokedex').classList.contains('active'))renderDex();if($('#roulette').classList.contains('active'))renderPicker()}
+async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id)}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache'}
 function matchesSearch(p,q){if(!q)return true;q=q.trim().toLowerCase();const n=parseInt(q,10);return p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&p.id===n)}
 async function ensureCategoryFlags(ids){if(!['legendary','mythical'].includes(state.activeCategory))return;const missing=ids.filter(id=>!state.species.has(id));let i=0;async function w(){while(i<missing.length){await getSpecies(missing[i++])}}await Promise.allSettled(Array.from({length:8},w))}
 function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
@@ -603,13 +603,34 @@ function rouletteCatalogPreviewShiny(){
   const variants=activeRouletteVariants();
   return variants.length>0&&variants.every(v=>v.shiny);
 }
+function refreshRouletteCatalogCard(id){
+  const card=document.querySelector(`[data-catalog-pokemon="${id}"]`);
+  if(!card)return;
+  const count=selectedVariantCount(id);
+  card.classList.toggle('selected',!!count);
+  const badges=[
+    roulette.has(rouletteKey(id,false,false))?'<i>Normal</i>':'',
+    roulette.has(rouletteKey(id,false,true))?'<i>💯</i>':'',
+    roulette.has(rouletteKey(id,true,false))?'<i>✨</i>':'',
+    roulette.has(rouletteKey(id,true,true))?'<i>✨💯</i>':''
+  ].filter(Boolean).join('');
+  const badgeBox=card.querySelector('.catalog-selected-badges');
+  if(badgeBox)badgeBox.innerHTML=badges||'<i class="add-mark">＋ Adicionar</i>';
+  const regionSection=card.closest('.roulette-region-static');
+  if(regionSection){
+    const selected=[...regionSection.querySelectorAll('[data-catalog-pokemon]')].reduce((sum,c)=>sum+selectedVariantCount(Number(c.dataset.catalogPokemon)),0);
+    const em=regionSection.querySelector('.roulette-region-header em');
+    if(em)em.textContent=selected?selected+' opções escolhidas':'Todos exibidos';
+  }
+  updateRouletteSummary();
+}
 function toggleCatalogPokemon(id){
   const variants=activeRouletteVariants();
   if(!variants.length){toast('Escolha pelo menos uma variante.');return}
   const keys=variants.map(v=>rouletteKey(id,v.shiny,v.iv100));
   const allSelected=keys.every(k=>roulette.has(k));
   keys.forEach(k=>allSelected?roulette.delete(k):roulette.add(k));
-  save();renderPicker();drawWheel();
+  save();refreshRouletteCatalogCard(id);drawWheel();
 }
 function renderPicker(){
   const arr=rouletteFiltered(),previewShiny=rouletteCatalogPreviewShiny();
@@ -691,27 +712,51 @@ $('#spin').onclick=()=>{
 $('#rouletteSearch').oninput=renderPicker;
 $('#rouletteRegion').onchange=renderPicker;
 $('#rouletteType').onchange=renderPicker;
+function applyRoulettePreviewInPlace(){
+  const previewShiny=rouletteCatalogPreviewShiny();
+  document.querySelectorAll('#roulettePicker [data-catalog-pokemon]').forEach(card=>{
+    const id=Number(card.dataset.catalogPokemon),img=card.querySelector('img');
+    if(img)img.src=sprite(id,previewShiny);
+  });
+}
 ['variantNormal','variantNormal100','variantShiny','variantShiny100'].forEach(id=>{
-  $('#'+id).onchange=()=>renderPicker();
+  $('#'+id).onchange=()=>applyRoulettePreviewInPlace();
 });
 $('#addVisibleVariants').onclick=()=>{
   const variants=activeRouletteVariants();
   if(!variants.length){toast('Escolha pelo menos uma variante.');return}
   state.rouletteVisible.forEach(id=>variants.forEach(v=>roulette.add(rouletteKey(id,v.shiny,v.iv100))));
-  save();renderPicker();drawWheel();
+  save();state.rouletteVisible.forEach(refreshRouletteCatalogCard);drawWheel();
 };
 $('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{
   roulette.delete(rouletteKey(id,false,false));roulette.delete(rouletteKey(id,false,true));
   roulette.delete(rouletteKey(id,true,false));roulette.delete(rouletteKey(id,true,true));
-});save();renderPicker();drawWheel()};
-$('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML='';resetSpinState()};
+});save();state.rouletteVisible.forEach(refreshRouletteCatalogCard);drawWheel()};
+$('#clearRoulette').onclick=()=>{roulette.clear();save();state.rouletteVisible.forEach(refreshRouletteCatalogCard);drawWheel();$('#spinResult').innerHTML='';resetSpinState()};
+function applyDexShinyInPlace(){
+  document.querySelectorAll('#dexResults .poke-card').forEach(card=>{
+    const id=Number(card.dataset.id),specialCategory=card.dataset.specialCategory||null,specialIndex=Number(card.dataset.specialIndex||0);
+    card.dataset.shiny=state.dexShiny?'1':'0';
+    const img=card.querySelector('img'),title=card.querySelector('h3');
+    if(img){
+      if(specialCategory){
+        const f=specialFormsFor(id,specialCategory)[specialIndex];
+        img.src=state.dexShiny&&f?.shinyArt?f.shinyArt:(f?.art||sprite(id,state.dexShiny));
+      }else img.src=sprite(id,state.dexShiny);
+    }
+    if(title){
+      const base=title.textContent.replace(/\s*✨\s*$/,'');
+      title.textContent=base+(state.dexShiny?' ✨':'');
+    }
+  });
+}
 $('#dexShinyToggle').onclick=()=>{
   state.dexShiny=!state.dexShiny;
   const b=$('#dexShinyToggle');
   b.classList.toggle('active',state.dexShiny);
   b.setAttribute('aria-pressed',state.dexShiny?'true':'false');
   const status=b.querySelector('em');if(status)status.textContent=state.dexShiny?'ON':'OFF';
-  renderDex();
+  applyDexShinyInPlace();
 };
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
