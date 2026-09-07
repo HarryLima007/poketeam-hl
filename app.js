@@ -50,12 +50,8 @@ function preserveViewportDuring(renderFn){
   try{return renderFn(y)}
   finally{
     restoreScroll(y);
-    requestAnimationFrame(()=>{
-      restoreScroll(y);
-      body.style.minHeight=prevMin;
-      root.style.overflowAnchor=prevAnchor;
-      requestAnimationFrame(()=>restoreScroll(y));
-    });
+    body.style.minHeight=prevMin;
+    root.style.overflowAnchor=prevAnchor;
   }
 }
 // Dados do usuário ficam no localStorage; cache da PokéAPI fica apenas na sessão.
@@ -151,7 +147,7 @@ function dexCardSprite(id,shiny=false,formIndex=0){
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
 function siteConfirm(message,{title='Confirmar ação',confirmText='Confirmar',cancelText='Cancelar',icon='⚠️',danger=false}={}){
   return new Promise(resolve=>{
-    const modal=$('#siteDialog');
+    const modal=$('#siteDialog'),ownedScrollLock=document.body.dataset.scrollLocked!=='1';if(ownedScrollLock)lockPageScroll();
     $('#siteDialogTitle').textContent=title;
     $('#siteDialogMessage').textContent=message;
     $('#siteDialogIcon').textContent=icon;
@@ -162,6 +158,7 @@ function siteConfirm(message,{title='Confirmar ação',confirmText='Confirmar',c
     modal.classList.remove('hidden');
     const cleanup=result=>{
       modal.classList.add('hidden');
+      if(ownedScrollLock)unlockPageScroll();
       $('#siteDialogConfirm').onclick=null;
       $('#siteDialogCancel').onclick=null;
       modal.onclick=null;
@@ -177,7 +174,20 @@ function siteConfirm(message,{title='Confirmar ação',confirmText='Confirmar',c
 }
 function safe(fn){try{return fn()}catch(e){console.error(e);toast('Algo deu errado, mas o restante do site continua funcionando.')}}
 function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
-function go(page){document.body.dataset.page=page;qsa('.page').forEach(x=>x.classList.toggle('active',x.id===page));qsa('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
+const pageScrollPositions={home:0,pokedex:0,roulette:0,teams:0,wishes:0};
+function go(page){
+  const current=document.body.dataset.page||'home';
+  if(page===current)return;
+  pageScrollPositions[current]=stableScrollY();
+  document.body.dataset.page=page;
+  qsa('.page').forEach(x=>x.classList.toggle('active',x.id===page));
+  qsa('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  if(page==='wishes')renderFavs();
+  if(page==='teams')renderTeams();
+  if(page==='roulette'){renderPicker();drawWheel()}
+  if(page==='home')updateHome();
+  restoreScroll(pageScrollPositions[page]||0);
+}
 qsa('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
@@ -192,13 +202,9 @@ function setupSelects(){
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
-  const savedList=store.get('pokedexList',null);
-  state.list=Array.isArray(savedList)&&savedList.length===MAX
-    ? savedList
-    : Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));
-  $('#loadStatus').textContent=Array.isArray(savedList)&&savedList.length===MAX
-    ? 'Pokédex carregada • atualizando dados…'
-    : 'Pokédex disponível • carregando nomes…';
+  const savedList=store.get('pokedexList',null),hasSaved=Array.isArray(savedList)&&savedList.length===MAX;
+  state.list=hasSaved?savedList:Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));
+  $('#loadStatus').textContent=hasSaved?'Pokédex carregada • atualizando dados…':'Pokédex disponível • carregando nomes…';
   renderDex();
   renderPicker();
   try{
@@ -208,8 +214,19 @@ async function initData(){
       state.list=fresh;
       store.set('pokedexList',fresh);
       $('#loadStatus').textContent=`${state.list.length} espécies carregadas • detalhes progressivos`;
-      renderDex();
-      renderPicker();
+      if(!hasSaved){
+        renderDex();
+        renderPicker();
+      }else{
+        // Update names only; never destroy the visible catalog after the user has started browsing.
+        document.querySelectorAll('#dexResults .poke-card').forEach(card=>{
+          const p=state.list[Number(card.dataset.id)-1],h=card.querySelector('h3');
+          if(p&&h&&!card.dataset.specialCategory){
+            const suffix=card.dataset.shiny==='1'?' ✨':'';
+            h.textContent=cap(p.name)+suffix;
+          }
+        });
+      }
     }
     progressiveDetails();
   }catch(e){
@@ -236,7 +253,26 @@ function cardHTML(p,shiny=false,special=null){
 }
 function bindCards(root){root.querySelectorAll('.poke-card').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;openPokemon(+c.dataset.id,c.dataset.shiny==='1',c.dataset.specialCategory||null,Number(c.dataset.specialIndex||0))});root.querySelectorAll('[data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');toggleFav(+b.dataset.fav,card?.dataset.shiny==='1');b.classList.toggle('on',favs.has(+b.dataset.fav))});root.querySelectorAll('[data-add]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');addToTeam(+b.dataset.add,card?.dataset.shiny==='1')})}
 function toggleFav(id,shiny=false){if(favs.has(id)){favs.delete(id);delete favShiny[id]}else{favs.add(id);favShiny[id]=!!shiny}save();toast(favs.has(id)?'Adicionado aos desejos ⭐':'Removido dos desejos')}
-async function openPokemon(id,initialShiny=false,specialCategory=null,specialIndex=0){const modal=$('#modal');const openingY=stableScrollY();if(modal.classList.contains('hidden'))modal.dataset.returnScroll=String(openingY);const d=await getDetail(id),s=await getSpecies(id);const special=specialCategory?specialFormsFor(id,specialCategory)[specialIndex]:null;recent=[id,...recent.filter(x=>x!==id)].slice(0,8);save();let evo='<span class="muted">Evolução indisponível.</span>';if(s?.evolution_chain?.url){try{const chain=await fetchJSON(s.evolution_chain.url,'evo_'+s.evolution_chain.url.split('/').filter(Boolean).pop());const paths=[];function walk(node,path=[]){const nid=+(node.species.url.match(/\/(\d+)\/$/)||[])[1];const np=[...path,{id:nid,name:node.species.name}];if(!node.evolves_to.length)paths.push(np);else node.evolves_to.forEach(n=>walk(n,np))}walk(chain.chain);evo=paths.map(path=>`<div class="evo">${path.map((x,i)=>`${i?'→':''}<button data-evo="${x.id}"><img loading="lazy" data-evo-img="${x.id}" src="${sprite(x.id,false)}">${cap(x.name)}</button>`).join('')}</div>`).join('')}catch(e){console.warn(e)}}let specialSection='';
+function lockPageScroll(y=stableScrollY()){
+  const body=document.body;
+  if(body.dataset.scrollLocked==='1')return;
+  body.dataset.scrollLocked='1';
+  body.dataset.lockedScroll=String(y);
+  body.style.position='fixed';
+  body.style.top=`-${y}px`;
+  body.style.left='0';
+  body.style.right='0';
+  body.style.width='100%';
+}
+function unlockPageScroll(){
+  const body=document.body,y=Number(body.dataset.lockedScroll||0);
+  if(body.dataset.scrollLocked!=='1')return y;
+  body.style.position='';body.style.top='';body.style.left='';body.style.right='';body.style.width='';
+  delete body.dataset.scrollLocked;delete body.dataset.lockedScroll;
+  restoreScroll(y);
+  return y;
+}
+async function openPokemon(id,initialShiny=false,specialCategory=null,specialIndex=0){const modal=$('#modal');const openingY=stableScrollY();if(modal.classList.contains('hidden')){modal.dataset.returnScroll=String(openingY);lockPageScroll(openingY)}const d=await getDetail(id),s=await getSpecies(id);const special=specialCategory?specialFormsFor(id,specialCategory)[specialIndex]:null;recent=[id,...recent.filter(x=>x!==id)].slice(0,8);save();let evo='<span class="muted">Evolução indisponível.</span>';if(s?.evolution_chain?.url){try{const chain=await fetchJSON(s.evolution_chain.url,'evo_'+s.evolution_chain.url.split('/').filter(Boolean).pop());const paths=[];function walk(node,path=[]){const nid=+(node.species.url.match(/\/(\d+)\/$/)||[])[1];const np=[...path,{id:nid,name:node.species.name}];if(!node.evolves_to.length)paths.push(np);else node.evolves_to.forEach(n=>walk(n,np))}walk(chain.chain);evo=paths.map(path=>`<div class="evo">${path.map((x,i)=>`${i?'→':''}<button data-evo="${x.id}"><img loading="lazy" data-evo-img="${x.id}" src="${sprite(x.id,false)}">${cap(x.name)}</button>`).join('')}</div>`).join('')}catch(e){console.warn(e)}}let specialSection='';
 const evoSpecies=new Map();
 if(s?.evolution_chain?.url){
   try{
@@ -262,8 +298,8 @@ for(const [sid,sname] of evoSpecies){
   }
 }
 if(specialGroups.length)specialSection=`<h3>Formas Especiais da Linha Evolutiva</h3><div class="special-forms-panel">${specialGroups.join('')}</div>`;
-const forms=d.forms?.map(cap).join(', ')||'Forma padrão';const modalTypes=special?.types?.length?special.types:d.types;const modalName=special?specialFormLabel(special.formName,d.name):cap(d.name);const modalImg=special?(initialShiny&&special.shinyArt?special.shinyArt:special.art):sprite(id,initialShiny);$('#modalContent').innerHTML=`<div class="detail-top"><img id="detailImg" src="${modalImg}"><div><span class="num">#${pad(id)} • ${regionOf(id)}</span><h2>${modalName}</h2><div class="types">${modalTypes.map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div><p class="muted">${special?'Forma especial selecionada':'Formas registradas: '+forms}</p><div class="detail-actions"><button id="shinyBtn">✨ Shiny: ${initialShiny?'ON':'OFF'}</button><button id="modalFav" class="fav ${favs.has(id)?'on':''}">★ Favoritar</button><button id="modalAdd" class="primary">＋ Adicionar ao time</button></div></div></div><h3>Linha Evolutiva</h3>${evo}${specialSection}`;modal.classList.remove('charmander-rgb');modal.classList.add('pokemon-rgb');const typePalette={normal:['#a8a77a','#e5e2c7','#7f8064'],fire:['#f0442e','#ff9d32','#ffd35a'],water:['#2589e8','#63b9ff','#195fc1'],electric:['#f2c91c','#fff36a','#d99b00'],grass:['#35a853','#7bdc75','#1f7a3b'],ice:['#55cfd0','#b8f4f1','#3b9da8'],fighting:['#c53b32','#f06a4f','#7e201f'],poison:['#9b4bb0','#dc78e5','#682a7d'],ground:['#c9934d','#e5c57b','#8a5c2d'],flying:['#7aa6e8','#b9d2ff','#6f69b5'],psychic:['#ed4f83','#ff94b6','#a92f66'],bug:['#91a51c','#c8d94a','#596d13'],rock:['#b69b45','#ddc979','#766426'],ghost:['#6a57a5','#9d8bd4','#3e326c'],dragon:['#6245e8','#9a7cff','#3327a0'],dark:['#5b4a42','#9a8073','#2f2724'],steel:['#8fa5b5','#d1dce4','#607583'],fairy:['#e978a7','#ffb6d2','#ad4777']};const ts=special?.types?.length?special.types:(d.types||[]);const p1=typePalette[ts[0]]||['#36a8ff','#8ad8ff','#1d69c7'];const p2=typePalette[ts[1]]||p1;modal.style.setProperty('--poke-c1',p1[0]);modal.style.setProperty('--poke-c2',p1[1]);modal.style.setProperty('--poke-c3',p2[0]);modal.style.setProperty('--poke-c4',p2[1]);modal.style.setProperty('--poke-glow',p1[0]);modal.classList.remove('hidden');restoreScroll(Number(modal.dataset.returnScroll||openingY));let shiny=!!initialShiny;$('#shinyBtn').onclick=()=>{shiny=!shiny;$('#detailImg').src=special?(shiny&&special.shinyArt?special.shinyArt:special.art):sprite(id,shiny);document.querySelectorAll('[data-evo-img]').forEach(img=>img.src=sprite(+img.dataset.evoImg,shiny));document.querySelectorAll('[data-special-img]').forEach(img=>{img.src=shiny?(img.dataset.shinySrc||img.dataset.normalSrc):img.dataset.normalSrc});$('#shinyBtn').textContent=`✨ Shiny: ${shiny?'ON':'OFF'}`};$('#modalFav').onclick=()=>{toggleFav(id,shiny);$('#modalFav').classList.toggle('on',favs.has(id));$('#modalFav').textContent=favs.has(id)?'★ Favoritado':'★ Favoritar'};$('#modalAdd').onclick=()=>addToTeam(id,shiny);document.querySelectorAll('[data-special-open]').forEach(b=>b.onclick=()=>openPokemon(Number(b.dataset.specialId||id),shiny,b.dataset.specialOpen,Number(b.dataset.specialIndex||0)));qsa('[data-evo]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.evo,shiny))}
-function closePokemonModal(){const modal=$('#modal'),y=Number(modal.dataset.returnScroll||stableScrollY());modal.classList.add('hidden');restoreScroll(y)}$('#closeModal').onclick=closePokemonModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closePokemonModal()};
+const forms=d.forms?.map(cap).join(', ')||'Forma padrão';const modalTypes=special?.types?.length?special.types:d.types;const modalName=special?specialFormLabel(special.formName,d.name):cap(d.name);const modalImg=special?(initialShiny&&special.shinyArt?special.shinyArt:special.art):sprite(id,initialShiny);$('#modalContent').innerHTML=`<div class="detail-top"><img id="detailImg" src="${modalImg}"><div><span class="num">#${pad(id)} • ${regionOf(id)}</span><h2>${modalName}</h2><div class="types">${modalTypes.map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join('')}</div><p class="muted">${special?'Forma especial selecionada':'Formas registradas: '+forms}</p><div class="detail-actions"><button id="shinyBtn">✨ Shiny: ${initialShiny?'ON':'OFF'}</button><button id="modalFav" class="fav ${favs.has(id)?'on':''}">★ Favoritar</button><button id="modalAdd" class="primary">＋ Adicionar ao time</button></div></div></div><h3>Linha Evolutiva</h3>${evo}${specialSection}`;modal.classList.remove('charmander-rgb');modal.classList.add('pokemon-rgb');const typePalette={normal:['#a8a77a','#e5e2c7','#7f8064'],fire:['#f0442e','#ff9d32','#ffd35a'],water:['#2589e8','#63b9ff','#195fc1'],electric:['#f2c91c','#fff36a','#d99b00'],grass:['#35a853','#7bdc75','#1f7a3b'],ice:['#55cfd0','#b8f4f1','#3b9da8'],fighting:['#c53b32','#f06a4f','#7e201f'],poison:['#9b4bb0','#dc78e5','#682a7d'],ground:['#c9934d','#e5c57b','#8a5c2d'],flying:['#7aa6e8','#b9d2ff','#6f69b5'],psychic:['#ed4f83','#ff94b6','#a92f66'],bug:['#91a51c','#c8d94a','#596d13'],rock:['#b69b45','#ddc979','#766426'],ghost:['#6a57a5','#9d8bd4','#3e326c'],dragon:['#6245e8','#9a7cff','#3327a0'],dark:['#5b4a42','#9a8073','#2f2724'],steel:['#8fa5b5','#d1dce4','#607583'],fairy:['#e978a7','#ffb6d2','#ad4777']};const ts=special?.types?.length?special.types:(d.types||[]);const p1=typePalette[ts[0]]||['#36a8ff','#8ad8ff','#1d69c7'];const p2=typePalette[ts[1]]||p1;modal.style.setProperty('--poke-c1',p1[0]);modal.style.setProperty('--poke-c2',p1[1]);modal.style.setProperty('--poke-c3',p2[0]);modal.style.setProperty('--poke-c4',p2[1]);modal.style.setProperty('--poke-glow',p1[0]);modal.classList.remove('hidden');let shiny=!!initialShiny;$('#shinyBtn').onclick=()=>{shiny=!shiny;$('#detailImg').src=special?(shiny&&special.shinyArt?special.shinyArt:special.art):sprite(id,shiny);document.querySelectorAll('[data-evo-img]').forEach(img=>img.src=sprite(+img.dataset.evoImg,shiny));document.querySelectorAll('[data-special-img]').forEach(img=>{img.src=shiny?(img.dataset.shinySrc||img.dataset.normalSrc):img.dataset.normalSrc});$('#shinyBtn').textContent=`✨ Shiny: ${shiny?'ON':'OFF'}`};$('#modalFav').onclick=()=>{toggleFav(id,shiny);$('#modalFav').classList.toggle('on',favs.has(id));$('#modalFav').textContent=favs.has(id)?'★ Favoritado':'★ Favoritar'};$('#modalAdd').onclick=()=>addToTeam(id,shiny);document.querySelectorAll('[data-special-open]').forEach(b=>b.onclick=()=>openPokemon(Number(b.dataset.specialId||id),shiny,b.dataset.specialOpen,Number(b.dataset.specialIndex||0)));qsa('[data-evo]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.evo,shiny))}
+function closePokemonModal(){const modal=$('#modal');modal.classList.add('hidden');unlockPageScroll()}$('#closeModal').onclick=closePokemonModal;$('#modal').onclick=e=>{if(e.target.id==='modal')closePokemonModal()};
 function updateHome(){ $('#homeFavs').textContent=favs.size;$('#homeTeams').textContent=teams.length;$('#homeRoulette').textContent=roulette.size;const box=$('#recentList');if(!recent.length){box.className='mini-list empty-state';box.textContent='Nenhum Pokémon pesquisado ainda.';return}box.className='mini-list';box.innerHTML=recent.map(id=>{const p=state.list[id-1]||{name:`#${id}`};return `<button class="mini-poke" data-recent="${id}"><img src="${sprite(id)}">${cap(p.name)}</button>`}).join('');qsa('[data-recent]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.recent))}
 function renderFavs(){const q=$('#favSearch').value.toLowerCase();const arr=[...favs].sort((a,b)=>a-b).map(id=>state.list[id-1]||{id,name:`pokemon-${id}`}).filter(p=>matchesSearch(p,q));$('#favResults').innerHTML=arr.length?arr.map(p=>cardHTML(p,!!favShiny[p.id])).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';bindCards($('#favResults'))}
 $('#clearFavs').onclick=async()=>{if(!favs.size)return;const ok=await siteConfirm('Remover todos os favoritos?',{title:'Limpar Desejos',confirmText:'Remover todos',icon:'⭐',danger:true});if(ok){favs.clear();save();renderFavs()}};$('#favSearch').oninput=renderFavs;
@@ -477,6 +513,7 @@ function bindTeamNameForm(onCreated){
 }
 function createTeam(){
   const modal=$('#teamChooser'),content=$('#teamChooserContent');
+  if(document.body.dataset.scrollLocked!=='1'){document.body.dataset.teamScrollLock='1';lockPageScroll()}
   if(!modal||!content){toast('Não foi possível abrir o criador de equipe.');return null}
   content.innerHTML=teamNameFormHTML();
   modal.classList.remove('hidden');
@@ -501,9 +538,10 @@ async function commitAddToTeam(team,id,shiny=false,iv100=false){
   toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''}${iv100?' 💯':''} adicionado a ${team.name}`);
   return true;
 }
-function closeTeamChooser(){const el=$('#teamChooser');if(el)el.classList.add('hidden')}
+function closeTeamChooser(){const el=$('#teamChooser');if(el)el.classList.add('hidden');if(document.body.dataset.teamScrollLock==='1'){delete document.body.dataset.teamScrollLock;unlockPageScroll()}}
 function openTeamChooser(id,shiny=false,iv100=false){
   const modal=$('#teamChooser'),content=$('#teamChooserContent');
+  if(document.body.dataset.scrollLocked!=='1'){document.body.dataset.teamScrollLock='1';lockPageScroll()}
   if(!modal||!content){const fallback=teams.find(t=>t.members.length<6);if(fallback)return commitAddToTeam(fallback,id,shiny,iv100);toast('Não foi possível abrir o seletor de equipes.');return false}
   const p=state.list[id-1]||{name:`#${id}`};
   modal.dataset.pendingPokemonId=String(id);
