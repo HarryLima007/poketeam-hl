@@ -11,7 +11,32 @@
 
 <section id="teams" class="page"><div class="page-head"><div><span class="eyebrow">TEAM BUILDER</span><h1>⚔️ Times</h1></div><button id="newTeam" class="primary">+ Criar equipe</button></div><div id="teamTabs" class="chips"></div><div id="teamArea"></div></section>
 
-<section id="roulette" class="page"><div class="page-head"><div><span class="eyebrow">1/N • CHANCES IGUAIS</span><h1>🎡 Roleta Pokémon</h1></div><button id="clearRoulette" class="danger">Limpar seleção</button></div><div class="roulette-layout"><div class="wheel-panel panel"><div class="pointer">▼</div><canvas id="wheel" width="620" height="620"></canvas><button id="spin" class="spin primary">GIRAR ROLETA</button><p id="probabilityText">Selecione Pokémon para começar.</p><div id="spinResult"></div></div><div class="picker panel"><div class="toolbar"><input id="rouletteSearch" type="search" placeholder="🔎 Buscar Pokémon"><select id="rouletteRegion"></select></div><div class="picker-actions"><button id="selectVisible">Selecionar exibidos</button><button id="removeVisible">Remover exibidos</button><b id="rouletteCount">0 selecionados</b></div><div id="roulettePicker"></div></div></div></section>
+<section id="roulette" class="page">
+  <div class="page-head"><div><span class="eyebrow">1/N • CHANCES IGUAIS</span><h1>🎡 Roleta Pokémon</h1></div><button id="clearRoulette" class="danger">Limpar seleção</button></div>
+  <div class="roulette-controls panel">
+    <div class="toolbar roulette-toolbar">
+      <input id="rouletteSearch" type="search" placeholder="🔎 Buscar por nome ou número (Pikachu, 25, 025)">
+      <select id="rouletteRegion"></select>
+      <select id="rouletteType"><option value="all">Todos os tipos</option></select>
+    </div>
+    <div id="rouletteCategories" class="chips roulette-categories"></div>
+    <label class="shiny-toggle"><input id="rouletteShiny" type="checkbox"> ✨ Usar versões Shiny na roleta e no resultado</label>
+  </div>
+  <div class="roulette-layout">
+    <div class="wheel-panel panel">
+      <div class="pointer">▼</div>
+      <canvas id="wheel" width="620" height="620"></canvas>
+      <button id="spin" class="spin primary">GIRAR ROLETA</button>
+      <p id="probabilityText">Selecione Pokémon para começar.</p>
+      <div id="rouletteSummary" class="roulette-summary"></div>
+      <div id="spinResult"></div>
+    </div>
+    <div class="picker panel">
+      <div class="picker-actions"><button id="selectVisible">Selecionar exibidos</button><button id="removeVisible">Remover exibidos</button><b id="rouletteCount">0 selecionados</b></div>
+      <div id="roulettePicker"></div>
+    </div>
+  </div>
+</section>
 </main>
 <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><button id="closeModal" class="modal-close">×</button><div id="modalContent"></div></div></div>
 <div id="toast" class="toast"></div><script src="app.js"></script></body></html>
