@@ -30,7 +30,7 @@ const TYPE_CHART={
  steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
  fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}
 };
-const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeTeam:null,rouletteVisible:[]};
+const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeTeam:null,rouletteVisible:[],dexShiny:false};
 const specialArt=new Map();
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 // Dados do usuário ficam no localStorage; cache da PokéAPI fica apenas na sessão.
@@ -200,7 +200,7 @@ async function progressiveDetails(){let next=1,workers=10;async function worker(
 function matchesSearch(p,q){if(!q)return true;q=q.trim().toLowerCase();const n=parseInt(q,10);return p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&p.id===n)}
 async function ensureCategoryFlags(ids){if(!['legendary','mythical'].includes(state.activeCategory))return;const missing=ids.filter(id=>!state.species.has(id));let i=0;async function w(){while(i<missing.length){await getSpecies(missing[i++])}}await Promise.allSettled(Array.from({length:8},w))}
 function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
-let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(token!==dexToken)return;$('#dexResults').innerHTML=list.length?REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,false,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,false));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join(''):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))}
+let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(token!==dexToken)return;$('#dexResults').innerHTML=list.length?REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join(''):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))}
 function cardHTML(p,shiny=false,special=null){
   const d=state.details.get(p.id),baseTypes=d?.types||[],baseName=d?.name||p.name||`#${p.id}`;
   const types=special?.form?.types?.length?special.form.types:baseTypes;
@@ -683,6 +683,14 @@ $('#removeVisible').onclick=()=>{state.rouletteVisible.forEach(id=>{
   roulette.delete(rouletteKey(id,true,false));roulette.delete(rouletteKey(id,true,true));
 });save();renderPicker();drawWheel()};
 $('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWheel();$('#spinResult').innerHTML='';resetSpinState()};
+$('#dexShinyToggle').onclick=()=>{
+  state.dexShiny=!state.dexShiny;
+  const b=$('#dexShinyToggle');
+  b.classList.toggle('active',state.dexShiny);
+  b.setAttribute('aria-pressed',state.dexShiny?'true':'false');
+  const status=b.querySelector('em');if(status)status.textContent=state.dexShiny?'ON':'OFF';
+  renderDex();
+};
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
