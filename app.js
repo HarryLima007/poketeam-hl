@@ -318,7 +318,7 @@ function renderTeams(){
   $('#clearTeam').onclick=async()=>{const ok=await siteConfirm(`Remover todos os Pokémon de "${t.name}"?`,{title:'Limpar equipe',confirmText:'Limpar equipe',icon:'🧹',danger:true});if(ok){t.members=[];t.memberShiny=[];save();renderTeams()}};
   $('#deleteTeam').onclick=async()=>{const ok=await siteConfirm(`Excluir definitivamente a equipe "${t.name}"?`,{title:'Excluir equipe',confirmText:'Excluir equipe',icon:'🗑️',danger:true});if(ok){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
   if($('#teamRecFilter'))$('#teamRecFilter').onchange=e=>{state.teamRecFilter=e.target.value;renderTeams()};
-  $('[data-rec-add]').forEach(b=>b.onclick=()=>openTeamChooser(+b.dataset.recAdd,false));
+  $$('[data-rec-add]').forEach(b=>b.onclick=()=>openTeamChooser(+b.dataset.recAdd,false));
   ensureTeamDetails(t);
 }
 function createTeamNamed(name){
@@ -389,7 +389,7 @@ function openTeamChooser(id,shiny=false){
   }).join(''):'<div class="empty-state">Você ainda não criou nenhuma equipe.</div>';
   content.innerHTML=`<div class="team-chooser-head"><img src="${sprite(id,shiny)}"><div><span class="eyebrow">ADICIONAR AO TIME</span><h2>${cap(p.name)}${shiny?' ✨':''}</h2><p>Escolha uma equipe ou crie uma nova.</p></div></div><div class="team-choice-list">${list}</div><button id="chooserCreateTeam" class="primary">＋ Criar nova equipe</button>`;
   modal.classList.remove('hidden');
-  $('[data-team-choice]').forEach(b=>b.onclick=async()=>{const t=teams.find(x=>x.id===+b.dataset.teamChoice);if(await commitAddToTeam(t,id,shiny))closeTeamChooser()});
+  $$('[data-team-choice]').forEach(b=>b.onclick=async()=>{const t=teams.find(x=>x.id===+b.dataset.teamChoice);if(await commitAddToTeam(t,id,shiny))closeTeamChooser()});
   $('#chooserCreateTeam').onclick=()=>{
     content.innerHTML=teamNameFormHTML('Criar equipe para '+cap(p.name));
     bindTeamNameForm(async t=>{if(await commitAddToTeam(t,id,shiny))closeTeamChooser()});
