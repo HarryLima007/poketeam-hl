@@ -32,7 +32,7 @@
 .coverage-label{display:block;margin-bottom:6px;font-size:12px;font-weight:800;color:#aebbd0}
 .analysis-pill.coverage{border-color:#355d4b;background:#14231d}
 .analysis-pill.uncovered{border-color:#653c43;background:#26171b}
-.analysis-pill.stab{border-color:#465b84;background:#151d30}
+.analysis-pill.elemental{border-color:#465b84;background:#151d30}
 @media(max-width:800px){
   .balance-card{grid-template-columns:1fr}
   .balance-card p{grid-column:auto}
@@ -99,3 +99,5 @@
 .rec-score{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}.rec-score span{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:800}.rec-score strong{font-size:20px}.rec-score button{padding:6px 9px;font-size:11px}
 @media(max-width:900px){.recommendation-grid{grid-template-columns:1fr}.recommendations-head{align-items:flex-start;flex-direction:column}.recommendations-head select{max-width:none;width:100%}}
 @media(max-width:520px){.recommendation-card{grid-template-columns:58px 1fr}.recommendation-card>img{width:56px;height:56px}.rec-score{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-end}}
+
+.synergy-badge{display:inline-flex;margin-top:7px;padding:4px 7px;border-radius:999px;border:1px solid #3a4b68;background:#162137;color:#c9d7ee;font-size:10px;font-weight:900;letter-spacing:.02em}
