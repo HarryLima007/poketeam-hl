@@ -109,3 +109,12 @@
 .site-dialog-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
 .site-dialog-actions .danger{background:#6e2730;border-color:#8b3540;color:#fff}
 @media(max-width:560px){.site-dialog-card{grid-template-columns:44px 1fr}.site-dialog-icon{width:44px;height:44px;font-size:22px}.site-dialog-actions{flex-direction:column-reverse}.site-dialog-actions button{width:100%}}
+
+.iv-variant-row{grid-template-columns:minmax(230px,1fr) repeat(4,auto)}
+.iv100-choice{border-color:#6b5b22;background:#28230f}
+.iv100-choice input{accent-color:#f3c94c}
+.shiny100-choice{border-color:#7d5a8a;background:#27192d}
+.shiny100-choice input{accent-color:#e39cff}
+.roulette-variant-badge{display:inline-flex;margin:6px 0 10px;padding:5px 9px;border-radius:999px;border:1px solid #4b5d7a;background:#172238;font-size:12px;font-weight:900;color:#d9e4f4}
+@media(max-width:1100px){.iv-variant-row{grid-template-columns:1fr 1fr}.picker-pokemon{grid-column:1/-1}.variant-choice{justify-content:center}}
+@media(max-width:620px){.iv-variant-row{grid-template-columns:1fr}.picker-pokemon,.variant-choice{grid-column:1/-1}}
