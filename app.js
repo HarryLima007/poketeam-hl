@@ -94,7 +94,7 @@ function siteConfirm(message,{title='Confirmar ação',confirmText='Confirmar',c
 }
 function safe(fn){try{return fn()}catch(e){console.error(e);toast('Algo deu errado, mas o restante do site continua funcionando.')}}
 function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
-function go(page){document.body.dataset.page=page;$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
+function go(page){document.body.dataset.page=page;$$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
@@ -314,7 +314,7 @@ function renderTeams(){
     return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}${iv100?' 💯':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}${iv100?' • IV 100%':''}</small><button data-remove-member="${i}">Remover</button></div>`
   }).join('');
   $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}${teamRecommendationsHTML(t)}</div>`;
-  $('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);t.memberIV100?.splice(i,1);save();renderTeams()});
+  $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);t.memberIV100?.splice(i,1);save();renderTeams()});
   $('#renameTeam').onclick=()=>{
     const modal=$('#teamChooser'),content=$('#teamChooserContent');
     content.innerHTML=`<div class="team-create-form"><span class="eyebrow">TEAM BUILDER</span><h2>Renomear equipe</h2><label for="teamNameInput">Nome da equipe</label><input id="teamNameInput" type="text" maxlength="40" value="${t.name.replace(/"/g,'&quot;')}" autocomplete="off"><div class="team-create-actions"><button id="cancelTeamCreate">Cancelar</button><button id="confirmTeamCreate" class="primary">Salvar nome</button></div></div>`;
