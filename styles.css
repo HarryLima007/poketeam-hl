@@ -1027,3 +1027,104 @@ body[data-page="wishes"] .poke-card{
 html:has(body[data-page="wishes"]){
   background:#080d28;
 }
+
+/* Desejos v2 — wallpaper aplicado no painel correto */
+body[data-page="wishes"]{
+  background:
+    radial-gradient(circle at 78% 10%,rgba(150,125,255,.16),transparent 28%),
+    linear-gradient(180deg,#dfe6ff 0%,#eee9ff 48%,#e7e2f6 100%) !important;
+  color:#1c2450;
+}
+body[data-page="wishes"] .topbar{
+  background:rgba(247,248,255,.92)!important;
+  border-bottom-color:rgba(70,78,145,.12)!important;
+}
+body[data-page="wishes"] .brand{color:#182044!important}
+body[data-page="wishes"] nav button{color:#56618b}
+body[data-page="wishes"] nav button:hover,
+body[data-page="wishes"] nav button.active{
+  color:#fff;
+  background:linear-gradient(135deg,#6553d9,#a44ed6);
+  border-color:#8f7eea;
+}
+#wishes{
+  color:#1c2450!important;
+  background:transparent!important;
+}
+#wishes .wishes-hero{
+  position:sticky;
+  top:92px;
+  min-height:620px;
+  padding:34px 28px;
+  border-radius:30px;
+  overflow:hidden;
+  color:#fff;
+  background:
+    linear-gradient(180deg,rgba(5,12,45,.08),rgba(10,8,46,.20)),
+    url("desejos-wallpaper.png?v=2") center center / cover no-repeat !important;
+  border:1px solid rgba(148,134,255,.38)!important;
+  box-shadow:0 28px 70px rgba(41,36,104,.24)!important;
+}
+#wishes .wishes-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,8,35,.16) 0%,rgba(10,7,38,.02) 52%,rgba(6,7,32,.18) 100%);
+}
+#wishes .wishes-hero > *{position:relative;z-index:1}
+#wishes .wishes-hero h1{
+  color:#fff!important;
+  text-shadow:0 2px 16px rgba(0,0,40,.28);
+}
+#wishes .wishes-hero p{
+  color:#f2efff!important;
+  text-shadow:0 2px 12px rgba(0,0,40,.36);
+}
+#wishes .wishes-hero .eyebrow{color:#c8c0ff!important}
+#wishes .wishes-hero > img{display:none!important}
+
+#wishes .gallery-toolbar{
+  background:rgba(250,249,255,.80)!important;
+  border:1px solid rgba(102,91,170,.16)!important;
+  box-shadow:0 14px 38px rgba(53,47,106,.10)!important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+#wishes .gallery-toolbar h2{color:#20264f!important}
+#wishes .gallery-toolbar .eyebrow{color:#7663d9!important}
+#wishes .gallery-actions input{
+  background:rgba(255,255,255,.78)!important;
+  color:#20264f!important;
+  border-color:rgba(98,88,160,.20)!important;
+}
+#wishes #clearFavs{
+  background:rgba(255,236,246,.82)!important;
+  color:#c44272!important;
+  border-color:rgba(206,91,135,.20)!important;
+}
+#wishes .poke-card{
+  background:rgba(251,250,255,.82)!important;
+  color:#20264f!important;
+  border-color:rgba(106,96,166,.18)!important;
+  box-shadow:0 14px 36px rgba(57,49,111,.10)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+#wishes .poke-card:hover{
+  border-color:#8a72ea!important;
+  box-shadow:0 18px 44px rgba(91,70,187,.16)!important;
+}
+#wishes .poke-card .num,#wishes .muted{color:#6f7395!important}
+#wishes .poke-card .card-actions button{
+  background:rgba(239,237,255,.88)!important;
+  color:#343a71!important;
+  border-color:rgba(106,96,166,.18)!important;
+}
+html:has(body[data-page="wishes"]){background:#e7e2f6!important}
+@media(max-width:1000px){
+  #wishes .wishes-hero{position:relative;top:auto;min-height:420px;background-position:center 55%!important}
+}
+@media(max-width:680px){
+  #wishes .wishes-hero{min-height:360px;background-position:center 58%!important}
+}
