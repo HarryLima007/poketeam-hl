@@ -94,7 +94,7 @@ function siteConfirm(message,{title='Confirmar ação',confirmText='Confirmar',c
 }
 function safe(fn){try{return fn()}catch(e){console.error(e);toast('Algo deu errado, mas o restante do site continua funcionando.')}}
 function save(){const ok=[store.set('favs',[...favs]),store.set('favShiny',favShiny),store.set('teams',teams),store.set('roulette',[...roulette]),store.set('recent',recent)].every(Boolean);if(!ok)toast('Não foi possível salvar seus dados.');updateHome();return ok}
-function go(page){$$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
+function go(page){document.body.dataset.page=page;$('.page').forEach(x=>x.classList.toggle('active',x.id===page));$('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='wishes')renderFavs();if(page==='teams')renderTeams();if(page==='roulette'){renderPicker();drawWheel()}if(page==='home')updateHome()}
 $$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
@@ -591,6 +591,7 @@ $('#clearRoulette').onclick=()=>{roulette.clear();save();renderPicker();drawWhee
 let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
+document.body.dataset.page='home';
 (async function boot(){
   try{setupSelects()}catch(e){console.error('setupSelects failed',e)}
   try{await initData()}catch(e){console.error('initData failed',e);state.list=Array.from({length:MAX},(_,i)=>({id:i+1,name:`pokemon-${i+1}`}));try{renderDex()}catch(err){console.error(err)}}
