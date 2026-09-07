@@ -8,6 +8,28 @@ const MEGA=new Set([3,6,9,15,18,26,36,65,71,80,94,115,121,127,130,142,150,154,16
 const GMAX=new Set([3,6,9,12,25,52,68,94,99,131,133,143,569,809,812,815,818,823,826,834,839,841,842,844,849,851,858,861,869,879,884,892]);
 const LEGENDARY=new Set([144,145,146,150,243,244,245,249,250,377,378,379,380,381,382,383,384,480,481,482,483,484,485,486,487,488,638,639,640,641,642,643,644,645,646,716,717,718,772,773,785,786,787,788,789,790,791,792,800,888,889,890,891,892,894,895,896,897,898,905,1001,1002,1003,1004,1007,1008,1024]);
 const MYTHICAL=new Set([151,251,385,386,489,490,491,492,493,494,647,648,649,719,720,721,801,802,807,808,809,893,1025]);
+const TYPES=['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'];
+const TYPE_PT={normal:'Normal',fire:'Fogo',water:'Água',electric:'Elétrico',grass:'Planta',ice:'Gelo',fighting:'Lutador',poison:'Veneno',ground:'Terra',flying:'Voador',psychic:'Psíquico',bug:'Inseto',rock:'Pedra',ghost:'Fantasma',dragon:'Dragão',dark:'Sombrio',steel:'Aço',fairy:'Fada'};
+const TYPE_CHART={
+ normal:{rock:.5,ghost:0,steel:.5},
+ fire:{fire:.5,water:.5,grass:2,ice:2,bug:2,rock:.5,dragon:.5,steel:2},
+ water:{fire:2,water:.5,grass:.5,ground:2,rock:2,dragon:.5},
+ electric:{water:2,electric:.5,grass:.5,ground:0,flying:2,dragon:.5},
+ grass:{fire:.5,water:2,grass:.5,poison:.5,ground:2,flying:.5,bug:.5,rock:2,dragon:.5,steel:.5},
+ ice:{fire:.5,water:.5,grass:2,ice:.5,ground:2,flying:2,dragon:2,steel:.5},
+ fighting:{normal:2,ice:2,poison:.5,flying:.5,psychic:.5,bug:.5,rock:2,ghost:0,dark:2,steel:2,fairy:.5},
+ poison:{grass:2,poison:.5,ground:.5,rock:.5,ghost:.5,steel:0,fairy:2},
+ ground:{fire:2,electric:2,grass:.5,poison:2,flying:0,bug:.5,rock:2,steel:2},
+ flying:{electric:.5,grass:2,fighting:2,bug:2,rock:.5,steel:.5},
+ psychic:{fighting:2,poison:2,psychic:.5,dark:0,steel:.5},
+ bug:{fire:.5,grass:2,fighting:.5,poison:.5,flying:.5,psychic:2,ghost:.5,dark:2,steel:.5,fairy:.5},
+ rock:{fire:2,ice:2,fighting:.5,ground:.5,flying:2,bug:2,steel:.5},
+ ghost:{normal:0,psychic:2,ghost:2,dark:.5},
+ dragon:{dragon:2,steel:.5,fairy:0},
+ dark:{fighting:.5,psychic:2,ghost:2,dark:.5,fairy:.5},
+ steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
+ fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}
+};
 const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeTeam:null,rouletteVisible:[]};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 // Dados do usuário ficam no localStorage; cache da PokéAPI fica apenas na sessão.
@@ -80,7 +102,60 @@ function updateHome(){ $('#homeFavs').textContent=favs.size;$('#homeTeams').text
 function renderFavs(){const q=$('#favSearch').value.toLowerCase();const arr=[...favs].sort((a,b)=>a-b).map(id=>state.list[id-1]||{id,name:`pokemon-${id}`}).filter(p=>matchesSearch(p,q));$('#favResults').innerHTML=arr.length?arr.map(p=>cardHTML(p,!!favShiny[p.id])).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';bindCards($('#favResults'))}
 $('#clearFavs').onclick=()=>{if(favs.size&&confirm('Remover todos os favoritos?')){favs.clear();save();renderFavs()}};$('#favSearch').oninput=renderFavs;
 function createTeam(){const name=prompt('Nome da nova equipe:','Equipe '+(teams.length+1));if(!name)return;const id=Date.now();teams.push({id,name:name.trim().slice(0,40),members:[]});state.activeTeam=id;save();renderTeams()}
-function renderTeams(){if(!teams.length){$('#teamTabs').innerHTML='';$('#teamArea').innerHTML='<div class="panel empty-state">Você ainda não criou equipes. Clique em “+ Criar equipe”.</div>';return}if(!teams.some(t=>t.id===state.activeTeam))state.activeTeam=teams[0].id;$('#teamTabs').innerHTML=teams.map(t=>`<button data-team="${t.id}" class="${t.id===state.activeTeam?'active':''}">${t.name}</button>`).join('');$$('[data-team]').forEach(b=>b.onclick=()=>{state.activeTeam=+b.dataset.team;renderTeams()});const t=teams.find(x=>x.id===state.activeTeam);const slots=Array.from({length:6},(_,i)=>{const id=t.members[i];if(!id)return '<div class="slot">Espaço vazio</div>';const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`}).join('');$('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div></div>`;$$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});$('#renameTeam').onclick=()=>{const n=prompt('Novo nome:',t.name);if(n){t.name=n.trim().slice(0,40);save();renderTeams()}};$('#clearTeam').onclick=()=>{if(confirm('Limpar esta equipe?')){t.members=[];t.memberShiny=[];save();renderTeams()}};$('#deleteTeam').onclick=()=>{if(confirm('Excluir esta equipe?')){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}}}
+function defensiveMultiplier(attackType,defenderTypes){
+  return defenderTypes.reduce((m,t)=>m*(TYPE_CHART[attackType]?.[t]??1),1);
+}
+function teamAnalysisHTML(t){
+  if(!t.members.length)return '<div class="team-analysis empty-analysis"><h3>🛡️ Análise de tipos</h3><p>Adicione Pokémon para analisar fraquezas, resistências e imunidades.</p></div>';
+  const missing=t.members.filter(id=>!state.details.get(id)?.types?.length);
+  if(missing.length)return '<div class="team-analysis"><h3>🛡️ Análise de tipos</h3><p class="muted">Carregando tipos dos Pokémon…</p></div>';
+  const members=t.members.map(id=>state.details.get(id));
+  const rows=TYPES.map(type=>{
+    const values=members.map(d=>defensiveMultiplier(type,d.types));
+    return {type,weak:values.filter(v=>v>1).length,resist:values.filter(v=>v>0&&v<1).length,immune:values.filter(v=>v===0).length,max:Math.max(...values)};
+  });
+  const shared=rows.filter(x=>x.weak>=2).sort((a,b)=>b.weak-a.weak||b.max-a.max);
+  const immunities=rows.filter(x=>x.immune>0).sort((a,b)=>b.immune-a.immune);
+  const resistances=rows.filter(x=>x.resist>0).sort((a,b)=>b.resist-a.resist);
+  const badge=(x,kind,count)=>`<span class="analysis-pill ${kind}"><span class="type ${x.type}">${TYPE_PT[x.type]}</span><b>${count}</b></span>`;
+  return `<div class="team-analysis">
+    <div class="analysis-head"><div><span class="eyebrow">DEFESA DO TIME</span><h3>🛡️ Análise de tipos</h3></div><span class="analysis-count">${t.members.length}/6 Pokémon</span></div>
+    <div class="analysis-section"><h4>⚠️ Fraquezas compartilhadas</h4>
+      <div class="analysis-pills">${shared.length?shared.map(x=>badge(x,'weak',x.weak+' vulneráveis')).join(''):'<span class="muted">Nenhuma fraqueza compartilhada por 2 ou mais membros.</span>'}</div>
+    </div>
+    <div class="analysis-section"><h4>🚫 Imunidades</h4>
+      <div class="analysis-pills">${immunities.length?immunities.map(x=>badge(x,'immune',x.immune+' imune'+(x.immune>1?'s':''))).join(''):'<span class="muted">Nenhuma imunidade no time.</span>'}</div>
+    </div>
+    <div class="analysis-section"><h4>🛡️ Resistências</h4>
+      <div class="analysis-pills">${resistances.length?resistances.map(x=>badge(x,'resist',x.resist+' resistente'+(x.resist>1?'s':''))).join(''):'<span class="muted">Nenhuma resistência identificada.</span>'}</div>
+    </div>
+    <p class="analysis-note">A análise usa a combinação dos tipos atuais de cada Pokémon. Habilidades que alteram imunidades ou resistências não entram neste cálculo ainda.</p>
+  </div>`;
+}
+function ensureTeamDetails(t){
+  const missing=[...new Set(t.members.filter(id=>!state.details.get(id)?.types?.length))];
+  if(!missing.length)return;
+  Promise.allSettled(missing.map(getDetail)).then(()=>{if(state.activeTeam===t.id&&$('#teams').classList.contains('active'))renderTeams()});
+}
+function renderTeams(){
+  if(!teams.length){$('#teamTabs').innerHTML='';$('#teamArea').innerHTML='<div class="panel empty-state">Você ainda não criou equipes. Clique em “+ Criar equipe”.</div>';return}
+  if(!teams.some(t=>t.id===state.activeTeam))state.activeTeam=teams[0].id;
+  $('#teamTabs').innerHTML=teams.map(t=>`<button data-team="${t.id}" class="${t.id===state.activeTeam?'active':''}">${t.name}</button>`).join('');
+  $$('[data-team]').forEach(b=>b.onclick=()=>{state.activeTeam=+b.dataset.team;renderTeams()});
+  const t=teams.find(x=>x.id===state.activeTeam);
+  const slots=Array.from({length:6},(_,i)=>{
+    const id=t.members[i];
+    if(!id)return '<div class="slot">Espaço vazio</div>';
+    const shiny=!!t.memberShiny?.[i],p=state.list[id-1]||{name:`#${id}`},d=state.details.get(id);
+    return `<div class="slot filled"><img src="${sprite(id,shiny)}"><h4>${cap(p.name)}${shiny?' ✨':''}</h4><small>#${pad(id)} ${d?.types?.join(' / ')||''}</small><button data-remove-member="${i}">Remover</button></div>`
+  }).join('');
+  $('#teamArea').innerHTML=`<div class="team-card"><div class="team-head"><h2>${t.name}</h2><div><button id="renameTeam">Renomear</button> <button id="clearTeam">Limpar</button> <button id="deleteTeam" class="danger">Excluir</button></div></div><div class="team-slots">${slots}</div>${teamAnalysisHTML(t)}</div>`;
+  $$('[data-remove-member]').forEach(b=>b.onclick=()=>{const i=+b.dataset.removeMember;t.members.splice(i,1);t.memberShiny?.splice(i,1);save();renderTeams()});
+  $('#renameTeam').onclick=()=>{const n=prompt('Novo nome:',t.name);if(n){t.name=n.trim().slice(0,40);save();renderTeams()}};
+  $('#clearTeam').onclick=()=>{if(confirm('Limpar esta equipe?')){t.members=[];t.memberShiny=[];save();renderTeams()}};
+  $('#deleteTeam').onclick=()=>{if(confirm('Excluir esta equipe?')){teams=teams.filter(x=>x.id!==t.id);state.activeTeam=teams[0]?.id||null;save();renderTeams()}};
+  ensureTeamDetails(t);
+}
 function addToTeam(id,shiny=false){if(!teams.length){toast('Crie uma equipe primeiro ⚔️');go('teams');return}const t=teams.find(x=>x.id===state.activeTeam)||teams[0];if(t.members.length>=6){toast(`${t.name} já tem 6 Pokémon.`);return}if(t.members.includes(id)&&!confirm(`${cap(state.list[id-1]?.name||'Pokémon')} já está nesta equipe. Deseja mesmo adicionar outra?`))return;t.memberShiny=Array.isArray(t.memberShiny)?t.memberShiny:[];while(t.memberShiny.length<t.members.length)t.memberShiny.push(false);t.members.push(id);t.memberShiny.push(!!shiny);save();toast(`${cap(state.list[id-1]?.name||'Pokémon')}${shiny?' ✨':''} adicionado a ${t.name}`)}
 $('#newTeam').onclick=createTeam;
 function rouletteFiltered(){const q=$('#rouletteSearch').value,reg=$('#rouletteRegion').value;return state.list.filter(p=>matchesSearch(p,q)&&(reg==='all'||regionOf(p.id)===reg))}
