@@ -1128,3 +1128,19 @@ html:has(body[data-page="wishes"]){background:#e7e2f6!important}
 @media(max-width:680px){
   #wishes .wishes-hero{min-height:360px;background-position:center 58%!important}
 }
+
+/* Desejos v3 — corrigir wallpaper vazando para a página inteira */
+body[data-page="wishes"]{
+  background:
+    radial-gradient(circle at 82% 8%,rgba(157,136,235,.18),transparent 30%),
+    linear-gradient(180deg,#e8e9f7 0%,#f1edf8 48%,#e8e4f2 100%) !important;
+  background-image:
+    radial-gradient(circle at 82% 8%,rgba(157,136,235,.18),transparent 30%),
+    linear-gradient(180deg,#e8e9f7 0%,#f1edf8 48%,#e8e4f2 100%) !important;
+}
+#wishes .wishes-hero{
+  background:
+    linear-gradient(180deg,rgba(7,13,46,.12),rgba(12,8,48,.22)),
+    url("desejos-wallpaper.png?v=3") center center / cover no-repeat !important;
+}
+#wishes .wishes-hero > img{display:none!important}
