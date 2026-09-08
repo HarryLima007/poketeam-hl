@@ -1752,3 +1752,19 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     transform:translate(-50%, 104px)!important;
   }
 }
+
+
+/* Home — correção efetiva: descer SOMENTE os quatro atalhos sem tocar em Recentes */
+@media(min-width:1200px){
+  #home .quick-grid{
+    position:relative!important;
+    top:150px!important;
+    transform:translateX(-50%)!important;
+  }
+}
+@media(min-width:1600px){
+  #home .quick-grid{
+    top:165px!important;
+    transform:translateX(-50%)!important;
+  }
+}
