@@ -2571,3 +2571,41 @@ button.form-overview-card:hover{
   .type-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .category-filter-grid{grid-template-columns:1fr}
 }
+
+
+/* Correção: painel de filtros não pode ser cortado pela sidebar */
+.pokedex-shell,
+.pokedex-shell .sidebar,
+.pokedex-shell .side-card,
+.dex-filter-wrap{
+  overflow:visible;
+}
+.dex-filter-panel{
+  box-sizing:border-box;
+  max-width:min(620px,calc(100vw - 24px));
+}
+@media (min-width:701px){
+  .dex-filter-panel{
+    left:0;
+    right:auto;
+    width:min(620px,calc(100vw - 32px));
+  }
+}
+@media (max-width:700px){
+  .dex-filter-panel{
+    box-sizing:border-box;
+    left:12px;
+    right:12px;
+    width:auto;
+    max-width:none;
+    overflow-x:hidden;
+  }
+  .type-filter-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+  }
+  .type-filter-chip{
+    min-width:0;
+    max-width:100%;
+  }
+}
