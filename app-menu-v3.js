@@ -332,14 +332,20 @@ function setupSelects(){
   qsa('[data-roulette-cat]').forEach(b=>b.onclick=()=>{qsa('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
   $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
 
-  const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters'),shell=document.querySelector('#pokedex .pokedex-shell');
+  const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters');
   const setFilterPanelOpen=(isOpen)=>{
     panel.classList.toggle('hidden',!isOpen);
     open.setAttribute('aria-expanded',isOpen?'true':'false');
-    shell?.classList.toggle('filters-open',isOpen);
   };
   open.onclick=()=>setFilterPanelOpen(panel.classList.contains('hidden'));
   close.onclick=()=>setFilterPanelOpen(false);
+
+  qsa('[data-filter-tab]').forEach(tab=>tab.onclick=()=>{
+    const target=tab.dataset.filterTab;
+    qsa('[data-filter-tab]').forEach(x=>x.classList.toggle('active',x===tab));
+    $('#dexFilterTypesPanel').classList.toggle('active',target==='types');
+    $('#dexFilterCategoriesPanel').classList.toggle('active',target==='categories');
+  });
   syncDexCategoryUI();
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
