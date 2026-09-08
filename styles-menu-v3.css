@@ -1707,3 +1707,16 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-bottom:8px!important;
   }
 }
+
+
+/* Home — aproxima atalhos do bloco Pesquisados recentemente */
+@media(min-width:1200px){
+  #home>.panel{
+    margin-top:58px!important;
+  }
+}
+@media(min-width:1600px){
+  #home>.panel{
+    margin-top:62px!important;
+  }
+}
