@@ -1625,3 +1625,26 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     gap:26px!important;
   }
 }
+
+
+/* Home — ordem/posição final: atalhos acima dos pesquisados recentemente */
+@media(min-width:1200px){
+  #home .quick-grid{
+    margin-top:22px!important;
+    margin-bottom:34px!important;
+  }
+  #home>.panel{
+    margin-top:34px!important;
+    margin-bottom:70px!important;
+  }
+}
+@media(min-width:1600px){
+  #home .quick-grid{
+    margin-top:22px!important;
+    margin-bottom:38px!important;
+  }
+  #home>.panel{
+    margin-top:38px!important;
+    margin-bottom:80px!important;
+  }
+}
