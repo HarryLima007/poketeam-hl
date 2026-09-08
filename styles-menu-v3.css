@@ -1410,3 +1410,28 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
   .topbar #nav button{font-size:15.5px!important;padding:0 16px!important}
   .global-search{width:250px!important}
 }
+
+/* Menu por partes — etapa 1: logo PokéTeam */
+@media(min-width:1200px){
+  .topbar .brand{
+    justify-self:start!important;
+    font-size:24px!important;
+    font-weight:900!important;
+    letter-spacing:-.55px!important;
+    gap:12px!important;
+    padding:0!important;
+    min-height:52px!important;
+  }
+  .topbar .brand .ball{
+    width:36px!important;
+    height:36px!important;
+    flex:0 0 36px!important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.20)!important;
+  }
+  .topbar .brand .ball:after{
+    width:8px!important;
+    height:8px!important;
+    left:11px!important;
+    top:11px!important;
+  }
+}
