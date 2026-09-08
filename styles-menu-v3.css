@@ -2373,3 +2373,49 @@ button.form-overview-card:hover{
   20%{box-shadow:0 0 0 4px rgba(71,188,255,.85),0 0 28px rgba(71,188,255,.42)}
   55%{box-shadow:0 0 0 2px rgba(71,188,255,.5),0 0 18px rgba(71,188,255,.22)}
 }
+
+
+/* Pokédex — filtros combináveis */
+.dex-combo-filter{
+  display:grid;
+  gap:8px;
+  margin:14px 0 10px;
+}
+.dex-combo-filter select,
+.dex-combo-filter button{
+  width:100%;
+}
+.dex-combo-filter button{
+  min-height:38px;
+  border:1px solid rgba(101,159,220,.24);
+  border-radius:11px;
+  background:rgba(10,29,54,.58);
+  color:var(--muted,#a9bdd4);
+  cursor:pointer;
+}
+.dex-combo-filter button:hover{
+  border-color:rgba(88,188,255,.55);
+  color:#dff5ff;
+}
+.active-filter-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  min-height:0;
+  margin:0 0 10px;
+}
+.active-filter-summary span{
+  font-size:10px;
+  color:var(--muted,#9eb3c9);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.active-filter-summary b{
+  padding:4px 8px;
+  border:1px solid rgba(71,183,255,.26);
+  border-radius:999px;
+  background:rgba(41,132,198,.13);
+  color:#9edfff;
+  font-size:10px;
+}
