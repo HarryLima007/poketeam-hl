@@ -1,12 +1,14 @@
 'use strict';
 const API='https://pokeapi.co/api/v2'; const MAX=1025;
 const REGIONS=[['Kanto',1,151],['Johto',152,251],['Hoenn',252,386],['Sinnoh',387,493],['Unova',494,649],['Kalos',650,721],['Alola',722,809],['Galar',810,898],['Hisui',899,905],['Paldea',906,1025]];
+// Special-group reference lists reviewed against PokéAPI/Bulbapedia (Sep 2026).
 const UB=new Set([793,794,795,796,797,798,799,803,804,805,806]);
+const PARADOX=new Set([984,985,986,987,988,989,990,991,992,993,994,995,1005,1006,1007,1008,1009,1010,1020,1021,1022,1023]);
 const STARTERS=new Set([1,2,3,4,5,6,7,8,9,152,153,154,155,156,157,158,159,160,252,253,254,255,256,257,258,259,260,387,388,389,390,391,392,393,394,395,495,496,497,498,499,500,501,502,503,650,651,652,653,654,655,656,657,658,722,723,724,725,726,727,728,729,730,810,811,812,813,814,815,816,817,818,906,907,908,909,910,911,912,913,914]);
 // Species with a known Mega Evolution as of Sep 2026, including Legends: Z-A + Mega Dimension.
 const MEGA=new Set([3,6,9,15,18,26,36,65,71,80,94,115,121,127,130,142,150,154,160,181,208,212,214,229,248,254,257,260,282,302,303,306,308,310,319,323,334,354,359,362,373,376,380,381,384,428,445,448,460,475,531,719,9,18,26,36,71,121,149,154,160,227,358,359,398,445,448,478,485,491,500,530,545,560,604,609,623,652,655,658,668,670,678,687,689,691,701,718,740,768,780,801,807,870,952,970,978,998]);
 const GMAX=new Set([3,6,9,12,25,52,68,94,99,131,133,143,569,809,812,815,818,823,826,834,839,841,842,844,849,851,858,861,869,879,884,892]);
-const LEGENDARY=new Set([144,145,146,150,243,244,245,249,250,377,378,379,380,381,382,383,384,480,481,482,483,484,485,486,487,488,638,639,640,641,642,643,644,645,646,716,717,718,772,773,785,786,787,788,789,790,791,792,800,888,889,890,891,892,894,895,896,897,898,905,1001,1002,1003,1004,1007,1008,1024]);
+const LEGENDARY=new Set([144,145,146,150,243,244,245,249,250,377,378,379,380,381,382,383,384,480,481,482,483,484,485,486,487,488,638,639,640,641,642,643,644,645,646,716,717,718,772,773,785,786,787,788,789,790,791,792,800,888,889,890,891,892,894,895,896,897,898,905,1001,1002,1003,1004,1007,1008,1014,1015,1016,1017,1024]);
 const MYTHICAL=new Set([151,251,385,386,489,490,491,492,493,494,647,648,649,719,720,721,801,802,807,808,809,893,1025]);
 const TYPES=['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'];
 const TYPE_PT={normal:'Normal',fire:'Fogo',water:'Água',electric:'Elétrico',grass:'Planta',ice:'Gelo',fighting:'Lutador',poison:'Veneno',ground:'Terra',flying:'Voador',psychic:'Psíquico',bug:'Inseto',rock:'Pedra',ghost:'Fantasma',dragon:'Dragão',dark:'Sombrio',steel:'Aço',fairy:'Fada'};
@@ -211,7 +213,7 @@ function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
   $('#regionFilter').innerHTML=opts;
   $('#rouletteRegion').innerHTML=opts;
-  const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
+  const cats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
   $('#categoryFilters').innerHTML=cats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
   qsa('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;qsa('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()});
   $('#rouletteCategories').innerHTML=cats.map(([v,l])=>`<button data-roulette-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
@@ -259,7 +261,7 @@ async function getSpecies(id){if(state.species.has(id))return state.species.get(
 async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id)}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache'}
 function matchesSearch(p,q){if(!q)return true;q=q.trim().toLowerCase();const n=parseInt(q,10);return p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&p.id===n)}
 async function ensureCategoryFlags(ids){if(!['legendary','mythical'].includes(state.activeCategory))return;const missing=ids.filter(id=>!state.species.has(id));let i=0;async function w(){while(i<missing.length){await getSpecies(missing[i++])}}await Promise.allSettled(Array.from({length:8},w))}
-function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
+function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='paradox')return PARADOX.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
 let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join(''):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
 function cardHTML(p,shiny=false,special=null){
   const d=state.details.get(p.id),baseTypes=d?.types||[],baseName=d?.name||p.name||`#${p.id}`;
@@ -616,6 +618,7 @@ function rouletteVariantLabel(entry){
 function rouletteCategoryMatch(p,cat){
   if(cat==='all')return true;
   if(cat==='ub')return UB.has(p.id);
+  if(cat==='paradox')return PARADOX.has(p.id);
   if(cat==='starter')return STARTERS.has(p.id);
   if(cat==='mega')return MEGA.has(p.id);
   if(cat==='gmax')return GMAX.has(p.id);
