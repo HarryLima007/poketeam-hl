@@ -8,7 +8,18 @@ const STARTERS=new Set([1,2,3,4,5,6,7,8,9,152,153,154,155,156,157,158,159,160,25
 
 // Espécies com formas/variedades alternativas registradas na PokéAPI.
 // Mega e Gigantamax continuam em categorias próprias.
-const TRANSFORMABLE=new Set([19,20,25,26,27,28,37,38,50,51,52,53,58,59,74,75,76,77,78,79,80,83,88,89,100,101,103,105,110,122,128,133,144,145,146,157,194,199,211,215,222,263,264,351,382,383,386,413,479,483,484,487,492,503,549,550,554,555,562,570,571,618,628,641,642,645,646,647,648,658,670,678,681,705,706,710,711,713,718,720,724,735,738,741,743,744,745,746,752,754,758,774,777,778,784,800,801,845,849,875,876,877,888,889,890,892,893,898,901,902,905,916,925,931,964,978,982,999,1007,1008,1017,1024]);
+const REGIONAL_FORM_SPECIES=new Set([
+  19,20,26,27,28,37,38,50,51,52,53,74,75,76,88,89,103,105,
+  77,78,79,80,83,110,122,144,145,146,199,222,263,264,554,555,562,618,
+  58,59,100,101,157,211,215,503,549,570,571,628,705,706,713,724,
+  128,194
+]);
+// Espécies não-regionais com variedades/formas relevantes expostas pela PokéAPI.
+// A lista é um índice de carregamento; a classificação final é feita pelo nome real da variedade.
+const TRANSFORMABLE=new Set([
+  ...REGIONAL_FORM_SPECIES,
+  25,351,386,413,421,422,423,479,483,484,487,492,493,550,585,586,641,642,645,646,647,648,658,666,669,670,671,676,678,681,710,711,718,720,735,738,741,743,744,745,746,752,754,758,774,777,778,784,800,801,845,849,875,876,877,888,889,890,892,893,898,901,902,905,916,925,931,964,978,982,999,1007,1008,1017,1024
+]);
 // Species with a known Mega Evolution as of Sep 2026, including Legends: Z-A + Mega Dimension.
 const MEGA=new Set([3,6,9,15,18,26,36,65,71,80,94,115,121,127,130,142,150,154,160,181,208,212,214,229,248,254,257,260,282,302,303,306,308,310,319,323,334,354,359,362,373,376,380,381,384,428,445,448,460,475,531,719,9,18,26,36,71,121,149,154,160,227,358,359,398,445,448,478,485,491,500,530,545,560,604,609,623,652,655,658,668,670,678,687,689,691,701,718,740,768,780,801,807,870,952,970,978,998]);
 const GMAX=new Set([3,6,9,12,25,52,68,94,99,131,133,143,569,809,812,815,818,823,826,834,839,841,842,844,849,851,858,861,869,879,884,892]);
@@ -140,31 +151,42 @@ async function ensureSpecialCategoryArt(list,category){
   if(!['mega','gmax'].includes(category)||!list.length)return;
   await Promise.allSettled(list.map(p=>getSpecialForms(p.id,category)));
 }
+function transformationLabel(speciesName,formName){
+  const tail=formName.startsWith(speciesName+'-')?formName.slice(speciesName.length+1):formName;
+  const regional={alola:'Forma de Alola',galar:'Forma de Galar',hisui:'Forma de Hisui',paldea:'Forma de Paldea'};
+  for(const [key,label] of Object.entries(regional)){
+    if(tail===key||tail.startsWith(key+'-')){
+      const extra=tail.slice(key.length).replace(/^-+/,'').split('-').filter(Boolean).map(cap).join(' ');
+      return `${cap(speciesName)} — ${label}${extra?' '+extra:''}`;
+    }
+  }
+  return `${cap(speciesName)} ${tail.split('-').map(cap).join(' ')}`;
+}
 async function getTransformationForms(id){
   const key=`transform:${id}:forms`;
   if(specialArt.has(key))return specialArt.get(key);
   const s=await getSpecies(id);
   if(!s){specialArt.set(key,[]);return []}
   const speciesName=s.name||state.list[id-1]?.name||'';
-  const varieties=(s.varieties||[]).filter(v=>!v.is_default).filter(v=>{
-    const n=v.pokemon?.name||'';
-    return n&&!n.includes('-mega')&&!n.includes('-gmax');
-  });
+  const varietyNames=(s.varieties||[]).filter(v=>!v.is_default).map(v=>v.pokemon?.name).filter(Boolean)
+    .filter(n=>!n.includes('-mega')&&!n.includes('-gmax'));
+  // Primal Reversion is a true transformation but is not consistently surfaced in species.varieties.
+  if(id===382&&!varietyNames.includes('kyogre-primal'))varietyNames.push('kyogre-primal');
+  if(id===383&&!varietyNames.includes('groudon-primal'))varietyNames.push('groudon-primal');
+
   const forms=[];
-  for(const v of varieties){
+  for(const formName of [...new Set(varietyNames)]){
     try{
-      const p=await fetchJSON(v.pokemon.url,`transform_v1_${v.pokemon.name}`);
+      const p=await fetchJSON(`${API}/pokemon/${formName}`,`transform_v2_${formName}`);
       const art=p?.sprites?.other?.['official-artwork']?.front_default
         ||p?.sprites?.other?.home?.front_default
         ||p?.sprites?.front_default||'';
       const shinyArt=p?.sprites?.other?.['official-artwork']?.front_shiny
         ||p?.sprites?.other?.home?.front_shiny
         ||p?.sprites?.front_shiny||'';
-      if(!art)continue;
-      const tail=v.pokemon.name.startsWith(speciesName+'-')?v.pokemon.name.slice(speciesName.length+1):v.pokemon.name;
-      const label=`${cap(speciesName)} ${cap(tail)}`;
-      forms.push({formName:v.pokemon.name,label,art,shinyArt,types:(p.types||[]).sort((a,b)=>a.slot-b.slot).map(x=>x.type.name)});
-    }catch(e){console.warn('transformation form unavailable',v.pokemon?.name,e)}
+      if(!art||forms.some(f=>f.formName===formName))continue;
+      forms.push({formName,label:transformationLabel(speciesName,formName),art,shinyArt,types:(p.types||[]).sort((a,b)=>a.slot-b.slot).map(x=>x.type.name)});
+    }catch(e){console.warn('transformation form unavailable',formName,e)}
   }
   specialArt.set(key,forms);
   return forms;
@@ -315,18 +337,20 @@ function paradoxSections(list){
 }
 function transformationGroup(form){
   const n=(form?.formName||'').toLowerCase();
-  if(n.includes('-alola'))return 'alola';
-  if(n.includes('-galar'))return 'galar';
-  if(n.includes('-hisui'))return 'hisui';
-  if(n.includes('-paldea'))return 'paldea';
+  if(/-alola(?:-|$)/.test(n))return 'alola';
+  if(/-galar(?:-|$)/.test(n))return 'galar';
+  if(/-hisui(?:-|$)/.test(n))return 'hisui';
+  if(/-paldea(?:-|$)/.test(n))return 'paldea';
 
-  const specialKeywords=[
+  // Mudanças de forma acionadas por item, habilidade, batalha, fusão ou estado.
+  const transformationKeywords=[
     'primal','unbound','origin','therian','black','white','resolute','pirouette',
     'ash','battle-bond','zen','school','blade','shield','complete','10','50',
-    'ultra','dusk','dawn','crowned','eternamax','hero','hangry','gulping',
-    'gorging','noice','ice-rider','shadow-rider'
+    'ultra','dusk-mane','dawn-wings','crowned','eternamax','hero','hangry',
+    'gulping','gorging','noice','ice-rider','shadow-rider','terastal','stellar',
+    'sunshine','rainy','snowy','sunny','overcast'
   ];
-  if(specialKeywords.some(k=>n.includes(k)))return 'special';
+  if(transformationKeywords.some(k=>n.includes(k)))return 'special';
   return 'other';
 }
 function transformationSections(list){
@@ -335,8 +359,8 @@ function transformationSections(list){
     ['galar','Formas de Galar'],
     ['hisui','Formas de Hisui'],
     ['paldea','Formas de Paldea'],
-    ['special','Transformações Especiais'],
-    ['other','Outras Formas']
+    ['special','Transformações / Mudanças de Forma'],
+    ['other','Outras Formas e Variações']
   ];
   const buckets=new Map(groups.map(([key])=>[key,[]]));
   list.forEach(p=>{
