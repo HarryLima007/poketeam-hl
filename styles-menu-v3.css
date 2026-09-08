@@ -2673,3 +2673,87 @@ button.form-overview-card:hover{
     margin-top:10px;
   }
 }
+
+
+/* Painel de filtros compacto dentro da sidebar */
+#pokedex .pokedex-shell.filters-open{
+  grid-template-columns:270px minmax(0,1fr)!important;
+}
+#pokedex .pokedex-side{
+  overflow:visible!important;
+}
+#pokedex .dex-filter-panel{
+  position:static!important;
+  width:100%!important;
+  max-width:none!important;
+  max-height:430px!important;
+  margin-top:8px!important;
+  padding:12px!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+}
+#pokedex .dex-filter-panel-head{
+  margin-bottom:8px!important;
+}
+#pokedex .dex-filter-panel-head h3{
+  font-size:16px!important;
+}
+#pokedex .dex-filter-panel-head .eyebrow{
+  font-size:9px!important;
+}
+#pokedex .dex-filter-section{
+  padding:8px 0!important;
+}
+#pokedex .dex-filter-section h4{
+  margin-bottom:6px!important;
+  font-size:10px!important;
+}
+.dex-filter-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin:8px 0;
+}
+.dex-filter-tabs button{
+  min-height:34px;
+  padding:6px 8px;
+  border:1px solid rgba(88,159,216,.22);
+  border-radius:9px;
+  background:rgba(9,30,55,.72);
+  color:#b9cee1;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.dex-filter-tabs button.active{
+  background:rgba(43,139,204,.34);
+  border-color:rgba(79,191,255,.65);
+  color:#fff;
+}
+.dex-filter-tab-panel{display:none}
+.dex-filter-tab-panel.active{display:block}
+#pokedex .type-filter-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:6px!important;
+}
+#pokedex .type-filter-chip{
+  min-height:30px!important;
+  padding:3px 6px!important;
+  font-size:9px!important;
+}
+#pokedex .category-filter-grid{
+  grid-template-columns:1fr!important;
+  gap:6px!important;
+}
+#pokedex .category-filter-grid button{
+  min-height:34px!important;
+  padding:6px 8px!important;
+  font-size:10px!important;
+}
+#pokedex .dex-filter-actions{
+  padding-top:8px!important;
+}
+#pokedex .dex-filter-actions button{
+  min-height:32px!important;
+  font-size:10px!important;
+}
