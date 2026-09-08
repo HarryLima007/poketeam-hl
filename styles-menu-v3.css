@@ -1553,3 +1553,26 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-bottom:135px!important;
   }
 }
+
+/* Recentes — tamanho/posição conforme marcação do usuário */
+@media(min-width:1200px){
+  #home>.panel{
+    box-sizing:border-box!important;
+    width:calc(100% + 620px)!important;
+    max-width:none!important;
+    margin-left:-310px!important;
+    margin-right:-310px!important;
+    margin-top:70px!important;
+    min-height:220px!important;
+    padding:28px 34px!important;
+  }
+}
+@media(min-width:1600px){
+  #home>.panel{
+    width:calc(100% + 760px)!important;
+    margin-left:-380px!important;
+    margin-right:-380px!important;
+    margin-top:78px!important;
+    min-height:245px!important;
+  }
+}
