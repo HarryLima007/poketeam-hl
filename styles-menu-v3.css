@@ -2005,3 +2005,17 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     font-size:172px!important;
   }
 }
+
+
+/* Home — sobe somente o conteúdo textual esquerdo para perto da barra superior.
+   Não alterar atalhos, Recentes ou frase inferior. */
+@media(min-width:1200px){
+  #home .hero-copy{
+    top:-82px!important;
+  }
+}
+@media(min-width:1600px){
+  #home .hero-copy{
+    top:-92px!important;
+  }
+}
