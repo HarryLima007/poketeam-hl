@@ -1481,3 +1481,30 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
   }
   .topbar #nav button .nav-icon{font-size:20px!important}
 }
+
+/* Menu por partes — etapa 2B: navegação central com escala forte */
+@media(min-width:1200px){
+  .topbar #nav{gap:22px!important}
+  .topbar #nav button{
+    min-height:54px!important;height:54px!important;
+    padding:0 22px!important;border-radius:18px!important;
+    font-size:18px!important;font-weight:800!important;
+    gap:11px!important;
+  }
+  .topbar #nav button .nav-icon{font-size:22px!important}
+  .topbar #nav button.active{
+    padding-left:24px!important;padding-right:24px!important;
+    border:1.5px solid #28aaff!important;
+    background:linear-gradient(135deg,rgba(14,66,115,.98),rgba(8,38,73,.98))!important;
+    box-shadow:0 0 0 1px rgba(46,173,255,.12),0 0 28px rgba(25,145,255,.20),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  }
+}
+@media(min-width:1600px){
+  .topbar #nav{gap:25px!important}
+  .topbar #nav button{
+    min-height:56px!important;height:56px!important;
+    padding:0 24px!important;font-size:19px!important;gap:12px!important;
+  }
+  .topbar #nav button .nav-icon{font-size:23px!important}
+  .topbar #nav button.active{padding-left:26px!important;padding-right:26px!important}
+}
