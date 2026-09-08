@@ -1739,3 +1739,16 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-top:132px!important;
   }
 }
+
+
+/* Home — Recentes TRAVADO; mover somente os quatro atalhos para baixo */
+@media(min-width:1200px){
+  #home .quick-grid{
+    transform:translate(-50%, 92px)!important;
+  }
+}
+@media(min-width:1600px){
+  #home .quick-grid{
+    transform:translate(-50%, 104px)!important;
+  }
+}
