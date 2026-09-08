@@ -1883,3 +1883,13 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     transform:translateX(-50%)!important;
   }
 }
+
+
+/* Home — correção apenas para monitores largos.
+   Mantém Pesquisados recentemente travado e ajusta somente os quatro atalhos. */
+@media(min-width:1600px){
+  #home .quick-grid{
+    top:112px!important;
+    transform:translateX(-50%)!important;
+  }
+}
