@@ -1963,3 +1963,45 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     left:calc(50% + 50vw - 174px)!important;
   }
 }
+
+
+/* Home — texto esquerdo 2x maior. Não tocar nos atalhos nem em Recentes. */
+@media(min-width:1200px){
+  #home .hero-copy{
+    width:min(1080px,calc(100vw - 40px))!important;
+    max-width:1080px!important;
+  }
+  #home .hero-copy .eyebrow{
+    font-size:26px!important;
+    margin-bottom:28px!important;
+  }
+  #home .hero-copy h1{
+    font-size:clamp(128px,9.8vw,172px)!important;
+    line-height:.91!important;
+    margin-bottom:40px!important;
+  }
+  #home .hero-copy p{
+    font-size:30px!important;
+    max-width:1080px!important;
+    line-height:1.55!important;
+  }
+  #home .hero-actions{
+    margin-top:48px!important;
+    gap:24px!important;
+  }
+  #home .hero-actions button{
+    min-height:100px!important;
+    padding:0 44px!important;
+    font-size:28px!important;
+    border-radius:20px!important;
+  }
+}
+@media(min-width:1600px){
+  #home .hero-copy{
+    width:min(1140px,calc(100vw - 40px))!important;
+    max-width:1140px!important;
+  }
+  #home .hero-copy h1{
+    font-size:172px!important;
+  }
+}
