@@ -332,9 +332,14 @@ function setupSelects(){
   qsa('[data-roulette-cat]').forEach(b=>b.onclick=()=>{qsa('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
   $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
 
-  const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters');
-  open.onclick=()=>{panel.classList.toggle('hidden');open.setAttribute('aria-expanded',panel.classList.contains('hidden')?'false':'true')};
-  close.onclick=()=>{panel.classList.add('hidden');open.setAttribute('aria-expanded','false')};
+  const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters'),shell=document.querySelector('#pokedex .pokedex-shell');
+  const setFilterPanelOpen=(isOpen)=>{
+    panel.classList.toggle('hidden',!isOpen);
+    open.setAttribute('aria-expanded',isOpen?'true':'false');
+    shell?.classList.toggle('filters-open',isOpen);
+  };
+  open.onclick=()=>setFilterPanelOpen(panel.classList.contains('hidden'));
+  close.onclick=()=>setFilterPanelOpen(false);
   syncDexCategoryUI();
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
