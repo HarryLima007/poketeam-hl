@@ -313,7 +313,46 @@ function paradoxSections(list){
     return `<section class="region-section paradox-section"><div class="region-title"><h2>${title}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`;
   }).join('');
 }
-let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(state.activeCategory==='transform'&&list.length){await ensureTransformationArt(list)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?(state.activeCategory==='paradox'?paradoxSections(list):REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax','transform'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join('')):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
+function transformationGroup(form){
+  const n=(form?.formName||'').toLowerCase();
+  if(n.includes('-alola'))return 'alola';
+  if(n.includes('-galar'))return 'galar';
+  if(n.includes('-hisui'))return 'hisui';
+  if(n.includes('-paldea'))return 'paldea';
+
+  const specialKeywords=[
+    'primal','unbound','origin','therian','black','white','resolute','pirouette',
+    'ash','battle-bond','zen','school','blade','shield','complete','10','50',
+    'ultra','dusk','dawn','crowned','eternamax','hero','hangry','gulping',
+    'gorging','noice','ice-rider','shadow-rider'
+  ];
+  if(specialKeywords.some(k=>n.includes(k)))return 'special';
+  return 'other';
+}
+function transformationSections(list){
+  const groups=[
+    ['alola','Formas de Alola'],
+    ['galar','Formas de Galar'],
+    ['hisui','Formas de Hisui'],
+    ['paldea','Formas de Paldea'],
+    ['special','Transformações Especiais'],
+    ['other','Outras Formas']
+  ];
+  const buckets=new Map(groups.map(([key])=>[key,[]]));
+  list.forEach(p=>{
+    const forms=specialFormsFor(p.id,'transform');
+    forms.forEach((form,i)=>{
+      const key=transformationGroup(form);
+      buckets.get(key)?.push(cardHTML(p,state.dexShiny,{category:'transform',formIndex:i,form}));
+    });
+  });
+  return groups.map(([key,title])=>{
+    const cards=buckets.get(key)||[];
+    if(!cards.length)return '';
+    return `<section class="region-section transformation-section"><div class="region-title"><h2>${title}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`;
+  }).join('');
+}
+let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(state.activeCategory==='transform'&&list.length){await ensureTransformationArt(list)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?(state.activeCategory==='paradox'?paradoxSections(list):state.activeCategory==='transform'?transformationSections(list):REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax','transform'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join('')):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
 function cardHTML(p,shiny=false,special=null){
   const d=state.details.get(p.id),baseTypes=d?.types||[],baseName=d?.name||p.name||`#${p.id}`;
   const types=special?.form?.types?.length?special.form.types:baseTypes;
