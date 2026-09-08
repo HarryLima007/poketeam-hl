@@ -1099,7 +1099,7 @@ let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTim
   qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
   qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));
   renderDex();
-};$('#clearDexFilters').onclick=()=>{state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];$('#regionFilter').value='all';$('#dexTypeFilter').value='all';qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));renderDex()};
+};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
 document.body.dataset.page='home';
