@@ -1720,3 +1720,22 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-top:62px!important;
   }
 }
+
+
+/* Home — mantém Recentes embaixo e desce os quatro atalhos até ele */
+@media(min-width:1200px){
+  #home .quick-grid{
+    margin-top:76px!important;
+  }
+  #home>.panel{
+    margin-top:118px!important;
+  }
+}
+@media(min-width:1600px){
+  #home .quick-grid{
+    margin-top:82px!important;
+  }
+  #home>.panel{
+    margin-top:132px!important;
+  }
+}
