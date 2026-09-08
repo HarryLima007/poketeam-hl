@@ -2267,3 +2267,90 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     font-size:12px!important;
   }
 }
+
+
+/* Modal individual — visão geral de formas */
+.form-overview{
+  margin:24px 0 8px;
+  padding:18px;
+  border:1px solid rgba(94,154,226,.24);
+  border-radius:18px;
+  background:rgba(5,18,39,.42);
+}
+.form-overview-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:14px;
+}
+.form-overview-head h3{margin:4px 0 0}
+.form-overview-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+.form-overview-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:104px;
+  padding:12px 14px;
+  border:1px solid rgba(95,157,228,.22);
+  border-radius:16px;
+  background:rgba(7,23,47,.72);
+  color:inherit;
+  text-align:left;
+}
+button.form-overview-card{
+  cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+button.form-overview-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(72,174,255,.62);
+  background:rgba(11,34,66,.9);
+}
+.form-overview-card.current{
+  border-color:rgba(92,193,255,.46);
+}
+.form-overview-card img{
+  width:82px;
+  height:82px;
+  object-fit:contain;
+  flex:0 0 auto;
+}
+.form-overview-card div{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  min-width:0;
+}
+.form-overview-card strong{
+  font-size:15px;
+  line-height:1.25;
+}
+.form-overview-card small{
+  color:var(--muted,#a9bdd4);
+  line-height:1.35;
+}
+.form-badge{
+  display:inline-flex;
+  width:max-content;
+  max-width:100%;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(50,157,235,.16);
+  border:1px solid rgba(82,181,255,.25);
+  color:#8fd8ff;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+@media(max-width:700px){
+  .form-overview{padding:14px}
+  .form-overview-head{align-items:flex-start;flex-direction:column}
+  .form-overview-grid{grid-template-columns:1fr}
+}
