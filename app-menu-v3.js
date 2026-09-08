@@ -46,7 +46,7 @@ const TYPE_CHART={
  steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
  fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}
 };
-const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeType:'all',activeTeam:null,rouletteVisible:[],dexShiny:false};
+const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeCategories:[],activeRegion:'all',activeType:'all',activeTypes:[],activeTeam:null,rouletteVisible:[],dexShiny:false};
 const specialArt=new Map();
 const $=s=>document.querySelector(s); const qsa=s=>[...document.querySelectorAll(s)];
 function stableScrollY(){return window.scrollY||document.documentElement.scrollTop||0}
@@ -270,9 +270,9 @@ function runGlobalSearch(){
   const input=$('#globalSearch'),q=input?.value.trim();
   if(!q)return;
   const dex=$('#dexSearch');if(dex)dex.value=q;
-  state.activeRegion='all';state.activeType='all';state.activeCategory='all';
+  state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];
   const region=$('#regionFilter');if(region)region.value='all';
-  qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='all'));
+  qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
   pageScrollPositions.pokedex=0;
   go('pokedex');
   renderDex();
@@ -280,18 +280,43 @@ function runGlobalSearch(){
 $('#globalSearchGo').onclick=runGlobalSearch;
 $('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runGlobalSearch()}});
 $('#profileButton').onclick=()=>toast('Perfil em breve.');
+function syncPrimaryDexCategory(){
+  state.activeCategory=state.activeCategories.length===1?state.activeCategories[0]:'all';
+}
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
   $('#regionFilter').innerHTML=opts;
   $('#rouletteRegion').innerHTML=opts;
-  const dexCats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['transform','🔄 Transformações'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
+
+  const dexCats=[['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['transform','🔄 Transformações'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
   const rouletteCats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
-  $('#categoryFilters').innerHTML=dexCats.map(([v,l])=>`<button data-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
-  qsa('[data-cat]').forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;qsa('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderDex()});
+
+  $('#dexTypeFilters').innerHTML=TYPES.map(t=>`<button type="button" class="type type-filter-chip ${t}" data-filter-type="${t}">${TYPE_PT[t]}</button>`).join('');
+  $('#categoryFilters').innerHTML=dexCats.map(([v,l])=>`<button type="button" data-cat="${v}" data-filter-cat="${v}">${l}</button>`).join('');
+
+  qsa('[data-filter-type]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.filterType;
+    state.activeTypes=state.activeTypes.includes(v)?state.activeTypes.filter(x=>x!==v):[...state.activeTypes,v];
+    state.activeType=state.activeTypes.length===1?state.activeTypes[0]:'all';
+    b.classList.toggle('active',state.activeTypes.includes(v));
+    renderDex();
+  });
+
+  qsa('[data-filter-cat]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.filterCat;
+    state.activeCategories=state.activeCategories.includes(v)?state.activeCategories.filter(x=>x!==v):[...state.activeCategories,v];
+    syncPrimaryDexCategory();
+    b.classList.toggle('active',state.activeCategories.includes(v));
+    renderDex();
+  });
+
   $('#rouletteCategories').innerHTML=rouletteCats.map(([v,l])=>`<button data-roulette-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
   qsa('[data-roulette-cat]').forEach(b=>b.onclick=()=>{qsa('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
   $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
-  $('#dexTypeFilter').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
+
+  const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters');
+  open.onclick=()=>{panel.classList.toggle('hidden');open.setAttribute('aria-expanded',panel.classList.contains('hidden')?'false':'true')};
+  close.onclick=()=>{panel.classList.add('hidden');open.setAttribute('aria-expanded','false')};
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
@@ -334,7 +359,21 @@ async function getSpecies(id){if(state.species.has(id))return state.species.get(
 async function progressiveDetails(){let next=1,workers=10;async function worker(){while(next<=MAX){const id=next++;await getDetail(id)}}await Promise.allSettled(Array.from({length:workers},worker));$('#loadStatus').textContent='Pokédex pronta • dados em cache'}
 function matchesSearch(p,q){if(!q)return true;q=q.trim().toLowerCase();const n=parseInt(q,10);return p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&p.id===n)}
 async function ensureCategoryFlags(ids){if(!['legendary','mythical'].includes(state.activeCategory))return;const missing=ids.filter(id=>!state.species.has(id));let i=0;async function w(){while(i<missing.length){await getSpecies(missing[i++])}}await Promise.allSettled(Array.from({length:8},w))}
-function categoryMatch(p){if(state.activeCategory==='all')return true;if(state.activeCategory==='ub')return UB.has(p.id);if(state.activeCategory==='paradox')return PARADOX.has(p.id);if(state.activeCategory==='transform')return TRANSFORMABLE.has(p.id);if(state.activeCategory==='starter')return STARTERS.has(p.id);if(state.activeCategory==='mega')return MEGA.has(p.id);if(state.activeCategory==='gmax')return GMAX.has(p.id);if(state.activeCategory==='legendary')return LEGENDARY.has(p.id);if(state.activeCategory==='mythical')return MYTHICAL.has(p.id);return true}
+function categorySingleMatch(p,cat){
+  if(cat==='ub')return UB.has(p.id);
+  if(cat==='paradox')return PARADOX.has(p.id);
+  if(cat==='transform')return TRANSFORMABLE.has(p.id);
+  if(cat==='starter')return STARTERS.has(p.id);
+  if(cat==='mega')return MEGA.has(p.id);
+  if(cat==='gmax')return GMAX.has(p.id);
+  if(cat==='legendary')return LEGENDARY.has(p.id);
+  if(cat==='mythical')return MYTHICAL.has(p.id);
+  return true;
+}
+function categoryMatch(p){
+  if(!state.activeCategories.length)return true;
+  return state.activeCategories.some(cat=>categorySingleMatch(p,cat));
+}
 const PARADOX_PAST=new Set([984,985,986,987,988,989,1005,1007,1009,1020,1021]);
 const PARADOX_FUTURE=new Set([990,991,992,993,994,995,1006,1008,1010,1022,1023]);
 function paradoxSections(list){
@@ -404,23 +443,25 @@ function transformationSections(list){
   }).join('');
 }
 function typeMatch(p){
-  if(state.activeType==='all')return true;
+  if(!state.activeTypes.length)return true;
   const d=state.details.get(p.id);
-  return !!d?.types?.includes(state.activeType);
+  return !!d?.types?.some(t=>state.activeTypes.includes(t));
 }
 function updateActiveDexFilters(){
   const el=$('#activeDexFilters');if(!el)return;
   const parts=[];
   if(state.activeRegion!=='all')parts.push(state.activeRegion);
-  if(state.activeType!=='all')parts.push(TYPE_PT[state.activeType]||state.activeType);
-  if(state.activeCategory!=='all'){
-    const label=document.querySelector(`[data-cat="${state.activeCategory}"]`)?.textContent?.replace(/^[^\p{L}\p{N}]+/u,'').trim();
+  state.activeTypes.forEach(t=>parts.push(TYPE_PT[t]||t));
+  state.activeCategories.forEach(cat=>{
+    const label=document.querySelector(`[data-filter-cat="${cat}"]`)?.textContent?.replace(/^[^\p{L}\p{N}]+/u,'').trim();
     if(label)parts.push(label);
-  }
+  });
   el.innerHTML=parts.length?`<span>Ativos:</span>${parts.map(x=>`<b>${x}</b>`).join('')}`:'';
+  const count=(state.activeRegion!=='all'?1:0)+state.activeTypes.length+state.activeCategories.length;
+  const counter=$('#dexFilterCount');if(counter)counter.textContent=String(count);
 }
 async function ensureDexTypeDetails(base){
-  if(state.activeType==='all')return;
+  if(!state.activeTypes.length)return;
   const missing=base.filter(p=>!state.details.has(p.id));
   let i=0;
   async function worker(){while(i<missing.length){await getDetail(missing[i++].id)}}
@@ -491,12 +532,14 @@ function formOverviewHTML(id,baseName,baseTypes,forms){
 async function goToTransformationEntry(id,index=0,formName=''){
   closePokemonModal();
   state.activeCategory='transform';
+  state.activeCategories=['transform'];
   state.activeRegion='all';
   state.activeType='all';
+  state.activeTypes=[];
   const search=$('#dexSearch');if(search)search.value='';
   const region=$('#regionFilter');if(region)region.value='all';
-  const type=$('#dexTypeFilter');if(type)type.value='all';
-  qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='transform'));
+  qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
+  qsa('[data-filter-cat]').forEach(b=>b.classList.toggle('active',b.dataset.filterCat==='transform'));
   pageScrollPositions.pokedex=0;
   go('pokedex');
   await renderDex();
@@ -1050,7 +1093,13 @@ $('#dexShinyToggle').onclick=()=>{
   const status=b.querySelector('em');if(status)status.textContent=state.dexShiny?'ON':'OFF';
   applyDexShinyInPlace();
 };
-let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};$('#dexTypeFilter').onchange=e=>{state.activeType=e.target.value;renderDex()};$('#clearDexFilters').onclick=()=>{state.activeRegion='all';state.activeType='all';state.activeCategory='all';$('#regionFilter').value='all';$('#dexTypeFilter').value='all';qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='all'));renderDex()};
+let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};$('#clearDexFilters').onclick=()=>{
+  state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];
+  $('#regionFilter').value='all';
+  qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
+  qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));
+  renderDex();
+};$('#clearDexFilters').onclick=()=>{state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];$('#regionFilter').value='all';$('#dexTypeFilter').value='all';qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
 document.body.dataset.page='home';
