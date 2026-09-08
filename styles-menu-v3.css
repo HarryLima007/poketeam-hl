@@ -2609,3 +2609,38 @@ button.form-overview-card:hover{
     max-width:100%;
   }
 }
+
+
+/* Correção definitiva do painel de filtros:
+   a sidebar da Pokédex tinha overflow:hidden e recortava o painel na largura de 270px. */
+#pokedex .pokedex-side{
+  overflow:visible!important;
+  z-index:60;
+}
+#pokedex .dex-filter-wrap{
+  position:relative;
+  z-index:70;
+  overflow:visible!important;
+}
+#pokedex .dex-filter-panel{
+  z-index:100!important;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+@media (min-width:1001px){
+  #pokedex .dex-filter-panel{
+    position:absolute;
+    left:0!important;
+    right:auto!important;
+    width:620px!important;
+    max-width:calc(100vw - 48px)!important;
+  }
+}
+@media (min-width:701px) and (max-width:1000px){
+  #pokedex .dex-filter-panel{
+    position:absolute;
+    left:0!important;
+    right:auto!important;
+    width:min(620px,calc(100vw - 48px))!important;
+  }
+}
