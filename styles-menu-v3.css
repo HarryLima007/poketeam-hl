@@ -1648,3 +1648,62 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-bottom:80px!important;
   }
 }
+
+
+/* Home — ajuste visual inspirado na referência enviada */
+@media(min-width:1200px){
+  #home .quick-grid{
+    width:min(90vw,1360px)!important;
+    max-width:none!important;
+    margin:18px 50% 0!important;
+    transform:translateX(-50%)!important;
+    padding:0 10px!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:18px!important;
+  }
+
+  #home .quick-grid button{
+    min-height:154px!important;
+    padding:26px 26px!important;
+    border-radius:22px!important;
+    width:100%!important;
+  }
+
+  #home>.panel{
+    width:min(88vw,1400px)!important;
+    max-width:none!important;
+    min-height:188px!important;
+    margin:118px 0 12px 50%!important;
+    transform:translateX(-50%)!important;
+    padding:28px 34px!important;
+  }
+
+  #home>.panel .section-title{
+    margin-bottom:18px!important;
+  }
+
+  #home #recentList{
+    justify-content:center!important;
+    align-items:center!important;
+    gap:10px!important;
+  }
+}
+
+@media(min-width:1600px){
+  #home .quick-grid{
+    width:min(91vw,1420px)!important;
+    gap:20px!important;
+  }
+
+  #home .quick-grid button{
+    min-height:160px!important;
+    padding:28px 28px!important;
+  }
+
+  #home>.panel{
+    width:min(90vw,1450px)!important;
+    min-height:190px!important;
+    margin-top:132px!important;
+    margin-bottom:8px!important;
+  }
+}
