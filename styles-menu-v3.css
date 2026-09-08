@@ -1866,3 +1866,20 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     font-style:italic!important;
   }
 }
+
+
+/* Correção: restaura os quatro atalhos à posição aprovada antes da alteração do hero.
+   Pesquisados recentemente permanece intocado. */
+@media(min-width:1200px){
+  #home .quick-grid{
+    position:relative!important;
+    top:150px!important;
+    transform:translateX(-50%)!important;
+  }
+}
+@media(min-width:1600px){
+  #home .quick-grid{
+    top:165px!important;
+    transform:translateX(-50%)!important;
+  }
+}
