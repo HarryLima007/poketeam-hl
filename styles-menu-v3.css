@@ -2644,3 +2644,32 @@ button.form-overview-card:hover{
     width:min(620px,calc(100vw - 48px))!important;
   }
 }
+
+
+/* Painel de filtros em fluxo: não cobre os cards da Pokédex */
+@media (min-width:1001px){
+  #pokedex .pokedex-shell{
+    transition:grid-template-columns .2s ease;
+  }
+  #pokedex .pokedex-shell.filters-open{
+    grid-template-columns:minmax(560px,620px) minmax(0,1fr)!important;
+  }
+  #pokedex .pokedex-shell.filters-open .pokedex-side{
+    width:auto;
+  }
+  #pokedex .pokedex-shell.filters-open .dex-filter-panel{
+    position:static!important;
+    width:100%!important;
+    max-width:none!important;
+    margin-top:10px;
+    box-shadow:none;
+  }
+}
+@media (max-width:1000px){
+  #pokedex .dex-filter-panel{
+    position:static!important;
+    width:100%!important;
+    max-width:none!important;
+    margin-top:10px;
+  }
+}
