@@ -46,7 +46,7 @@ const TYPE_CHART={
  steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
  fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}
 };
-const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeTeam:null,rouletteVisible:[],dexShiny:false};
+const state={list:[],details:new Map(),species:new Map(),activeCategory:'all',activeRegion:'all',activeType:'all',activeTeam:null,rouletteVisible:[],dexShiny:false};
 const specialArt=new Map();
 const $=s=>document.querySelector(s); const qsa=s=>[...document.querySelectorAll(s)];
 function stableScrollY(){return window.scrollY||document.documentElement.scrollTop||0}
@@ -270,7 +270,7 @@ function runGlobalSearch(){
   const input=$('#globalSearch'),q=input?.value.trim();
   if(!q)return;
   const dex=$('#dexSearch');if(dex)dex.value=q;
-  state.activeRegion='all';state.activeCategory='all';
+  state.activeRegion='all';state.activeType='all';state.activeCategory='all';
   const region=$('#regionFilter');if(region)region.value='all';
   qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='all'));
   pageScrollPositions.pokedex=0;
@@ -291,6 +291,7 @@ function setupSelects(){
   $('#rouletteCategories').innerHTML=rouletteCats.map(([v,l])=>`<button data-roulette-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
   qsa('[data-roulette-cat]').forEach(b=>b.onclick=()=>{qsa('[data-roulette-cat]').forEach(x=>x.classList.toggle('active',x===b));renderPicker()});
   $('#rouletteType').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
+  $('#dexTypeFilter').innerHTML='<option value="all">Todos os tipos</option>'+TYPES.map(t=>`<option value="${t}">${TYPE_PT[t]}</option>`).join('');
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
@@ -402,7 +403,30 @@ function transformationSections(list){
     return `<section class="region-section transformation-section"><div class="region-title"><h2>${title}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`;
   }).join('');
 }
-let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));const list=base.filter(categoryMatch).sort((a,b)=>a.id-b.id);if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(state.activeCategory==='transform'&&list.length){await ensureTransformationArt(list)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?(state.activeCategory==='paradox'?paradoxSections(list):state.activeCategory==='transform'?transformationSections(list):REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax','transform'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join('')):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
+function typeMatch(p){
+  if(state.activeType==='all')return true;
+  const d=state.details.get(p.id);
+  return !!d?.types?.includes(state.activeType);
+}
+function updateActiveDexFilters(){
+  const el=$('#activeDexFilters');if(!el)return;
+  const parts=[];
+  if(state.activeRegion!=='all')parts.push(state.activeRegion);
+  if(state.activeType!=='all')parts.push(TYPE_PT[state.activeType]||state.activeType);
+  if(state.activeCategory!=='all'){
+    const label=document.querySelector(`[data-cat="${state.activeCategory}"]`)?.textContent?.replace(/^[^\p{L}\p{N}]+/u,'').trim();
+    if(label)parts.push(label);
+  }
+  el.innerHTML=parts.length?`<span>Ativos:</span>${parts.map(x=>`<b>${x}</b>`).join('')}`:'';
+}
+async function ensureDexTypeDetails(base){
+  if(state.activeType==='all')return;
+  const missing=base.filter(p=>!state.details.has(p.id));
+  let i=0;
+  async function worker(){while(i<missing.length){await getDetail(missing[i++].id)}}
+  await Promise.allSettled(Array.from({length:10},worker));
+}
+let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));await ensureDexTypeDetails(base);if(token!==dexToken)return;const list=base.filter(p=>categoryMatch(p)&&typeMatch(p)).sort((a,b)=>a.id-b.id);updateActiveDexFilters();if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(state.activeCategory==='transform'&&list.length){await ensureTransformationArt(list)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?(state.activeCategory==='paradox'?paradoxSections(list):state.activeCategory==='transform'?transformationSections(list):REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax','transform'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join('')):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
 function cardHTML(p,shiny=false,special=null){
   const d=state.details.get(p.id),baseTypes=d?.types||[],baseName=d?.name||p.name||`#${p.id}`;
   const types=special?.form?.types?.length?special.form.types:baseTypes;
@@ -468,8 +492,10 @@ async function goToTransformationEntry(id,index=0,formName=''){
   closePokemonModal();
   state.activeCategory='transform';
   state.activeRegion='all';
+  state.activeType='all';
   const search=$('#dexSearch');if(search)search.value='';
   const region=$('#regionFilter');if(region)region.value='all';
+  const type=$('#dexTypeFilter');if(type)type.value='all';
   qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='transform'));
   pageScrollPositions.pokedex=0;
   go('pokedex');
@@ -1024,7 +1050,7 @@ $('#dexShinyToggle').onclick=()=>{
   const status=b.querySelector('em');if(status)status.textContent=state.dexShiny?'ON':'OFF';
   applyDexShinyInPlace();
 };
-let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};
+let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTimeout(renderDex,120)};$('#regionFilter').onchange=e=>{state.activeRegion=e.target.value;$('#pokedex').animate?.([{opacity:.5},{opacity:1}],{duration:220});renderDex()};$('#dexTypeFilter').onchange=e=>{state.activeType=e.target.value;renderDex()};$('#clearDexFilters').onclick=()=>{state.activeRegion='all';state.activeType='all';state.activeCategory='all';$('#regionFilter').value='all';$('#dexTypeFilter').value='all';qsa('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat==='all'));renderDex()};
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
 // Inicialização resiliente: a Pokédex deve carregar mesmo que outra área falhe.
 document.body.dataset.page='home';
