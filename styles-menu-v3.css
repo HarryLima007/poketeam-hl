@@ -1554,25 +1554,33 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
   }
 }
 
-/* Recentes — tamanho/posição conforme marcação do usuário */
+/* Recentes — ajuste final conforme a marcação vermelha do usuário */
 @media(min-width:1200px){
   #home>.panel{
     box-sizing:border-box!important;
-    width:calc(100% + 620px)!important;
+    width:min(88vw,1400px)!important;
     max-width:none!important;
-    margin-left:-310px!important;
-    margin-right:-310px!important;
-    margin-top:70px!important;
-    min-height:220px!important;
+    min-height:164px!important;
+    margin-top:86px!important;
+    margin-bottom:0!important;
+    margin-left:50%!important;
+    margin-right:0!important;
+    transform:translateX(-50%)!important;
     padding:28px 34px!important;
+  }
+  #home>.panel .section-title{
+    justify-content:flex-start!important;
+  }
+  #home #recentList{
+    justify-content:center!important;
+    align-items:center!important;
+    gap:10px!important;
   }
 }
 @media(min-width:1600px){
   #home>.panel{
-    width:calc(100% + 760px)!important;
-    margin-left:-380px!important;
-    margin-right:-380px!important;
-    margin-top:78px!important;
-    min-height:245px!important;
+    width:min(88vw,1400px)!important;
+    min-height:164px!important;
+    margin-top:86px!important;
   }
 }
