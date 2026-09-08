@@ -355,23 +355,24 @@ function transformationGroup(form){
   if(/-hisui(?:-|$)/.test(n))return 'hisui';
   if(/-paldea(?:-|$)/.test(n))return 'paldea';
 
-  // Fusões: formas que combinam explicitamente dois Pokémon.
-  const fusionKeywords=[
-    'kyurem-black','kyurem-white',
-    'necrozma-dusk','necrozma-dawn',
-    'calyrex-ice','calyrex-shadow'
-  ];
-  if(fusionKeywords.some(k=>n.includes(k)))return 'fusion';
+  // Fusões: duas espécies combinadas numa única forma.
+  if(['kyurem-black','kyurem-white','necrozma-dusk','necrozma-dawn','calyrex-ice','calyrex-shadow'].some(k=>n.includes(k)))return 'fusion';
 
-  // Mudanças de forma acionadas por item, habilidade, batalha ou estado.
-  const transformationKeywords=[
-    'primal','unbound','origin','therian','resolute','pirouette',
-    'ash','battle-bond','zen','school','blade','shield','complete','10','50',
-    'ultra','dusk-mane','dawn-wings','crowned','eternamax','hero','hangry',
-    'gulping','gorging','noice','ice-rider','shadow-rider','terastal','stellar',
-    'sunshine','rainy','snowy','sunny','overcast'
-  ];
-  if(transformationKeywords.some(k=>n.includes(k)))return 'special';
+  // Reversões e transformações de poder.
+  if(['primal','ultra','eternamax','terastal','stellar'].some(k=>n.includes(k)))return 'power';
+
+  // Formas obtidas por item, objeto-chave ou mudança deliberada fora da batalha.
+  if(['unbound','origin','resolute','crowned'].some(k=>n.includes(k)))return 'item';
+
+  // Formas/estados que mudam durante ou em função da batalha.
+  if(['zen','school','blade','shield','complete','-10','-50','ash','battle-bond','hero','hangry','gulping','gorging','noice'].some(k=>n.includes(k)))return 'battle';
+
+  // Formas ligadas a clima/condição ambiental.
+  if(['sunshine','sunny','rainy','snowy','overcast'].some(k=>n.includes(k)))return 'environment';
+
+  // Mudanças de postura/formas selecionáveis que não se encaixam acima.
+  if(['therian','pirouette'].some(k=>n.includes(k)))return 'stance';
+
   return 'other';
 }
 function transformationSections(list){
@@ -381,7 +382,11 @@ function transformationSections(list){
     ['hisui','Formas de Hisui'],
     ['paldea','Formas de Paldea'],
     ['fusion','Fusões'],
-    ['special','Transformações / Mudanças de Forma'],
+    ['power','Transformações de Poder'],
+    ['item','Mudanças por Item / Forma Especial'],
+    ['battle','Mudanças em Batalha'],
+    ['environment','Mudanças por Clima / Ambiente'],
+    ['stance','Mudanças de Postura / Estado'],
     ['other','Outras Formas e Variações']
   ];
   const buckets=new Map(groups.map(([key])=>[key,[]]));
