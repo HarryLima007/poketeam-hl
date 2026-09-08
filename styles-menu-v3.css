@@ -1893,3 +1893,73 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     transform:translateX(-50%)!important;
   }
 }
+
+
+/* Home — amplia o bloco principal e move a frase para o canto inferior direito.
+   NÃO alterar quick-grid nem Pesquisados recentemente. */
+@media(min-width:1200px){
+  #home .hero-copy{
+    top:26px!important;
+    left:calc((100% - 100vw)/2 + 8px)!important;
+    width:min(560px,calc(100vw - 40px))!important;
+    max-width:560px!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:13px!important;
+    letter-spacing:.22em!important;
+    margin-bottom:14px!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(64px,4.9vw,86px)!important;
+    line-height:.91!important;
+    letter-spacing:-.05em!important;
+    margin:0 0 20px!important;
+  }
+
+  #home .hero-copy p{
+    font-size:15px!important;
+    max-width:540px!important;
+    line-height:1.55!important;
+  }
+
+  #home .hero-actions{
+    margin-top:24px!important;
+    gap:12px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:50px!important;
+    padding:0 22px!important;
+    font-size:14px!important;
+  }
+
+  #home .hero-quote{
+    position:absolute!important;
+    top:575px!important;
+    left:calc(50% + 50vw - 174px)!important;
+    width:160px!important;
+    margin:0!important;
+    padding:14px 16px!important;
+    z-index:4!important;
+  }
+}
+
+@media(min-width:1600px){
+  #home .hero-copy{
+    top:28px!important;
+    left:calc((100% - 100vw)/2 + 8px)!important;
+    width:570px!important;
+    max-width:570px!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:86px!important;
+  }
+
+  #home .hero-quote{
+    top:585px!important;
+    left:calc(50% + 50vw - 174px)!important;
+  }
+}
