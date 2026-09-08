@@ -1585,15 +1585,14 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
   }
 }
 
-
-/* Recentes — posição vertical conforme marcação 07/09 */
+/* Recentes — posição vertical final conforme marcação */
 @media(min-width:1200px){
   #home>.panel{
-    margin-top:240px!important;
+    margin-top:360px!important;
   }
 }
 @media(min-width:1600px){
   #home>.panel{
-    margin-top:240px!important;
+    margin-top:360px!important;
   }
 }
