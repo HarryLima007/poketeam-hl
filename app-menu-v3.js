@@ -272,7 +272,7 @@ function runGlobalSearch(){
   const dex=$('#dexSearch');if(dex)dex.value=q;
   state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];
   const region=$('#regionFilter');if(region)region.value='all';
-  qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
+  syncDexCategoryUI();qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
   pageScrollPositions.pokedex=0;
   go('pokedex');
   renderDex();
@@ -283,16 +283,26 @@ $('#profileButton').onclick=()=>toast('Perfil em breve.');
 function syncPrimaryDexCategory(){
   state.activeCategory=state.activeCategories.length===1?state.activeCategories[0]:'all';
 }
+function syncDexCategoryUI(){
+  qsa('[data-filter-cat]').forEach(b=>b.classList.toggle('active',state.activeCategories.includes(b.dataset.filterCat)));
+  qsa('[data-quick-cat]').forEach(b=>{
+    const v=b.dataset.quickCat;
+    const on=v==='all'?state.activeCategories.length===0:(state.activeCategories.length===1&&state.activeCategories[0]===v);
+    b.classList.toggle('active',on);
+  });
+}
 function setupSelects(){
   const opts='<option value="all">Todas as regiões</option>'+REGIONS.map(r=>`<option value="${r[0]}">${r[0]} — #${r[1]}–#${r[2]}</option>`).join('');
   $('#regionFilter').innerHTML=opts;
   $('#rouletteRegion').innerHTML=opts;
 
   const dexCats=[['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['transform','🔄 Transformações'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
+  const quickCats=[['all','🔹 Todos'],...dexCats];
   const rouletteCats=[['all','🔹 Todos'],['legendary','🟡 Lendários'],['mythical','🔵 Míticos'],['ub','🟣 Ultra Beasts'],['paradox','🌀 Paradoxos'],['starter','🌱 Iniciais Regionais'],['mega','💥 Mega Evoluções'],['gmax','⚡ Gigantamax']];
 
   $('#dexTypeFilters').innerHTML=TYPES.map(t=>`<button type="button" class="type type-filter-chip ${t}" data-filter-type="${t}">${TYPE_PT[t]}</button>`).join('');
   $('#categoryFilters').innerHTML=dexCats.map(([v,l])=>`<button type="button" data-cat="${v}" data-filter-cat="${v}">${l}</button>`).join('');
+  $('#categoryQuickFilters').innerHTML=quickCats.map(([v,l])=>`<button type="button" data-quick-cat="${v}" class="${v==='all'?'active':''}">${l}</button>`).join('');
 
   qsa('[data-filter-type]').forEach(b=>b.onclick=()=>{
     const v=b.dataset.filterType;
@@ -306,7 +316,15 @@ function setupSelects(){
     const v=b.dataset.filterCat;
     state.activeCategories=state.activeCategories.includes(v)?state.activeCategories.filter(x=>x!==v):[...state.activeCategories,v];
     syncPrimaryDexCategory();
-    b.classList.toggle('active',state.activeCategories.includes(v));
+    syncDexCategoryUI();
+    renderDex();
+  });
+
+  qsa('[data-quick-cat]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.quickCat;
+    state.activeCategories=v==='all'?[]:[v];
+    syncPrimaryDexCategory();
+    syncDexCategoryUI();
     renderDex();
   });
 
@@ -317,6 +335,7 @@ function setupSelects(){
   const panel=$('#dexFilterPanel'),open=$('#openDexFilters'),close=$('#closeDexFilters');
   open.onclick=()=>{panel.classList.toggle('hidden');open.setAttribute('aria-expanded',panel.classList.contains('hidden')?'false':'true')};
   close.onclick=()=>{panel.classList.add('hidden');open.setAttribute('aria-expanded','false')};
+  syncDexCategoryUI();
 }
 async function fetchJSON(url,key){const cached=cache.get(key,null);if(cached)return cached;const c=new AbortController(),timer=setTimeout(()=>c.abort(),12000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error(r.status);const j=await r.json();cache.set(key,j);return j}finally{clearTimeout(timer)}}
 async function initData(){
@@ -539,7 +558,7 @@ async function goToTransformationEntry(id,index=0,formName=''){
   const search=$('#dexSearch');if(search)search.value='';
   const region=$('#regionFilter');if(region)region.value='all';
   qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
-  qsa('[data-filter-cat]').forEach(b=>b.classList.toggle('active',b.dataset.filterCat==='transform'));
+  syncDexCategoryUI();
   pageScrollPositions.pokedex=0;
   go('pokedex');
   await renderDex();
@@ -1097,7 +1116,7 @@ let debounce;$('#dexSearch').oninput=()=>{clearTimeout(debounce);debounce=setTim
   state.activeRegion='all';state.activeType='all';state.activeTypes=[];state.activeCategory='all';state.activeCategories=[];
   $('#regionFilter').value='all';
   qsa('[data-filter-type]').forEach(b=>b.classList.remove('active'));
-  qsa('[data-filter-cat]').forEach(b=>b.classList.remove('active'));
+  syncDexCategoryUI();
   renderDex();
 };
 window.addEventListener('error',e=>console.error('Non-fatal UI error:',e.error||e.message));window.addEventListener('unhandledrejection',e=>{console.error('Non-fatal promise error:',e.reason);e.preventDefault()});
