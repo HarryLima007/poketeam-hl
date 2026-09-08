@@ -2019,3 +2019,251 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     top:-92px!important;
   }
 }
+
+
+/* =========================================================
+   HOME — PROTEÇÃO RESPONSIVA FINAL
+   Mantém quick-grid e Pesquisados recentemente intocados.
+   O hero conserva o tamanho 2x quando há espaço e reduz
+   progressivamente apenas quando a resolução exige.
+   ========================================================= */
+
+/* Desktop / notebook: 1200–1599 */
+@media (min-width:1200px) and (max-width:1599px){
+  #home .hero-copy{
+    top:max(-72px,-7vh)!important;
+    width:min(920px,calc(100vw - 64px))!important;
+    max-width:920px!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:clamp(17px,1.45vw,23px)!important;
+    margin-bottom:clamp(14px,1.7vh,24px)!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(92px,min(9.2vw,15vh),146px)!important;
+    line-height:.90!important;
+    margin-bottom:clamp(20px,2.4vh,34px)!important;
+  }
+
+  #home .hero-copy p{
+    font-size:clamp(18px,1.65vw,26px)!important;
+    line-height:1.45!important;
+    max-width:880px!important;
+  }
+
+  #home .hero-actions{
+    margin-top:clamp(22px,3vh,38px)!important;
+    gap:16px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:clamp(58px,8vh,82px)!important;
+    padding:0 clamp(24px,2.5vw,36px)!important;
+    font-size:clamp(17px,1.55vw,23px)!important;
+    border-radius:18px!important;
+  }
+
+  #home .hero-quote{
+    top:clamp(500px,67vh,590px)!important;
+    left:auto!important;
+    right:18px!important;
+    width:150px!important;
+  }
+}
+
+/* Desktop Full HD / ultrawide comum: 1600–2199 */
+@media (min-width:1600px) and (max-width:2199px){
+  #home .hero-copy{
+    top:max(-92px,-8vh)!important;
+    width:min(1140px,calc(100vw - 80px))!important;
+    max-width:1140px!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:clamp(21px,1.35vw,26px)!important;
+    margin-bottom:clamp(20px,2.2vh,28px)!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(132px,min(8.95vw,15.3vh),172px)!important;
+    line-height:.90!important;
+    margin-bottom:clamp(28px,3vh,40px)!important;
+  }
+
+  #home .hero-copy p{
+    font-size:clamp(24px,1.55vw,30px)!important;
+    line-height:1.45!important;
+    max-width:1080px!important;
+  }
+
+  #home .hero-actions{
+    margin-top:clamp(30px,3.6vh,48px)!important;
+    gap:22px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:clamp(72px,9vh,100px)!important;
+    padding:0 clamp(32px,2.3vw,44px)!important;
+    font-size:clamp(21px,1.45vw,28px)!important;
+  }
+
+  #home .hero-quote{
+    top:clamp(540px,66vh,620px)!important;
+    left:auto!important;
+    right:22px!important;
+    width:160px!important;
+  }
+}
+
+/* 2K / 4K e telas muito largas: mantém o 2x completo */
+@media (min-width:2200px){
+  #home .hero-copy{
+    top:-92px!important;
+    width:1140px!important;
+    max-width:1140px!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:26px!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:172px!important;
+    line-height:.90!important;
+  }
+
+  #home .hero-copy p{
+    font-size:30px!important;
+    max-width:1080px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:100px!important;
+    padding:0 44px!important;
+    font-size:28px!important;
+  }
+
+  #home .hero-quote{
+    top:clamp(585px,58vh,700px)!important;
+    left:auto!important;
+    right:28px!important;
+  }
+}
+
+/* Notebooks com pouca altura: evita o texto invadir os atalhos */
+@media (min-width:1200px) and (max-height:800px){
+  #home .hero-copy{
+    top:-46px!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:16px!important;
+    margin-bottom:12px!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(82px,12.7vh,108px)!important;
+    line-height:.88!important;
+    margin-bottom:16px!important;
+  }
+
+  #home .hero-copy p{
+    font-size:18px!important;
+    line-height:1.35!important;
+  }
+
+  #home .hero-actions{
+    margin-top:18px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:54px!important;
+    padding:0 24px!important;
+    font-size:17px!important;
+  }
+
+  #home .hero-quote{
+    top:calc(100vh - 176px)!important;
+    right:16px!important;
+    width:145px!important;
+  }
+}
+
+/* Tablets: mantém tudo dentro da largura disponível */
+@media (min-width:801px) and (max-width:1199px){
+  #home .home-hero{
+    min-height:auto!important;
+    padding:34px 28px 60px!important;
+  }
+
+  #home .hero-copy{
+    width:100%!important;
+    max-width:760px!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(58px,8vw,82px)!important;
+    line-height:.92!important;
+  }
+
+  #home .hero-copy p{
+    font-size:18px!important;
+    max-width:680px!important;
+  }
+
+  #home .hero-quote{
+    position:static!important;
+    width:min(210px,100%)!important;
+    margin:30px 0 0!important;
+  }
+}
+
+/* Celulares */
+@media (max-width:800px){
+  #home .home-hero{
+    min-height:auto!important;
+    padding:28px 18px 46px!important;
+  }
+
+  #home .hero-copy{
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    font-size:10px!important;
+    letter-spacing:.15em!important;
+  }
+
+  #home .hero-copy h1{
+    font-size:clamp(44px,13vw,66px)!important;
+    line-height:.92!important;
+    letter-spacing:-.045em!important;
+  }
+
+  #home .hero-copy p{
+    font-size:16px!important;
+    line-height:1.5!important;
+  }
+
+  #home .hero-actions{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:10px!important;
+  }
+
+  #home .hero-actions button{
+    min-height:48px!important;
+    padding:0 18px!important;
+    font-size:14px!important;
+  }
+
+  #home .hero-quote{
+    position:static!important;
+    width:min(190px,100%)!important;
+    margin:24px 0 0!important;
+    font-size:12px!important;
+  }
+}
