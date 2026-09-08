@@ -2419,3 +2419,155 @@ button.form-overview-card:hover{
   color:#9edfff;
   font-size:10px;
 }
+
+
+/* Pokédex — painel visual de filtros */
+.dex-filter-wrap{
+  position:relative;
+  margin:14px 0 10px;
+}
+.dex-filter-button{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  min-height:44px;
+  padding:0 14px;
+  border:1px solid rgba(83,162,230,.28);
+  border-radius:12px;
+  background:rgba(8,28,52,.72);
+  color:#dcecff;
+  font-weight:800;
+  cursor:pointer;
+}
+.dex-filter-button:hover,
+.dex-filter-button[aria-expanded="true"]{
+  border-color:rgba(81,190,255,.7);
+  background:rgba(13,42,76,.92);
+}
+.dex-filter-button span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:24px;
+  height:24px;
+  padding:0 7px;
+  border-radius:999px;
+  background:rgba(62,172,240,.17);
+  color:#8fdcff;
+  font-size:11px;
+}
+.dex-filter-panel{
+  position:absolute;
+  z-index:40;
+  left:0;
+  top:calc(100% + 10px);
+  width:min(620px,calc(100vw - 40px));
+  max-height:min(720px,calc(100vh - 120px));
+  overflow:auto;
+  padding:18px;
+  border:1px solid rgba(79,171,234,.34);
+  border-radius:18px;
+  background:rgba(5,18,36,.97);
+  box-shadow:0 24px 70px rgba(0,0,0,.48);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.dex-filter-panel.hidden{display:none!important}
+.dex-filter-panel-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.dex-filter-panel-head h3{margin:3px 0 0}
+.dex-filter-panel-head>button{
+  width:34px;
+  height:34px;
+  padding:0;
+  border-radius:10px;
+}
+.dex-filter-section{
+  padding:14px 0;
+  border-top:1px solid rgba(116,158,199,.13);
+}
+.dex-filter-section h4{
+  margin:0 0 10px;
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#d7eaff;
+}
+.dex-filter-section select{
+  width:100%;
+}
+.type-filter-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.type-filter-chip{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  width:100%;
+  border:1px solid rgba(255,255,255,.1)!important;
+  opacity:.72;
+  cursor:pointer;
+  transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease;
+}
+.type-filter-chip:hover{
+  opacity:1;
+  transform:translateY(-1px);
+}
+.type-filter-chip.active{
+  opacity:1;
+  box-shadow:0 0 0 2px rgba(255,255,255,.8),0 8px 22px rgba(0,0,0,.28);
+}
+.category-filter-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.category-filter-grid button{
+  min-height:42px;
+  padding:8px 10px;
+  border:1px solid rgba(92,157,214,.22);
+  border-radius:11px;
+  background:rgba(9,31,57,.72);
+  color:#d8e9fb;
+  cursor:pointer;
+  text-align:left;
+}
+.category-filter-grid button:hover{
+  border-color:rgba(84,188,255,.52);
+}
+.category-filter-grid button.active{
+  border-color:rgba(83,197,255,.85);
+  background:rgba(31,111,165,.32);
+  box-shadow:0 0 0 1px rgba(83,197,255,.2) inset;
+}
+.dex-filter-actions{
+  display:flex;
+  justify-content:flex-end;
+  padding-top:14px;
+  border-top:1px solid rgba(116,158,199,.13);
+}
+.dex-filter-actions button{
+  min-height:38px;
+}
+@media(max-width:700px){
+  .dex-filter-panel{
+    position:fixed;
+    left:12px;
+    right:12px;
+    top:80px;
+    width:auto;
+    max-height:calc(100vh - 100px);
+  }
+  .type-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .category-filter-grid{grid-template-columns:1fr}
+}
