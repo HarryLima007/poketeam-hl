@@ -1508,3 +1508,23 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
   .topbar #nav button .nav-icon{font-size:23px!important}
   .topbar #nav button.active{padding-left:26px!important;padding-right:26px!important}
 }
+
+/* Home por partes — Pesquisados recentemente: mais baixo e mais largo */
+@media(min-width:1200px){
+  #home>.panel{
+    width:calc(100% + 120px)!important;
+    max-width:none!important;
+    margin-top:42px!important;
+    margin-left:-60px!important;
+    margin-right:-60px!important;
+    padding:22px 26px!important;
+  }
+}
+@media(min-width:1600px){
+  #home>.panel{
+    width:calc(100% + 180px)!important;
+    margin-top:54px!important;
+    margin-left:-90px!important;
+    margin-right:-90px!important;
+  }
+}
