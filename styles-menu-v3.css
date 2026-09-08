@@ -1768,3 +1768,101 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     transform:translateX(-50%)!important;
   }
 }
+
+
+/* Home — hero aberto: conteúdo à esquerda, sem painel e sem Lucario.
+   IMPORTANTE: não alterar .quick-grid nem o painel de Pesquisados recentemente. */
+@media(min-width:1200px){
+  #home .home-hero{
+    position:relative!important;
+    min-height:520px!important;
+    margin-top:34px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    overflow:visible!important;
+    display:block!important;
+  }
+
+  #home .hero-copy{
+    position:absolute!important;
+    top:18px!important;
+    left:calc((100% - 100vw)/2 + 20px)!important;
+    width:min(480px,calc(100vw - 40px))!important;
+    max-width:480px!important;
+    z-index:3!important;
+    padding:0!important;
+  }
+
+  #home .hero-copy .eyebrow{
+    display:block!important;
+    margin-bottom:12px!important;
+  }
+
+  #home .hero-copy h1{
+    margin:0 0 18px!important;
+  }
+
+  #home .hero-copy p{
+    margin:0!important;
+  }
+
+  #home .hero-actions{
+    margin-top:22px!important;
+  }
+
+  #home .hero-quote{
+    width:150px!important;
+    margin:88px 0 0 auto!important;
+    padding:14px 16px!important;
+    border:1px solid rgba(111,160,224,.28)!important;
+    border-radius:14px!important;
+    background:rgba(3,11,28,.54)!important;
+    color:#e9f2ff!important;
+    font-family:Georgia,"Times New Roman",serif!important;
+    font-size:13px!important;
+    line-height:1.45!important;
+    font-style:italic!important;
+    text-align:left!important;
+    box-shadow:0 10px 30px rgba(0,0,0,.18)!important;
+    backdrop-filter:blur(8px)!important;
+    -webkit-backdrop-filter:blur(8px)!important;
+  }
+
+  #home .hero-art{
+    display:none!important;
+  }
+}
+
+@media(min-width:1600px){
+  #home .hero-copy{
+    left:calc((100% - 100vw)/2 + 20px)!important;
+    width:480px!important;
+  }
+}
+
+@media(max-width:1199px){
+  #home .home-hero{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  #home .hero-art{
+    display:none!important;
+  }
+  #home .hero-quote{
+    width:min(210px,100%)!important;
+    margin:28px 0 0!important;
+    padding:14px 16px!important;
+    border:1px solid rgba(111,160,224,.28)!important;
+    border-radius:14px!important;
+    background:rgba(3,11,28,.54)!important;
+    color:#e9f2ff!important;
+    font-family:Georgia,"Times New Roman",serif!important;
+    font-style:italic!important;
+  }
+}
