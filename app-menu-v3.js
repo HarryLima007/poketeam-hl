@@ -152,6 +152,19 @@ async function ensureSpecialCategoryArt(list,category){
   await Promise.allSettled(list.map(p=>getSpecialForms(p.id,category)));
 }
 function transformationLabel(speciesName,formName){
+  const fusionLabels={
+    'kyurem-black':'Black Kyurem — Kyurem + Zekrom',
+    'kyurem-white':'White Kyurem — Kyurem + Reshiram',
+    'necrozma-dusk':'Dusk Mane Necrozma — Necrozma + Solgaleo',
+    'necrozma-dusk-mane':'Dusk Mane Necrozma — Necrozma + Solgaleo',
+    'necrozma-dawn':'Dawn Wings Necrozma — Necrozma + Lunala',
+    'necrozma-dawn-wings':'Dawn Wings Necrozma — Necrozma + Lunala',
+    'calyrex-ice':'Ice Rider Calyrex — Calyrex + Glastrier',
+    'calyrex-ice-rider':'Ice Rider Calyrex — Calyrex + Glastrier',
+    'calyrex-shadow':'Shadow Rider Calyrex — Calyrex + Spectrier',
+    'calyrex-shadow-rider':'Shadow Rider Calyrex — Calyrex + Spectrier'
+  };
+  if(fusionLabels[formName])return fusionLabels[formName];
   const tail=formName.startsWith(speciesName+'-')?formName.slice(speciesName.length+1):formName;
   const regional={alola:'Forma de Alola',galar:'Forma de Galar',hisui:'Forma de Hisui',paldea:'Forma de Paldea'};
   for(const [key,label] of Object.entries(regional)){
@@ -342,9 +355,17 @@ function transformationGroup(form){
   if(/-hisui(?:-|$)/.test(n))return 'hisui';
   if(/-paldea(?:-|$)/.test(n))return 'paldea';
 
-  // Mudanças de forma acionadas por item, habilidade, batalha, fusão ou estado.
+  // Fusões: formas que combinam explicitamente dois Pokémon.
+  const fusionKeywords=[
+    'kyurem-black','kyurem-white',
+    'necrozma-dusk','necrozma-dawn',
+    'calyrex-ice','calyrex-shadow'
+  ];
+  if(fusionKeywords.some(k=>n.includes(k)))return 'fusion';
+
+  // Mudanças de forma acionadas por item, habilidade, batalha ou estado.
   const transformationKeywords=[
-    'primal','unbound','origin','therian','black','white','resolute','pirouette',
+    'primal','unbound','origin','therian','resolute','pirouette',
     'ash','battle-bond','zen','school','blade','shield','complete','10','50',
     'ultra','dusk-mane','dawn-wings','crowned','eternamax','hero','hangry',
     'gulping','gorging','noice','ice-rider','shadow-rider','terastal','stellar',
@@ -359,6 +380,7 @@ function transformationSections(list){
     ['galar','Formas de Galar'],
     ['hisui','Formas de Hisui'],
     ['paldea','Formas de Paldea'],
+    ['fusion','Fusões'],
     ['special','Transformações / Mudanças de Forma'],
     ['other','Outras Formas e Variações']
   ];
