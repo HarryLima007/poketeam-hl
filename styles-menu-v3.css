@@ -1528,3 +1528,28 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     margin-right:-90px!important;
   }
 }
+
+/* Home por partes — ajuste fino conforme vídeo/fala */
+@media(min-width:1200px){
+  #home>.panel{
+    width:86%!important;
+    max-width:980px!important;
+    margin:56px auto 120px!important;
+    padding:22px 24px!important;
+  }
+  #home>.panel .section-title{
+    justify-content:flex-start!important;
+  }
+  #home #recentList{
+    justify-content:center!important;
+    gap:10px!important;
+  }
+}
+@media(min-width:1600px){
+  #home>.panel{
+    width:82%!important;
+    max-width:940px!important;
+    margin-top:66px!important;
+    margin-bottom:135px!important;
+  }
+}
