@@ -2354,3 +2354,22 @@ button.form-overview-card:hover{
   .form-overview-head{align-items:flex-start;flex-direction:column}
   .form-overview-grid{grid-template-columns:1fr}
 }
+
+
+/* Modal -> atalho para a aba Transformações */
+.transform-jump{
+  border-color:rgba(91,185,255,.42)!important;
+  background:rgba(20,91,150,.24)!important;
+}
+.transform-jump:hover{
+  border-color:rgba(99,203,255,.78)!important;
+  background:rgba(23,112,183,.38)!important;
+}
+.poke-card.jump-highlight{
+  animation:transformJumpPulse 2.2s ease both;
+}
+@keyframes transformJumpPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(71,188,255,0)}
+  20%{box-shadow:0 0 0 4px rgba(71,188,255,.85),0 0 28px rgba(71,188,255,.42)}
+  55%{box-shadow:0 0 0 2px rgba(71,188,255,.5),0 0 18px rgba(71,188,255,.22)}
+}
