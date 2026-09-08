@@ -1435,3 +1435,49 @@ body[data-page="home"] .topbar{background:rgba(2,8,20,.78)!important;backdrop-fi
     top:11px!important;
   }
 }
+
+/* Menu por partes — etapa 2: navegação central */
+@media(min-width:1200px){
+  .topbar #nav{
+    justify-self:center!important;
+    gap:16px!important;
+  }
+  .topbar #nav button{
+    min-height:50px!important;
+    height:50px!important;
+    padding:0 18px!important;
+    border-radius:18px!important;
+    font-size:16px!important;
+    font-weight:800!important;
+    gap:10px!important;
+    color:#eef4ff!important;
+    letter-spacing:-.1px!important;
+  }
+  .topbar #nav button .nav-icon{
+    font-size:19px!important;
+    line-height:1!important;
+  }
+  .topbar #nav button:hover{
+    background:rgba(12,38,76,.72)!important;
+    border-color:rgba(70,157,242,.34)!important;
+    box-shadow:0 0 18px rgba(42,145,255,.08)!important;
+  }
+  .topbar #nav button.active{
+    background:linear-gradient(135deg,#103c6c 0%,#0a2f59 100%)!important;
+    border-color:#2aa9ff!important;
+    box-shadow:
+      0 0 0 1px rgba(50,177,255,.14),
+      0 0 24px rgba(29,144,255,.16),
+      inset 0 1px 0 rgba(255,255,255,.06)!important;
+  }
+}
+@media(min-width:1600px){
+  .topbar #nav{gap:18px!important}
+  .topbar #nav button{
+    min-height:52px!important;
+    height:52px!important;
+    padding:0 20px!important;
+    font-size:16.5px!important;
+  }
+  .topbar #nav button .nav-icon{font-size:20px!important}
+}
