@@ -72,18 +72,51 @@
     };
   }
 
+  function patchTeamChooserPreview(){
+    if(!pendingTeamForm) return;
+    const chooser = document.getElementById('teamChooser');
+    const head = document.querySelector('#teamChooserContent .team-chooser-head');
+    if(!chooser || !head || chooser.classList.contains('hidden')) return;
+
+    const shiny = chooser.dataset.pendingShiny === '1';
+    const iv100 = chooser.dataset.pendingIV100 === '1';
+    const img = head.querySelector('img');
+    const title = head.querySelector('h2');
+    const desc = head.querySelector('p');
+    const label = pendingTeamForm.label || pendingTeamForm.formName || 'Forma especial';
+    const formTag = pendingTeamForm.category === 'mega' ? 'Mega Evolução' : pendingTeamForm.category === 'gmax' ? 'Gigantamax' : 'Forma especial';
+
+    if(img){
+      img.src = shiny && pendingTeamForm.shinyArt ? pendingTeamForm.shinyArt : (pendingTeamForm.art || img.src);
+      img.alt = label;
+    }
+    if(title) title.textContent = `${label}${shiny ? ' ✨' : ''}${iv100 ? ' 💯' : ''}`;
+    if(desc) desc.textContent = `${formTag}${iv100 ? ' • IV 100%' : ''} • Escolha uma equipe ou crie uma nova.`;
+  }
+
   document.addEventListener('click', event => {
     const add = event.target.closest?.('#dexResults [data-add]');
     if(add){
       pendingTeamForm = formFromCard(add.closest('.poke-card'));
+      requestAnimationFrame(patchTeamChooserPreview);
       return;
     }
     if(event.target.closest?.('#modalAdd')){
       pendingTeamForm = formFromModal();
+      requestAnimationFrame(patchTeamChooserPreview);
       return;
     }
     if(event.target.closest?.('#closeTeamChooser, #cancelTeamCreate')) pendingTeamForm = null;
   }, true);
+
+  if(typeof openTeamChooser === 'function'){
+    const originalOpenTeamChooser = openTeamChooser;
+    openTeamChooser = function(){
+      const result = originalOpenTeamChooser.apply(this, arguments);
+      requestAnimationFrame(patchTeamChooserPreview);
+      return result;
+    };
+  }
 
   if(typeof commitAddToTeam === 'function'){
     const originalCommitAddToTeam = commitAddToTeam;
