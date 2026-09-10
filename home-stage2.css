@@ -51,7 +51,7 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span{
   color:#f2f7ff!important;
   letter-spacing:.15px!important;
   text-shadow:0 2px 12px rgba(56,174,255,.16)!important;
-  transition:transform .28s ease,color .28s ease,text-shadow .28s ease!important;
+  transition:color .32s ease,text-shadow .32s ease!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   content:"";
@@ -60,17 +60,19 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   bottom:-11px;
   width:27px;
   height:2px;
-  border-radius:99px;
+  border:1.5px solid transparent;
+  border-radius:8px;
   background:#42c7ff;
   box-shadow:0 0 8px rgba(66,199,255,.45);
   transform:translateX(-50%);
-  transition:width .28s ease,box-shadow .28s ease,background .28s ease;
+  transition:width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),bottom .38s cubic-bezier(.2,.8,.2,1),background .2s ease,border-color .2s ease,box-shadow .38s ease;
+  pointer-events:none;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>small{
   top:64%!important;
   font-size:0!important;
   color:#8fa8c5!important;
-  transition:transform .28s ease,color .28s ease,text-shadow .28s ease!important;
+  transition:color .28s ease,text-shadow .28s ease!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>small::before{
   content:"Explore. Descubra. Complete.";
@@ -86,17 +88,18 @@ body[data-page="home"] #home .quick-grid button:nth-child(1):hover{
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span{
   color:#bdebff!important;
-  transform:translate(4px,-50%)!important;
   text-shadow:0 0 8px rgba(85,204,255,.42),0 0 18px rgba(55,171,255,.26)!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::after{
-  width:45px;
-  background:#64d8ff;
-  box-shadow:0 0 12px rgba(100,216,255,.72);
+  width:118px;
+  height:38px;
+  bottom:-10px;
+  background:rgba(48,189,255,.025);
+  border-color:#64d8ff;
+  box-shadow:0 0 8px rgba(100,216,255,.55),inset 0 0 10px rgba(70,190,255,.10);
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{
   color:#bdd5eb!important;
-  transform:translateX(4px)!important;
   text-shadow:0 0 10px rgba(94,190,255,.15)!important;
 }
 
