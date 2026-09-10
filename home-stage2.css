@@ -59,8 +59,8 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   content:"";
   position:absolute;
   top:50%;
-  width:48px;
-  height:32px;
+  width:49px;
+  height:33px;
   pointer-events:none;
   background-repeat:no-repeat;
   will-change:background-size,filter;
@@ -90,11 +90,11 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
 }
 @keyframes pokedexTraceHalf{
   0%{background-size:14px 2px,2px 0,0 2px}
-  18%{background-size:24px 2px,2px 0,0 2px}
-  38%{background-size:48px 2px,2px 4px,0 2px}
-  58%{background-size:48px 2px,2px 22px,6px 2px}
-  76%{background-size:48px 2px,2px 32px,22px 2px}
-  100%{background-size:48px 2px,2px 32px,48px 2px}
+  8%{background-size:14px 2px,2px 0,0 2px}
+  42%{background-size:49px 2px,2px 0,0 2px}
+  70%{background-size:49px 2px,2px 33px,0 2px}
+  72%{background-size:49px 2px,2px 33px,0 2px}
+  100%{background-size:49px 2px,2px 33px,49px 2px}
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>small{
   top:64%!important;
