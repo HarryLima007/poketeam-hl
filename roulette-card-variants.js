@@ -119,6 +119,25 @@
     };
   }
 
+  function fixHomeQuoteOverlap(){
+    const quote = document.querySelector('#home .hero-quote');
+    const quickCards = [...document.querySelectorAll('#home .quick-grid > button')];
+    if(!quote || !quickCards.length) return;
+
+    quote.style.visibility = 'visible';
+    quote.style.pointerEvents = 'none';
+
+    if(window.innerWidth < 1200) return;
+
+    const q = quote.getBoundingClientRect();
+    const overlaps = quickCards.some(card => {
+      const c = card.getBoundingClientRect();
+      return q.left < c.right && q.right > c.left && q.top < c.bottom && q.bottom > c.top;
+    });
+
+    quote.style.visibility = overlaps ? 'hidden' : 'visible';
+  }
+
   function start(){
     const picker = document.getElementById('roulettePicker');
     if(picker){
@@ -127,6 +146,8 @@
       observer.observe(picker, {childList:true, subtree:true});
     }
     installSpinSyncFix();
+    requestAnimationFrame(fixHomeQuoteOverlap);
+    window.addEventListener('resize', () => requestAnimationFrame(fixHomeQuoteOverlap), {passive:true});
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
