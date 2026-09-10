@@ -1,0 +1,75 @@
+/* Roleta — controles de variante por Pokémon */
+#roulette .variant-toolbar{display:none!important}
+#roulette .roulette-poke-card{
+  padding-right:78px!important;
+  min-height:154px!important;
+}
+#roulette .catalog-selected-badges{display:none!important}
+#roulette .card-variant-controls{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:62px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:5px;
+  z-index:3;
+}
+#roulette .card-variant-option{
+  min-height:25px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px 5px;
+  border:1px solid #3b3159;
+  border-radius:7px;
+  background:#17162a;
+  color:#aeb3c6;
+  font-size:8px;
+  line-height:1;
+  font-weight:900;
+  white-space:nowrap;
+  cursor:pointer;
+  user-select:none;
+  transition:.16s ease;
+}
+#roulette .card-variant-option:hover{
+  transform:translateY(-1px);
+  border-color:#8a6cc2;
+  color:#fff;
+}
+#roulette .card-variant-option.active.normal{
+  color:#fff;
+  background:#215d96;
+  border-color:#58a8ef;
+  box-shadow:0 0 12px rgba(88,168,239,.22);
+}
+#roulette .card-variant-option.active.iv{
+  color:#17120a;
+  background:#e0b948;
+  border-color:#f3d76e;
+  box-shadow:0 0 12px rgba(224,185,72,.20);
+}
+#roulette .card-variant-option.active.shiny{
+  color:#fff;
+  background:#8a3f8f;
+  border-color:#d67adc;
+  box-shadow:0 0 12px rgba(214,122,220,.20);
+}
+#roulette .card-variant-option.active.shiny100{
+  color:#fff;
+  background:linear-gradient(135deg,#78429a,#b56d8f);
+  border-color:#d9a0dd;
+  box-shadow:0 0 12px rgba(181,109,143,.22);
+}
+@media(max-width:800px){
+  #roulette .roulette-poke-card{padding-right:72px!important}
+  #roulette .card-variant-controls{right:6px;width:58px;gap:4px}
+  #roulette .card-variant-option{font-size:7px;min-height:24px}
+}
+@media(max-width:520px){
+  #roulette .roulette-poke-card{padding-right:68px!important}
+  #roulette .card-variant-controls{width:54px}
+  #roulette .card-variant-option{font-size:6.5px;padding:3px}
+}
