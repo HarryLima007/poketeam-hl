@@ -133,7 +133,7 @@
   function refreshHomeCount(){const el=document.getElementById('homeFavs');if(el)el.textContent=entries.length}
 
   function patchDexStars(root=document){
-    root.querySelectorAll?.('#dexResults .poke-card[data-id],#favResults .poke-card[data-id]').forEach(card=>{
+    root.querySelectorAll?.('#dexResults .poke-card[data-id]').forEach(card=>{
       const ctx=fromCard(card),btn=card.querySelector('[data-fav]');
       if(btn&&ctx)btn.classList.toggle('on',hasVariant(ctx));
     });
@@ -179,6 +179,7 @@
     style.id='favorite-card-remove-style';
     style.textContent=`
       #wishes #favResults .poke-card{padding-bottom:58px}
+      #wishes #favResults .poke-card .card-actions .fav{display:none!important}
       #wishes #favResults .fav-card-remove{position:absolute;left:12px;right:12px;bottom:12px;width:calc(100% - 24px);min-height:34px;padding:7px 10px;border-radius:10px;border:1px solid rgba(255,91,108,.45);background:rgba(104,28,39,.42);color:#ffb0b8;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;z-index:2}
       #wishes #favResults .fav-card-remove:hover{background:rgba(136,34,48,.72);border-color:rgba(255,116,130,.75);color:#fff;transform:translateY(-1px)}
     `;
