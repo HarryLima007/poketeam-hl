@@ -194,7 +194,7 @@
 
   const homeStage2Style = document.createElement('link');
   homeStage2Style.rel = 'stylesheet';
-  homeStage2Style.href = 'home-stage2.css?v=home-stage2-roleta-orbit-20260910-8';
+  homeStage2Style.href = 'home-stage2.css?v=home-stage2-roleta-fast-vertical-spin-20260910-9';
   document.head.appendChild(homeStage2Style);
 
   const favFormsScript = document.createElement('script');
