@@ -173,7 +173,33 @@
     }
   }
 
-  syncLegacy();persistEntries();entries.forEach(preloadForm);
+  function ensureFavoriteRemoveStyle(){
+    if(document.getElementById('favorite-card-remove-style'))return;
+    const style=document.createElement('style');
+    style.id='favorite-card-remove-style';
+    style.textContent=`
+      #wishes #favResults .poke-card{padding-bottom:58px}
+      #wishes #favResults .fav-card-remove{position:absolute;left:12px;right:12px;bottom:12px;width:calc(100% - 24px);min-height:34px;padding:7px 10px;border-radius:10px;border:1px solid rgba(255,91,108,.45);background:rgba(104,28,39,.42);color:#ffb0b8;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;z-index:2}
+      #wishes #favResults .fav-card-remove:hover{background:rgba(136,34,48,.72);border-color:rgba(255,116,130,.75);color:#fff;transform:translateY(-1px)}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function favoriteCardHTML(entry){
+    const p=state.list[entry.id-1]||{id:entry.id,name:`pokemon-${entry.id}`};
+    let html;
+    if(entry.form){
+      preloadForm(entry);
+      html=cardHTML(p,entry.shiny,{category:entry.form.category,formIndex:entry.form.index||0,form:entry.form});
+    }else{
+      html=cardHTML(p,entry.shiny);
+    }
+    const key=encodeURIComponent(variantKey(entry));
+    const label=displayName(entry).replace(/"/g,'&quot;');
+    return html.replace('</article>',`<button class="fav-card-remove" type="button" data-remove-favorite="${key}" aria-label="Remover ${label} dos favoritos">🗑 Remover</button></article>`);
+  }
+
+  syncLegacy();persistEntries();entries.forEach(preloadForm);ensureFavoriteRemoveStyle();
 
   toggleFav=async function(id,shiny=false){
     const ctx=exactContext(Number(id),shiny),key=variantKey(ctx);
@@ -215,11 +241,8 @@
         return !q||display.toLowerCase().includes(q)||p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&entry.id===n);
       });
       const root=document.getElementById('favResults');if(!root)return;
-      root.innerHTML=filtered.length?filtered.map(entry=>{
-        const p=state.list[entry.id-1]||{id:entry.id,name:`pokemon-${entry.id}`};
-        if(entry.form){preloadForm(entry);return cardHTML(p,entry.shiny,{category:entry.form.category,formIndex:entry.form.index||0,form:entry.form})}
-        return cardHTML(p,entry.shiny);
-      }).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';
+      ensureFavoriteRemoveStyle();
+      root.innerHTML=filtered.length?filtered.map(favoriteCardHTML).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';
       bindCards(root);patchDexStars(root);
     });
   };
@@ -236,6 +259,18 @@
   };
 
   document.addEventListener('click',async event=>{
+    const removeBtn=event.target.closest?.('#favResults [data-remove-favorite]');
+    if(removeBtn){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+      let key='';
+      try{key=decodeURIComponent(removeBtn.dataset.removeFavorite||'')}catch{key=removeBtn.dataset.removeFavorite||''}
+      const entry=entries.find(e=>variantKey(e)===key);
+      if(entry){
+        pendingFav={id:entry.id,shiny:entry.shiny,form:cloneForm(entry.form)};
+        await toggleFav(entry.id,entry.shiny);
+      }
+      return;
+    }
     const cardFav=event.target.closest?.('.poke-card [data-fav]');
     if(cardFav){
       event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
