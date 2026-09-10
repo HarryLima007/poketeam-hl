@@ -128,10 +128,90 @@ body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{
   text-shadow:0 0 10px rgba(94,190,255,.15)!important;
 }
 
-/* Roleta — roxo */
+/* Roleta — mesma base visual da Pokédex, identidade roxa e traço orbital horário */
+body[data-page="home"] #home .quick-grid button:nth-child(2){
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-orbit-1')!important;
+  background-size:100% 100%,92% auto!important;
+  background-position:center center,center center!important;
+  background-repeat:no-repeat!important;
+  background-color:#040d1f!important;
+  filter:brightness(.82) saturate(.92)!important;
+}
 body[data-page="home"] #home .quick-grid button:nth-child(2)::before{background:#9b76ff;box-shadow:0 0 16px rgba(155,118,255,.55)}
 body[data-page="home"] #home .quick-grid button:nth-child(2)::after{color:#b59cff}
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover{border-color:#a98cff!important;box-shadow:0 20px 46px rgba(111,78,207,.23),0 0 26px rgba(155,118,255,.10)!important}
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span{
+  color:#f5f0ff!important;
+  letter-spacing:.15px!important;
+  text-shadow:0 2px 12px rgba(155,118,255,.18)!important;
+  transition:color .34s ease,text-shadow .34s ease!important;
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:98px;
+  height:34px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  background-image:
+    linear-gradient(#a87dff,#d19cff),
+    linear-gradient(90deg,#d19cff,#b086ff),
+    linear-gradient(#b086ff,#8d63f4),
+    linear-gradient(90deg,#8d63f4,#a87dff);
+  background-position:right bottom,right top,left top,left bottom;
+  background-size:2px 0,0 2px,2px 0,0 2px;
+  background-repeat:no-repeat;
+  will-change:background-size,filter;
+  filter:drop-shadow(0 0 3px rgba(176,134,255,.40));
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:5px;
+  height:5px;
+  margin:-2.5px 0 0 -2.5px;
+  border-radius:50%;
+  background:#e4c6ff;
+  opacity:0;
+  box-shadow:0 0 7px rgba(201,153,255,.95),0 0 14px rgba(155,118,255,.55);
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+@keyframes rouletteTraceOrbit{
+  0%,5%{background-size:2px 0,0 2px,2px 0,0 2px}
+  27%{background-size:2px 34px,0 2px,2px 0,0 2px}
+  50%{background-size:2px 34px,98px 2px,2px 0,0 2px}
+  73%{background-size:2px 34px,98px 2px,2px 34px,0 2px}
+  100%{background-size:2px 34px,98px 2px,2px 34px,98px 2px}
+}
+@keyframes rouletteOrbitHead{
+  0%,5%{opacity:1;transform:translate(49px,17px)}
+  27%{opacity:1;transform:translate(49px,-17px)}
+  50%{opacity:1;transform:translate(-49px,-17px)}
+  73%{opacity:1;transform:translate(-49px,17px)}
+  100%{opacity:.25;transform:translate(49px,17px)}
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover{
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-orbit-1')!important;
+  background-size:100% 100%,92% auto!important;
+  filter:brightness(1.08) saturate(1.08)!important;
+  border-color:#a98cff!important;
+  box-shadow:0 20px 46px rgba(111,78,207,.28),0 0 30px rgba(155,118,255,.16)!important;
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{
+  color:#dcc8ff!important;
+  text-shadow:0 0 8px rgba(197,158,255,.48),0 0 18px rgba(155,118,255,.28)!important;
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{
+  animation:rouletteTraceOrbit 1.02s cubic-bezier(.42,0,.18,1) forwards;
+  filter:drop-shadow(0 0 4px rgba(211,174,255,.78)) drop-shadow(0 0 9px rgba(155,118,255,.28));
+}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{
+  animation:rouletteOrbitHead 1.02s cubic-bezier(.42,0,.18,1) forwards;
+}
 
 /* Times — vermelho */
 body[data-page="home"] #home .quick-grid button:nth-child(3)::before{background:#ff4f5f;box-shadow:0 0 16px rgba(255,79,95,.58)}
