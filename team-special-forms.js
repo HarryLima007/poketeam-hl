@@ -191,4 +191,8 @@
   }catch(err){
     console.error('Falha ao inicializar suporte a formas especiais nos times', err);
   }
+
+  const favFormsScript = document.createElement('script');
+  favFormsScript.src = 'favorite-special-forms.js?v=20260910-1';
+  document.head.appendChild(favFormsScript);
 })();
