@@ -29,6 +29,14 @@
     return `${name}${entry.shiny?' Shiny':''}`;
   }
 
+  function displayImage(entry){
+    if(entry.form){
+      if(entry.shiny&&entry.form.shinyArt)return entry.form.shinyArt;
+      if(entry.form.art)return entry.form.art;
+    }
+    return sprite(entry.id,entry.shiny);
+  }
+
   function formPayload(id,category,index){
     if(!category||!['mega','gmax','transform'].includes(category))return null;
     const form=specialFormsFor(id,category)?.[index];
@@ -139,6 +147,32 @@
     btn.textContent=on?'★ Favoritado':'★ Favoritar';
   }
 
+  function patchRemoveDialog(entry){
+    const name=displayName(entry);
+    const image=displayImage(entry);
+    const card=document.querySelector('#siteDialog .site-dialog-card');
+    const icon=document.getElementById('siteDialogIcon');
+    const title=document.getElementById('siteDialogTitle');
+    const message=document.getElementById('siteDialogMessage');
+
+    if(card)card.style.gridTemplateColumns='92px 1fr';
+    if(icon){
+      icon.style.width='92px';
+      icon.style.height='92px';
+      icon.style.padding='6px';
+      icon.style.background='linear-gradient(160deg,#15223a,#0d1627)';
+      icon.style.border='1px solid #345070';
+      icon.innerHTML=`<img src="${image}" alt="${name}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))">`;
+    }
+    if(title){
+      title.style.color='#f5f7fb';
+      title.textContent='Remover dos Favoritos';
+    }
+    if(message){
+      message.innerHTML=`<strong style="display:block;color:#fff;font-size:18px;margin-bottom:4px">${name}</strong><span>Deseja mesmo remover este Pokémon dos favoritos?</span>`;
+    }
+  }
+
   syncLegacy();persistEntries();entries.forEach(preloadForm);
 
   toggleFav=async function(id,shiny=false){
@@ -147,11 +181,10 @@
     let added=false;
     if(index>=0){
       const current=entries[index];
-      const confirmPromise=siteConfirm(`Deseja mesmo remover ${displayName(current)} dos favoritos?`,{
+      const confirmPromise=siteConfirm('Deseja mesmo remover este Pokémon dos favoritos?',{
         title:'Remover dos Favoritos',confirmText:'Remover',icon:'⭐',danger:true
       });
-      const dialogTitle=document.getElementById('siteDialogTitle');
-      if(dialogTitle)dialogTitle.style.color='#f5f7fb';
+      patchRemoveDialog(current);
       const ok=await confirmPromise;
       if(!ok){
         pendingFav=null;
@@ -202,7 +235,6 @@
     const result=await originalOpenPokemon.apply(this,arguments);patchModalFavButton();return result;
   };
 
-  // Intercepta o clique antes do handler antigo do card. Assim a remoção só acontece após confirmação.
   document.addEventListener('click',async event=>{
     const cardFav=event.target.closest?.('.poke-card [data-fav]');
     if(cardFav){
