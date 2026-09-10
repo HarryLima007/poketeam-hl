@@ -23,6 +23,12 @@
     return form?.label||specialFormLabel(form?.formName||'',base);
   }
 
+  function displayName(entry){
+    const base=state.list[entry.id-1]?.name||`pokemon-${entry.id}`;
+    const name=entry.form?.label||cap(base);
+    return `${name}${entry.shiny?' Shiny':''}`;
+  }
+
   function formPayload(id,category,index){
     if(!category||!['mega','gmax','transform'].includes(category))return null;
     const form=specialFormsFor(id,category)?.[index];
@@ -147,23 +153,38 @@
   persistEntries();
   entries.forEach(preloadForm);
 
-  toggleFav=function(id,shiny=false){
+  toggleFav=async function(id,shiny=false){
     const ctx=exactContext(Number(id),shiny);
     const key=variantKey(ctx);
     const index=entries.findIndex(e=>variantKey(e)===key);
     let added=false;
+
     if(index>=0){
+      const current=entries[index];
+      const ok=await siteConfirm(`Deseja mesmo remover ${displayName(current)} dos favoritos?`,{
+        title:'Remover dos Desejos',
+        confirmText:'Sim, remover',
+        icon:'⭐',
+        danger:true
+      });
+      if(!ok){
+        pendingFav=null;
+        requestAnimationFrame(()=>{patchDexStars();patchModalFavButton()});
+        return false;
+      }
       entries.splice(index,1);
     }else{
       entries.push({id:ctx.id,shiny:!!ctx.shiny,form:cloneForm(ctx.form)});
       added=true;
     }
+
     pendingFav=null;
     syncLegacy();
     persistEntries();
     store.set('favs',[...favs]);
     store.set('favShiny',favShiny);
     refreshHomeCount();
+    if(document.getElementById('wishes')?.classList.contains('active'))renderFavs();
     requestAnimationFrame(()=>{patchDexStars();patchModalFavButton()});
     toast(added?'Adicionado aos desejos ⭐':'Removido dos desejos');
     return added;
