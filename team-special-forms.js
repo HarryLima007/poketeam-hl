@@ -194,7 +194,7 @@
 
   const homeStage2Style = document.createElement('link');
   homeStage2Style.rel = 'stylesheet';
-  homeStage2Style.href = 'home-stage2.css?v=home-stage2-times-heavy-impact-20260910-15';
+  homeStage2Style.href = 'home-stage2.css?v=home-stage2-desejos-four-corners-20260910-16';
   document.head.appendChild(homeStage2Style);
 
   const favFormsScript = document.createElement('script');
