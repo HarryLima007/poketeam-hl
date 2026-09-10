@@ -153,9 +153,9 @@ body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{color:#e
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{animation:rouletteRectSpin .34s linear infinite}
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{animation:rouletteRectSpinTrail .34s linear infinite}
 
-/* Times — vermelho; duas frentes saem dos meios laterais, se chocam no topo/baixo, recuam e fecham. */
+/* Times — impacto forte: as duas frentes colidem, comprimem, recuam e batem de novo. */
 body[data-page="home"] #home .quick-grid button:nth-child(3){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-times.png?v=times-card-clash-1')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-times.png?v=times-card-clash-2')!important;
   background-size:100% 100%,92% auto!important;
   background-position:center center,center center!important;
   background-repeat:no-repeat!important;
@@ -174,61 +174,76 @@ body[data-page="home"] #home .quick-grid button:nth-child(3)>span::after{
   height:34px;
   pointer-events:none;
   background-repeat:no-repeat;
-  will-change:background-size,filter;
+  will-change:background-size,filter,transform;
   filter:drop-shadow(0 0 4px rgba(255,100,112,.56));
 }
-/* Metade esquerda: nasce no meio esquerdo, sobe/desce e corre para o centro. */
 body[data-page="home"] #home .quick-grid button:nth-child(3)>span::before{
   left:50%;
   transform:translate(-100%,-50%);
-  background-image:
-    linear-gradient(#ff4f5f,#ff7b86),
-    linear-gradient(#ff4f5f,#ff7b86),
-    linear-gradient(90deg,#ff7b86,#ffd0d5),
-    linear-gradient(90deg,#ff7b86,#ffd0d5);
+  background-image:linear-gradient(#ff4f5f,#ff7b86),linear-gradient(#ff4f5f,#ff7b86),linear-gradient(90deg,#ff7b86,#ffe4e7),linear-gradient(90deg,#ff7b86,#ffe4e7);
   background-position:left top,left bottom,left top,left bottom;
   background-size:2px 0,2px 0,0 2px,0 2px;
 }
-/* Metade direita: espelho da esquerda; ambas chegam ao centro juntas. */
 body[data-page="home"] #home .quick-grid button:nth-child(3)>span::after{
   left:50%;
   transform:translate(0,-50%);
-  background-image:
-    linear-gradient(#ff4f5f,#ff7b86),
-    linear-gradient(#ff4f5f,#ff7b86),
-    linear-gradient(90deg,#ffd0d5,#ff7b86),
-    linear-gradient(90deg,#ffd0d5,#ff7b86);
+  background-image:linear-gradient(#ff4f5f,#ff7b86),linear-gradient(#ff4f5f,#ff7b86),linear-gradient(90deg,#ffe4e7,#ff7b86),linear-gradient(90deg,#ffe4e7,#ff7b86);
   background-position:right top,right bottom,right top,right bottom;
   background-size:2px 0,2px 0,0 2px,0 2px;
 }
 @keyframes timesClashTrace{
   0%{background-size:2px 0,2px 0,0 2px,0 2px;filter:drop-shadow(0 0 4px rgba(255,100,112,.56))}
-  20%{background-size:2px 18px,2px 18px,0 2px,0 2px;filter:drop-shadow(0 0 4px rgba(255,100,112,.62))}
-  38%{background-size:2px 34px,2px 34px,30px 2px,30px 2px;filter:drop-shadow(0 0 5px rgba(255,112,124,.72))}
-  50%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 7px rgba(255,225,228,1)) drop-shadow(0 0 16px rgba(255,79,95,.78))}
-  57%{background-size:2px 34px,2px 34px,40px 2px,40px 2px;filter:drop-shadow(0 0 4px rgba(255,112,124,.68))}
-  65%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 7px rgba(255,235,237,1)) drop-shadow(0 0 17px rgba(255,79,95,.84))}
-  72%{background-size:2px 34px,2px 34px,44px 2px,44px 2px;filter:drop-shadow(0 0 5px rgba(255,130,141,.72))}
-  82%,100%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 5px rgba(255,151,161,.88)) drop-shadow(0 0 10px rgba(255,79,95,.40))}
+  18%{background-size:2px 19px,2px 19px,0 2px,0 2px;filter:drop-shadow(0 0 5px rgba(255,100,112,.66))}
+  35%{background-size:2px 34px,2px 34px,29px 2px,29px 2px;filter:drop-shadow(0 0 7px rgba(255,112,124,.82))}
+  47%{background-size:2px 34px,2px 34px,47px 2px,47px 2px;filter:drop-shadow(0 0 10px rgba(255,180,188,.94))}
+  50%{background-size:3px 34px,3px 34px,49px 3px,49px 3px;filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 18px rgba(255,79,95,1)) drop-shadow(0 0 32px rgba(255,35,55,.72))}
+  57%{background-size:2px 34px,2px 34px,37px 2px,37px 2px;filter:drop-shadow(0 0 5px rgba(255,112,124,.70))}
+  63%{background-size:2px 34px,2px 34px,46px 2px,46px 2px;filter:drop-shadow(0 0 9px rgba(255,180,188,.92))}
+  66%{background-size:3px 34px,3px 34px,49px 3px,49px 3px;filter:drop-shadow(0 0 9px #fff) drop-shadow(0 0 20px rgba(255,79,95,1)) drop-shadow(0 0 36px rgba(255,35,55,.78))}
+  73%{background-size:2px 34px,2px 34px,42px 2px,42px 2px;filter:drop-shadow(0 0 6px rgba(255,130,141,.76))}
+  84%,100%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 6px rgba(255,151,161,.92)) drop-shadow(0 0 12px rgba(255,79,95,.46))}
+}
+@keyframes timesClashLeft{
+  0%,47%{transform:translate(-100%,-50%)}
+  50%{transform:translate(calc(-100% + 4px),-50%) scaleX(1.06)}
+  57%{transform:translate(calc(-100% - 5px),-50%) scaleX(.94)}
+  63%{transform:translate(calc(-100% + 1px),-50%) scaleX(1.02)}
+  66%{transform:translate(calc(-100% + 5px),-50%) scaleX(1.08)}
+  73%{transform:translate(calc(-100% - 3px),-50%) scaleX(.96)}
+  84%,100%{transform:translate(-100%,-50%) scaleX(1)}
+}
+@keyframes timesClashRight{
+  0%,47%{transform:translate(0,-50%)}
+  50%{transform:translate(-4px,-50%) scaleX(1.06)}
+  57%{transform:translate(5px,-50%) scaleX(.94)}
+  63%{transform:translate(-1px,-50%) scaleX(1.02)}
+  66%{transform:translate(-5px,-50%) scaleX(1.08)}
+  73%{transform:translate(3px,-50%) scaleX(.96)}
+  84%,100%{transform:translate(0,-50%) scaleX(1)}
 }
 @keyframes timesCardImpact{
-  0%,44%{box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
-  50%{box-shadow:0 20px 46px rgba(207,48,63,.36),0 0 40px rgba(255,79,95,.34),0 0 12px rgba(255,210,215,.16)}
-  57%{box-shadow:0 20px 46px rgba(207,48,63,.28),0 0 26px rgba(255,79,95,.14)}
-  65%{box-shadow:0 20px 46px rgba(207,48,63,.38),0 0 42px rgba(255,79,95,.36),0 0 14px rgba(255,220,224,.18)}
-  72%,100%{box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
+  0%,46%{transform:translateY(-5px) scale(1.012);box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
+  48%{transform:translate(-1px,-5px) scale(1.016);box-shadow:0 20px 48px rgba(207,48,63,.38),0 0 42px rgba(255,79,95,.42)}
+  50%{transform:translate(3px,-5px) scale(1.026);box-shadow:0 22px 54px rgba(207,48,63,.48),0 0 58px rgba(255,79,95,.66),0 0 20px rgba(255,235,238,.34)}
+  52%{transform:translate(-3px,-5px) scale(1.004);box-shadow:0 18px 38px rgba(207,48,63,.26),0 0 22px rgba(255,79,95,.16)}
+  57%{transform:translate(1px,-5px) scale(1.01)}
+  63%{transform:translate(-1px,-5px) scale(1.018);box-shadow:0 20px 48px rgba(207,48,63,.40),0 0 44px rgba(255,79,95,.46)}
+  66%{transform:translate(-3px,-5px) scale(1.03);box-shadow:0 23px 58px rgba(207,48,63,.50),0 0 64px rgba(255,79,95,.72),0 0 24px rgba(255,240,242,.40)}
+  68%{transform:translate(3px,-5px) scale(1.002);box-shadow:0 18px 38px rgba(207,48,63,.25),0 0 22px rgba(255,79,95,.14)}
+  72%{transform:translate(-1px,-5px) scale(1.012)}
+  84%,100%{transform:translateY(-5px) scale(1.012);box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
 }
 body[data-page="home"] #home .quick-grid button:nth-child(3):hover{
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-times.png?v=times-card-clash-1')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-times.png?v=times-card-clash-2')!important;
   background-size:100% 100%,92% auto!important;
   filter:brightness(1.08) saturate(1.08)!important;
   border-color:#ff6472!important;
   box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)!important;
-  animation:timesCardImpact .88s cubic-bezier(.22,.61,.36,1) forwards;
+  animation:timesCardImpact .92s cubic-bezier(.16,.72,.22,1) forwards;
 }
-body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span{color:#ffd7dc!important;text-shadow:0 0 8px rgba(255,119,133,.56),0 0 18px rgba(255,79,95,.30)!important}
-body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::before,
-body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::after{animation:timesClashTrace .88s cubic-bezier(.22,.61,.36,1) forwards}
+body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span{color:#ffd7dc!important;text-shadow:0 0 9px rgba(255,150,162,.66),0 0 22px rgba(255,79,95,.38)!important}
+body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::before{animation:timesClashTrace .92s cubic-bezier(.16,.72,.22,1) forwards,timesClashLeft .92s cubic-bezier(.16,.72,.22,1) forwards}
+body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::after{animation:timesClashTrace .92s cubic-bezier(.16,.72,.22,1) forwards,timesClashRight .92s cubic-bezier(.16,.72,.22,1) forwards}
 
 /* Desejos */
 body[data-page="home"] #home .quick-grid button:nth-child(4)::before{background:#f0c94e;box-shadow:0 0 16px rgba(240,201,78,.50)}
