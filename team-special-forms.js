@@ -194,7 +194,7 @@
 
   const homeStage2Style = document.createElement('link');
   homeStage2Style.rel = 'stylesheet';
-  homeStage2Style.href = 'home-stage2.css?v=home-stage2-trace-path-20260910-5';
+  homeStage2Style.href = 'home-stage2.css?v=home-stage2-center-split-trace-20260910-6';
   document.head.appendChild(homeStage2Style);
 
   const favFormsScript = document.createElement('script');
