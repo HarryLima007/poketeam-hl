@@ -100,10 +100,7 @@
     favs.clear();
     Object.keys(favShiny).forEach(k=>delete favShiny[k]);
     const byId=new Map();
-    entries.forEach(e=>{
-      favs.add(e.id);
-      if(!byId.has(e.id))byId.set(e.id,e);
-    });
+    entries.forEach(e=>{favs.add(e.id);if(!byId.has(e.id))byId.set(e.id,e)});
     byId.forEach((e,id)=>{favShiny[id]=!!e.shiny});
   }
 
@@ -117,10 +114,7 @@
     specialArt.set(key,forms);
   }
 
-  function hasVariant(entry){
-    const key=variantKey(entry);
-    return entries.some(e=>variantKey(e)===key);
-  }
+  function hasVariant(entry){const key=variantKey(entry);return entries.some(e=>variantKey(e)===key)}
 
   function exactContext(id,shiny){
     if(pendingFav&&pendingFav.id===id)return {id,shiny:pendingFav.shiny,form:cloneForm(pendingFav.form)};
@@ -128,15 +122,11 @@
     return {id,shiny:!!shiny,form:null};
   }
 
-  function refreshHomeCount(){
-    const el=document.getElementById('homeFavs');
-    if(el)el.textContent=entries.length;
-  }
+  function refreshHomeCount(){const el=document.getElementById('homeFavs');if(el)el.textContent=entries.length}
 
   function patchDexStars(root=document){
     root.querySelectorAll?.('#dexResults .poke-card[data-id],#favResults .poke-card[data-id]').forEach(card=>{
-      const ctx=fromCard(card);
-      const btn=card.querySelector('[data-fav]');
+      const ctx=fromCard(card),btn=card.querySelector('[data-fav]');
       if(btn&&ctx)btn.classList.toggle('on',hasVariant(ctx));
     });
   }
@@ -149,23 +139,16 @@
     btn.textContent=on?'★ Favoritado':'★ Favoritar';
   }
 
-  syncLegacy();
-  persistEntries();
-  entries.forEach(preloadForm);
+  syncLegacy();persistEntries();entries.forEach(preloadForm);
 
   toggleFav=async function(id,shiny=false){
-    const ctx=exactContext(Number(id),shiny);
-    const key=variantKey(ctx);
+    const ctx=exactContext(Number(id),shiny),key=variantKey(ctx);
     const index=entries.findIndex(e=>variantKey(e)===key);
     let added=false;
-
     if(index>=0){
       const current=entries[index];
       const ok=await siteConfirm(`Deseja mesmo remover ${displayName(current)} dos favoritos?`,{
-        title:'Remover dos Desejos',
-        confirmText:'Sim, remover',
-        icon:'⭐',
-        danger:true
+        title:'Remover dos Favoritos',confirmText:'Sim, remover',icon:'⭐',danger:true
       });
       if(!ok){
         pendingFav=null;
@@ -177,12 +160,9 @@
       entries.push({id:ctx.id,shiny:!!ctx.shiny,form:cloneForm(ctx.form)});
       added=true;
     }
-
     pendingFav=null;
-    syncLegacy();
-    persistEntries();
-    store.set('favs',[...favs]);
-    store.set('favShiny',favShiny);
+    syncLegacy();persistEntries();
+    store.set('favs',[...favs]);store.set('favShiny',favShiny);
     refreshHomeCount();
     if(document.getElementById('wishes')?.classList.contains('active'))renderFavs();
     requestAnimationFrame(()=>{patchDexStars();patchModalFavButton()});
@@ -195,52 +175,47 @@
       const q=(document.getElementById('favSearch')?.value||'').trim().toLowerCase();
       const filtered=entries.filter(entry=>{
         const p=state.list[entry.id-1]||{id:entry.id,name:`pokemon-${entry.id}`};
-        const display=entry.form?.label||cap(p.name);
-        const n=parseInt(q,10);
+        const display=entry.form?.label||cap(p.name),n=parseInt(q,10);
         return !q||display.toLowerCase().includes(q)||p.name.toLowerCase().includes(q)||(!Number.isNaN(n)&&entry.id===n);
       });
-      const root=document.getElementById('favResults');
-      if(!root)return;
+      const root=document.getElementById('favResults');if(!root)return;
       root.innerHTML=filtered.length?filtered.map(entry=>{
         const p=state.list[entry.id-1]||{id:entry.id,name:`pokemon-${entry.id}`};
-        if(entry.form){
-          preloadForm(entry);
-          return cardHTML(p,entry.shiny,{category:entry.form.category,formIndex:entry.form.index||0,form:entry.form});
-        }
+        if(entry.form){preloadForm(entry);return cardHTML(p,entry.shiny,{category:entry.form.category,formIndex:entry.form.index||0,form:entry.form})}
         return cardHTML(p,entry.shiny);
       }).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';
-      bindCards(root);
-      patchDexStars(root);
+      bindCards(root);patchDexStars(root);
     });
   };
 
   const originalUpdateHome=updateHome;
-  updateHome=function(){
-    const result=originalUpdateHome.apply(this,arguments);
-    refreshHomeCount();
-    return result;
-  };
-
+  updateHome=function(){const result=originalUpdateHome.apply(this,arguments);refreshHomeCount();return result};
   const originalRenderDex=renderDex;
-  renderDex=async function(){
-    const result=await originalRenderDex.apply(this,arguments);
-    patchDexStars();
-    return result;
-  };
-
+  renderDex=async function(){const result=await originalRenderDex.apply(this,arguments);patchDexStars();return result};
   const originalOpenPokemon=openPokemon;
   openPokemon=async function(id,initialShiny=false,specialCategory=null,specialIndex=0){
     const form=specialCategory?formPayload(Number(id),specialCategory,Number(specialIndex||0)):null;
     modalFavContext={id:Number(id),shiny:!!initialShiny,form};
-    const result=await originalOpenPokemon.apply(this,arguments);
-    patchModalFavButton();
-    return result;
+    const result=await originalOpenPokemon.apply(this,arguments);patchModalFavButton();return result;
   };
 
-  document.addEventListener('click',event=>{
-    const favBtn=event.target.closest?.('.poke-card [data-fav]');
-    if(favBtn){pendingFav=fromCard(favBtn.closest('.poke-card'));return}
-    if(event.target.closest?.('#modalFav')){pendingFav=fromModal();requestAnimationFrame(patchModalFavButton);return}
+  // Intercepta o clique antes do handler antigo do card. Assim a remoção só acontece após confirmação.
+  document.addEventListener('click',async event=>{
+    const cardFav=event.target.closest?.('.poke-card [data-fav]');
+    if(cardFav){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+      const card=cardFav.closest('.poke-card');
+      pendingFav=fromCard(card);
+      if(pendingFav)await toggleFav(pendingFav.id,pendingFav.shiny);
+      return;
+    }
+    const modalFav=event.target.closest?.('#modalFav');
+    if(modalFav){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+      pendingFav=fromModal();
+      if(pendingFav)await toggleFav(pendingFav.id,pendingFav.shiny);
+      return;
+    }
     if(event.target.closest?.('#shinyBtn')){
       requestAnimationFrame(()=>{
         if(modalFavContext){modalFavContext.shiny=/Shiny:\s*ON/i.test(document.getElementById('shinyBtn')?.textContent||'');patchModalFavButton()}
@@ -254,10 +229,7 @@
     const ok=await siteConfirm('Remover todos os favoritos?',{title:'Limpar Desejos',confirmText:'Remover todos',icon:'⭐',danger:true});
     if(ok){entries=[];syncLegacy();persistEntries();store.set('favs',[]);store.set('favShiny',{});renderFavs();refreshHomeCount()}
   };
-
-  const search=document.getElementById('favSearch');
-  if(search)search.oninput=renderFavs;
-
+  const search=document.getElementById('favSearch');if(search)search.oninput=renderFavs;
   refreshHomeCount();
   requestAnimationFrame(()=>{patchDexStars();if(document.getElementById('wishes')?.classList.contains('active'))renderFavs()});
 })();
