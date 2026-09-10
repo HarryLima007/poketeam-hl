@@ -7,7 +7,7 @@ body[data-page="home"] #home .quick-grid button{
   background:linear-gradient(145deg,rgba(8,24,50,.96),rgba(4,13,31,.94))!important;
   border:1px solid rgba(87,161,255,.34)!important;
   box-shadow:0 14px 34px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03)!important;
-  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,filter .28s ease!important;
 }
 body[data-page="home"] #home .quick-grid button::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;z-index:2;background:#43a8ff;box-shadow:0 0 16px rgba(67,168,255,.55)}
 body[data-page="home"] #home .quick-grid button::after{content:"→";position:absolute;right:18px;top:16px;font-size:21px;line-height:1;font-weight:900;color:#70bdff;opacity:.48;transform:translateX(-3px);transition:opacity .22s ease,transform .22s ease}
@@ -20,10 +20,16 @@ body[data-page="home"] #home .quick-grid button:hover b{transform:scale(1.08);bo
 
 /* Pokédex — arte visual (primeiro card, teste isolado) */
 body[data-page="home"] #home .quick-grid button:nth-child(1){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.88) 37%,rgba(4,13,31,.22) 70%,rgba(4,13,31,.08) 100%),url('home-card-pokedex.png?v=pokedex-card-1')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-pokedex.png?v=pokedex-card-shadow-2')!important;
   background-size:cover!important;
   background-position:center center!important;
   background-repeat:no-repeat!important;
+  filter:brightness(.82) saturate(.92)!important;
+}
+body[data-page="home"] #home .quick-grid button:nth-child(1):hover{
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-pokedex.png?v=pokedex-card-shadow-2')!important;
+  filter:brightness(1.08) saturate(1.08)!important;
+  box-shadow:0 20px 46px rgba(15,89,160,.32),0 0 30px rgba(58,160,255,.18)!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>b,
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span,
