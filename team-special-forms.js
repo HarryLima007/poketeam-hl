@@ -193,6 +193,6 @@
   }
 
   const favFormsScript = document.createElement('script');
-  favFormsScript.src = 'favorite-special-forms.js?v=fav-confirm-intercept-20260910-2';
+  favFormsScript.src = 'favorite-special-forms.js?v=fav-remove-preview-20260910-1';
   document.head.appendChild(favFormsScript);
 })();
