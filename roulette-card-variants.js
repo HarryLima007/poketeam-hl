@@ -79,12 +79,54 @@
     if(hint) hint.textContent = 'Clique em uma variante dentro de cada Pokémon para adicionar ou remover da roleta.';
   }
 
+  function normalizeDeg(value){
+    return ((value % 360) + 360) % 360;
+  }
+
+  function readRotateDeg(el){
+    const match = el?.style?.transform?.match(/rotate\((-?[\d.]+)deg\)/i);
+    return match ? Number(match[1]) : 0;
+  }
+
+  function installSpinSyncFix(){
+    const spinButton = document.getElementById('spin');
+    const wheel = document.getElementById('wheel');
+    if(!spinButton || !wheel || typeof spinButton.onclick !== 'function') return;
+    if(spinButton.dataset.pointerSyncFixed === '1') return;
+
+    const originalSpin = spinButton.onclick;
+    spinButton.dataset.pointerSyncFixed = '1';
+
+    spinButton.onclick = function(event){
+      const before = readRotateDeg(wheel);
+      const entryCount = [...roulette].map(parseRouletteKey).filter(Boolean).length;
+
+      originalSpin.call(this, event);
+
+      if(entryCount < 1 || entryCount > 72) return;
+
+      const rawAfter = readRotateDeg(wheel);
+      if(!Number.isFinite(rawAfter) || rawAfter === before) return;
+
+      const fullTurns = 360 * 7;
+      const targetAngle = normalizeDeg(rawAfter - before - fullTurns);
+      const currentAngle = normalizeDeg(before);
+      const extraToTarget = normalizeDeg(targetAngle - currentAngle);
+      const correctedAfter = before + fullTurns + extraToTarget;
+
+      rotation = correctedAfter;
+      wheel.style.transform = `rotate(${correctedAfter}deg)`;
+    };
+  }
+
   function start(){
     const picker = document.getElementById('roulettePicker');
-    if(!picker) return;
-    enhanceAll();
-    const observer = new MutationObserver(() => requestAnimationFrame(enhanceAll));
-    observer.observe(picker, {childList:true, subtree:true});
+    if(picker){
+      enhanceAll();
+      const observer = new MutationObserver(() => requestAnimationFrame(enhanceAll));
+      observer.observe(picker, {childList:true, subtree:true});
+    }
+    installSpinSyncFix();
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
