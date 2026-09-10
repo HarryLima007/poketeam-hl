@@ -202,13 +202,21 @@ body[data-page="home"] #home .quick-grid button:nth-child(3)>span::after{
   background-size:2px 0,2px 0,0 2px,0 2px;
 }
 @keyframes timesClashTrace{
-  0%{background-size:2px 0,2px 0,0 2px,0 2px}
-  24%{background-size:2px 17px,2px 17px,0 2px,0 2px}
-  42%{background-size:2px 34px,2px 34px,31px 2px,31px 2px}
-  54%{background-size:2px 34px,2px 34px,49px 2px,49px 2px}
-  62%{background-size:2px 34px,2px 34px,43px 2px,43px 2px}
-  72%{background-size:2px 34px,2px 34px,47px 2px,47px 2px}
-  100%{background-size:2px 34px,2px 34px,49px 2px,49px 2px}
+  0%{background-size:2px 0,2px 0,0 2px,0 2px;filter:drop-shadow(0 0 4px rgba(255,100,112,.56))}
+  20%{background-size:2px 18px,2px 18px,0 2px,0 2px;filter:drop-shadow(0 0 4px rgba(255,100,112,.62))}
+  38%{background-size:2px 34px,2px 34px,30px 2px,30px 2px;filter:drop-shadow(0 0 5px rgba(255,112,124,.72))}
+  50%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 7px rgba(255,225,228,1)) drop-shadow(0 0 16px rgba(255,79,95,.78))}
+  57%{background-size:2px 34px,2px 34px,40px 2px,40px 2px;filter:drop-shadow(0 0 4px rgba(255,112,124,.68))}
+  65%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 7px rgba(255,235,237,1)) drop-shadow(0 0 17px rgba(255,79,95,.84))}
+  72%{background-size:2px 34px,2px 34px,44px 2px,44px 2px;filter:drop-shadow(0 0 5px rgba(255,130,141,.72))}
+  82%,100%{background-size:2px 34px,2px 34px,49px 2px,49px 2px;filter:drop-shadow(0 0 5px rgba(255,151,161,.88)) drop-shadow(0 0 10px rgba(255,79,95,.40))}
+}
+@keyframes timesCardImpact{
+  0%,44%{box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
+  50%{box-shadow:0 20px 46px rgba(207,48,63,.36),0 0 40px rgba(255,79,95,.34),0 0 12px rgba(255,210,215,.16)}
+  57%{box-shadow:0 20px 46px rgba(207,48,63,.28),0 0 26px rgba(255,79,95,.14)}
+  65%{box-shadow:0 20px 46px rgba(207,48,63,.38),0 0 42px rgba(255,79,95,.36),0 0 14px rgba(255,220,224,.18)}
+  72%,100%{box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)}
 }
 body[data-page="home"] #home .quick-grid button:nth-child(3):hover{
   background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-times.png?v=times-card-clash-1')!important;
@@ -216,10 +224,11 @@ body[data-page="home"] #home .quick-grid button:nth-child(3):hover{
   filter:brightness(1.08) saturate(1.08)!important;
   border-color:#ff6472!important;
   box-shadow:0 20px 46px rgba(207,48,63,.30),0 0 30px rgba(255,79,95,.18)!important;
+  animation:timesCardImpact .88s cubic-bezier(.22,.61,.36,1) forwards;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span{color:#ffd7dc!important;text-shadow:0 0 8px rgba(255,119,133,.56),0 0 18px rgba(255,79,95,.30)!important}
 body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::before,
-body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::after{animation:timesClashTrace .88s cubic-bezier(.22,.61,.36,1) forwards;filter:drop-shadow(0 0 5px rgba(255,151,161,.88)) drop-shadow(0 0 10px rgba(255,79,95,.40))}
+body[data-page="home"] #home .quick-grid button:nth-child(3):hover>span::after{animation:timesClashTrace .88s cubic-bezier(.22,.61,.36,1) forwards}
 
 /* Desejos */
 body[data-page="home"] #home .quick-grid button:nth-child(4)::before{background:#f0c94e;box-shadow:0 0 16px rgba(240,201,78,.50)}
