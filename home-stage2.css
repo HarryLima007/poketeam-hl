@@ -53,62 +53,49 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span{
   text-shadow:0 2px 12px rgba(56,174,255,.16)!important;
   transition:color .32s ease,text-shadow .32s ease!important;
 }
+body[data-page="home"] #home .quick-grid button:nth-child(1)>span::before,
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   content:"";
   position:absolute;
   left:50%;
   top:50%;
-  width:118px;
-  height:38px;
+  width:108px;
+  height:34px;
   transform:translate(-50%,-50%);
-  border-radius:8px;
+  border-radius:7px;
   pointer-events:none;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 4px rgba(66,199,255,.45));
+}
+/* metade esquerda: centro inferior -> canto inferior esquerdo -> sobe -> centro superior */
+body[data-page="home"] #home .quick-grid button:nth-child(1)>span::before{
   background-image:
     linear-gradient(#42c7ff,#42c7ff),
     linear-gradient(#42c7ff,#42c7ff),
+    linear-gradient(#42c7ff,#42c7ff);
+  background-position:50% 100%,0 100%,0 0;
+  background-size:13px 2px,2px 0,0 2px;
+}
+/* metade direita: centro inferior -> canto inferior direito -> sobe -> centro superior */
+body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
+  background-image:
     linear-gradient(#42c7ff,#42c7ff),
     linear-gradient(#42c7ff,#42c7ff),
     linear-gradient(#42c7ff,#42c7ff);
-  background-repeat:no-repeat;
-  background-position:
-    50% 100%,
-    100% 100%,
-    100% 0,
-    0 0,
-    0 100%;
-  background-size:
-    27px 2px,
-    2px 0,
-    0 2px,
-    2px 0,
-    0 2px;
-  filter:drop-shadow(0 0 4px rgba(66,199,255,.45));
+  background-position:50% 100%,100% 100%,100% 0;
+  background-size:13px 2px,2px 0,0 2px;
 }
-@keyframes pokedexTraceOutline{
-  0%{
-    background-size:27px 2px,2px 0,0 2px,2px 0,0 2px;
-    background-position:50% 100%,100% 100%,100% 0,0 0,0 100%;
-  }
-  20%{
-    background-size:59px 2px,2px 0,0 2px,2px 0,0 2px;
-    background-position:calc(50% + 16px) 100%,100% 100%,100% 0,0 0,0 100%;
-  }
-  40%{
-    background-size:59px 2px,2px 38px,0 2px,2px 0,0 2px;
-    background-position:calc(50% + 16px) 100%,100% 100%,100% 0,0 0,0 100%;
-  }
-  65%{
-    background-size:59px 2px,2px 38px,118px 2px,2px 0,0 2px;
-    background-position:calc(50% + 16px) 100%,100% 100%,100% 0,0 0,0 100%;
-  }
-  85%{
-    background-size:59px 2px,2px 38px,118px 2px,2px 38px,0 2px;
-    background-position:calc(50% + 16px) 100%,100% 100%,100% 0,0 0,0 100%;
-  }
-  100%{
-    background-size:59px 2px,2px 38px,118px 2px,2px 38px,59px 2px;
-    background-position:calc(50% + 16px) 100%,100% 100%,100% 0,0 0,0 100%;
-  }
+@keyframes pokedexTraceLeft{
+  0%{background-size:13px 2px,2px 0,0 2px}
+  28%{background-size:54px 2px,2px 0,0 2px}
+  62%{background-size:54px 2px,2px 34px,0 2px}
+  100%{background-size:54px 2px,2px 34px,54px 2px}
+}
+@keyframes pokedexTraceRight{
+  0%{background-size:13px 2px,2px 0,0 2px}
+  28%{background-size:54px 2px,2px 0,0 2px}
+  62%{background-size:54px 2px,2px 34px,0 2px}
+  100%{background-size:54px 2px,2px 34px,54px 2px}
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>small{
   top:64%!important;
@@ -132,8 +119,12 @@ body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span{
   color:#bdebff!important;
   text-shadow:0 0 8px rgba(85,204,255,.42),0 0 18px rgba(55,171,255,.26)!important;
 }
+body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::before{
+  animation:pokedexTraceLeft .8s cubic-bezier(.3,.7,.2,1) forwards;
+  filter:drop-shadow(0 0 5px rgba(100,216,255,.80)) drop-shadow(0 0 10px rgba(55,171,255,.28));
+}
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::after{
-  animation:pokedexTraceOutline .72s cubic-bezier(.3,.7,.2,1) forwards;
+  animation:pokedexTraceRight .8s cubic-bezier(.3,.7,.2,1) forwards;
   filter:drop-shadow(0 0 5px rgba(100,216,255,.80)) drop-shadow(0 0 10px rgba(55,171,255,.28));
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{
@@ -157,4 +148,4 @@ body[data-page="home"] #home .quick-grid button:nth-child(4)::after{color:#f3d46
 body[data-page="home"] #home .quick-grid button:nth-child(4):hover{border-color:#e7c95d!important;box-shadow:0 20px 46px rgba(181,143,37,.22),0 0 26px rgba(240,201,78,.09)!important}
 
 @media(max-width:800px){body[data-page="home"] #home .quick-grid button::after{opacity:.72!important;transform:none!important}body[data-page="home"] #home .quick-grid button:hover{transform:translateY(-2px)!important}}
-@media(prefers-reduced-motion:reduce){body[data-page="home"] #home .quick-grid button,body[data-page="home"] #home .quick-grid button::after,body[data-page="home"] #home .quick-grid button span,body[data-page="home"] #home .quick-grid button span::after,body[data-page="home"] #home .quick-grid button small{transition:none!important;animation:none!important}}
+@media(prefers-reduced-motion:reduce){body[data-page="home"] #home .quick-grid button,body[data-page="home"] #home .quick-grid button::after,body[data-page="home"] #home .quick-grid button span,body[data-page="home"] #home .quick-grid button span::before,body[data-page="home"] #home .quick-grid button span::after,body[data-page="home"] #home .quick-grid button small{transition:none!important;animation:none!important}}
