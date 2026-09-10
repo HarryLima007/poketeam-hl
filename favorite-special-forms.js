@@ -147,9 +147,12 @@
     let added=false;
     if(index>=0){
       const current=entries[index];
-      const ok=await siteConfirm(`Deseja mesmo remover ${displayName(current)} dos favoritos?`,{
-        title:'Remover dos Favoritos',confirmText:'Sim, remover',icon:'⭐',danger:true
+      const confirmPromise=siteConfirm(`Deseja mesmo remover ${displayName(current)} dos favoritos?`,{
+        title:'Remover dos Favoritos',confirmText:'Remover',icon:'⭐',danger:true
       });
+      const dialogTitle=document.getElementById('siteDialogTitle');
+      if(dialogTitle)dialogTitle.style.color='#f5f7fb';
+      const ok=await confirmPromise;
       if(!ok){
         pendingFav=null;
         requestAnimationFrame(()=>{patchDexStars();patchModalFavButton()});
