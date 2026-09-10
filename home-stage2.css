@@ -53,7 +53,6 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span{
   text-shadow:0 2px 12px rgba(56,174,255,.16)!important;
   transition:color .34s ease,text-shadow .34s ease!important;
 }
-/* Duas metades independentes: começam juntas no centro inferior e se encontram no centro superior. */
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::before,
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   content:"";
@@ -66,25 +65,17 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   will-change:background-size,filter;
   filter:drop-shadow(0 0 3px rgba(66,199,255,.42));
 }
-/* esquerda: centro -> esquerda -> sobe -> centro de cima */
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::before{
   left:50%;
   transform:translate(-100%,-50%);
-  background-image:
-    linear-gradient(90deg,#42c7ff,#64d8ff),
-    linear-gradient(#42c7ff,#64d8ff),
-    linear-gradient(90deg,#64d8ff,#42c7ff);
+  background-image:linear-gradient(90deg,#42c7ff,#64d8ff),linear-gradient(#42c7ff,#64d8ff),linear-gradient(90deg,#64d8ff,#42c7ff);
   background-position:right bottom,left bottom,left top;
   background-size:14px 2px,2px 0,0 2px;
 }
-/* direita: centro -> direita -> sobe -> centro de cima */
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   left:50%;
   transform:translate(0,-50%);
-  background-image:
-    linear-gradient(90deg,#64d8ff,#42c7ff),
-    linear-gradient(#42c7ff,#64d8ff),
-    linear-gradient(90deg,#42c7ff,#64d8ff);
+  background-image:linear-gradient(90deg,#64d8ff,#42c7ff),linear-gradient(#42c7ff,#64d8ff),linear-gradient(90deg,#42c7ff,#64d8ff);
   background-position:left bottom,right bottom,right top;
   background-size:14px 2px,2px 0,0 2px;
 }
@@ -96,46 +87,23 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   72%{background-size:49px 2px,2px 33px,0 2px}
   100%{background-size:49px 2px,2px 33px,49px 2px}
 }
-body[data-page="home"] #home .quick-grid button:nth-child(1)>small{
-  top:64%!important;
-  font-size:0!important;
-  color:#8fa8c5!important;
-  transition:color .30s ease,text-shadow .30s ease!important;
-}
-body[data-page="home"] #home .quick-grid button:nth-child(1)>small::before{
-  content:"Explore. Descubra. Complete.";
-  font-size:11px!important;
-  font-weight:500;
-  letter-spacing:.05px;
-}
+body[data-page="home"] #home .quick-grid button:nth-child(1)>small{top:64%!important;font-size:0!important;color:#8fa8c5!important;transition:color .30s ease,text-shadow .30s ease!important}
+body[data-page="home"] #home .quick-grid button:nth-child(1)>small::before{content:"Explore. Descubra. Complete.";font-size:11px!important;font-weight:500;letter-spacing:.05px}
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover{
   background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-pokedex.png?v=pokedex-card-size-3')!important;
   background-size:100% 100%,92% auto!important;
   filter:brightness(1.08) saturate(1.08)!important;
   box-shadow:0 20px 46px rgba(15,89,160,.32),0 0 30px rgba(58,160,255,.18)!important;
 }
-body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span{
-  color:#bdebff!important;
-  text-shadow:0 0 8px rgba(85,204,255,.42),0 0 18px rgba(55,171,255,.26)!important;
-}
+body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span{color:#bdebff!important;text-shadow:0 0 8px rgba(85,204,255,.42),0 0 18px rgba(55,171,255,.26)!important}
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::before,
-body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::after{
-  animation:pokedexTraceHalf .92s cubic-bezier(.22,.61,.36,1) forwards;
-  filter:drop-shadow(0 0 4px rgba(100,216,255,.72)) drop-shadow(0 0 8px rgba(55,171,255,.22));
-}
-body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{
-  color:#bdd5eb!important;
-  text-shadow:0 0 10px rgba(94,190,255,.15)!important;
-}
+body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::after{animation:pokedexTraceHalf .92s cubic-bezier(.22,.61,.36,1) forwards;filter:drop-shadow(0 0 4px rgba(100,216,255,.72)) drop-shadow(0 0 8px rgba(55,171,255,.22))}
+body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{color:#bdd5eb!important;text-shadow:0 0 10px rgba(94,190,255,.15)!important}
 
-/* Roleta — mesma base visual da Pokédex, com giro vertical rápido */
-@property --roulette-spin{
-  syntax:"<angle>";
-  inherits:false;
-  initial-value:0deg;
-}
+/* Roleta — linha forte, brilhante e giro vertical rápido */
+@property --roulette-spin{syntax:"<angle>";inherits:false;initial-value:0deg}
 body[data-page="home"] #home .quick-grid button:nth-child(2){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-spin-3')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-spin-4')!important;
   background-size:100% 100%,92% auto!important;
   background-position:center center,center center!important;
   background-repeat:no-repeat!important;
@@ -144,76 +112,28 @@ body[data-page="home"] #home .quick-grid button:nth-child(2){
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2)::before{background:#9b76ff;box-shadow:0 0 16px rgba(155,118,255,.55)}
 body[data-page="home"] #home .quick-grid button:nth-child(2)::after{color:#b59cff}
-body[data-page="home"] #home .quick-grid button:nth-child(2)>span{
-  color:#f5f0ff!important;
-  letter-spacing:.15px!important;
-  text-shadow:0 2px 12px rgba(155,118,255,.18)!important;
-  transition:color .34s ease,text-shadow .34s ease!important;
-}
-/* O oval fica parado; só o brilho percorre a borda. Isso dá giro real sem o contorno balançar. */
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span{color:#f5f0ff!important;letter-spacing:.15px!important;text-shadow:0 2px 12px rgba(155,118,255,.18)!important;transition:color .34s ease,text-shadow .34s ease!important}
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:102px;
-  height:38px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  pointer-events:none;
-  opacity:0;
-  --roulette-spin:0deg;
-  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 230deg,rgba(155,118,255,.10) 246deg,#a87dff 274deg,#e0c2ff 302deg,#9b76ff 330deg,transparent 360deg);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  will-change:opacity,filter;
-  filter:drop-shadow(0 0 4px rgba(201,153,255,.70)) drop-shadow(0 0 9px rgba(155,118,255,.28));
+  content:"";position:absolute;left:50%;top:50%;width:104px;height:40px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:0;--roulette-spin:0deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 115deg,rgba(176,126,255,.45) 130deg,#9b76ff 165deg,#d9b4ff 210deg,#ffffff 242deg,#d9b4ff 270deg,#9b76ff 305deg,rgba(176,126,255,.48) 335deg,transparent 360deg);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px));
+  will-change:opacity,filter;filter:drop-shadow(0 0 4px rgba(226,196,255,.98)) drop-shadow(0 0 10px rgba(172,115,255,.78)) drop-shadow(0 0 18px rgba(155,118,255,.38));
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:102px;
-  height:38px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  pointer-events:none;
-  opacity:0;
-  --roulette-spin:180deg;
-  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 314deg,rgba(224,194,255,.14) 324deg,#d5adff 342deg,transparent 360deg);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  will-change:opacity,filter;
-  filter:drop-shadow(0 0 5px rgba(224,194,255,.82));
+  content:"";position:absolute;left:50%;top:50%;width:104px;height:40px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:0;--roulette-spin:180deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 275deg,rgba(210,171,255,.18) 292deg,#c28cff 322deg,#f0dcff 344deg,transparent 360deg);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));
+  will-change:opacity,filter;filter:drop-shadow(0 0 6px rgba(235,214,255,.96)) drop-shadow(0 0 12px rgba(177,120,255,.66));
 }
-@keyframes rouletteWheelSpin{
-  0%{opacity:.18;--roulette-spin:0deg}
-  7%{opacity:1}
-  100%{opacity:1;--roulette-spin:360deg}
-}
-@keyframes rouletteWheelSpinTrail{
-  0%{opacity:.35;--roulette-spin:180deg}
-  7%{opacity:.88}
-  100%{opacity:.88;--roulette-spin:540deg}
-}
+@keyframes rouletteWheelSpin{0%{opacity:.72;--roulette-spin:0deg}5%{opacity:1}100%{opacity:1;--roulette-spin:360deg}}
+@keyframes rouletteWheelSpinTrail{0%{opacity:.60;--roulette-spin:180deg}5%{opacity:.95}100%{opacity:.95;--roulette-spin:540deg}}
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover{
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-spin-3')!important;
-  background-size:100% 100%,92% auto!important;
-  filter:brightness(1.08) saturate(1.08)!important;
-  border-color:#a98cff!important;
-  box-shadow:0 20px 46px rgba(111,78,207,.28),0 0 30px rgba(155,118,255,.16)!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-spin-4')!important;
+  background-size:100% 100%,92% auto!important;filter:brightness(1.08) saturate(1.08)!important;border-color:#b493ff!important;box-shadow:0 20px 46px rgba(111,78,207,.32),0 0 34px rgba(155,118,255,.24)!important
 }
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{
-  color:#dcc8ff!important;
-  text-shadow:0 0 8px rgba(197,158,255,.48),0 0 18px rgba(155,118,255,.28)!important;
-}
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{
-  animation:rouletteWheelSpin .30s linear infinite;
-}
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{
-  animation:rouletteWheelSpinTrail .30s linear infinite;
-}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{color:#e5d5ff!important;text-shadow:0 0 8px rgba(216,185,255,.62),0 0 20px rgba(155,118,255,.38)!important}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{animation:rouletteWheelSpin .34s linear infinite}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{animation:rouletteWheelSpinTrail .34s linear infinite}
 
 /* Times — vermelho */
 body[data-page="home"] #home .quick-grid button:nth-child(3)::before{background:#ff4f5f;box-shadow:0 0 16px rgba(255,79,95,.58)}
