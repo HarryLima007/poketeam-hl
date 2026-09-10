@@ -86,6 +86,32 @@ body[data-page="wishes"]{
 .topbar-arrow{background:transparent!important;border-color:transparent!important;font-size:29px!important;color:#8ba2c2!important}
 @media(max-width:1120px){.topbar-inner{width:calc(100% - 24px)!important;gap:12px!important}.topbar #nav{gap:3px!important}.topbar #nav button{padding:0 10px!important}.global-search{width:190px!important}}
 @media(max-width:900px){.topbar{height:auto!important;min-height:68px!important}.topbar-inner{grid-template-columns:auto 1fr!important;gap:8px 12px!important;padding:10px 0!important}.topbar-tools{justify-self:end!important}.topbar #nav{grid-column:1/-1!important;grid-row:2!important;justify-content:flex-start!important;overflow-x:auto!important}.global-search{width:min(240px,38vw)!important}}
+</style><style id="pokedex-sidebar-scroll-fix">
+@media(min-width:1001px){
+  #pokedex .pokedex-side{
+    max-height:calc(100vh - 104px)!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    scrollbar-width:thin;
+    scrollbar-color:#3d6f8f #0a1c2c;
+  }
+  #pokedex .pokedex-side::after{
+    position:static!important;
+    display:block!important;
+    margin-top:18px!important;
+    padding:0 2px 8px!important;
+  }
+  #pokedex .pokedex-side::-webkit-scrollbar{width:8px}
+  #pokedex .pokedex-side::-webkit-scrollbar-track{background:#0a1c2c;border-radius:999px}
+  #pokedex .pokedex-side::-webkit-scrollbar-thumb{background:#3d6f8f;border-radius:999px;border:2px solid #0a1c2c}
+  #pokedex .pokedex-side::-webkit-scrollbar-thumb:hover{background:#5795bd}
+}
+@media(max-width:1000px){
+  #pokedex .pokedex-side{max-height:none!important;overflow:visible!important}
+}
 </style></head><body data-page="home">
 <header class="topbar">
   <div class="topbar-inner">
