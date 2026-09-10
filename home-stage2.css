@@ -129,8 +129,13 @@ body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{
 }
 
 /* Roleta — mesma base visual da Pokédex, com giro vertical rápido */
+@property --roulette-spin{
+  syntax:"<angle>";
+  inherits:false;
+  initial-value:0deg;
+}
 body[data-page="home"] #home .quick-grid button:nth-child(2){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-spin-2')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-spin-3')!important;
   background-size:100% 100%,92% auto!important;
   background-position:center center,center center!important;
   background-repeat:no-repeat!important;
@@ -145,7 +150,7 @@ body[data-page="home"] #home .quick-grid button:nth-child(2)>span{
   text-shadow:0 2px 12px rgba(155,118,255,.18)!important;
   transition:color .34s ease,text-shadow .34s ease!important;
 }
-/* Arco luminoso elíptico: gira no sentido horário; na lateral direita desce de cima para baixo. */
+/* O oval fica parado; só o brilho percorre a borda. Isso dá giro real sem o contorno balançar. */
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before{
   content:"";
   position:absolute;
@@ -153,17 +158,17 @@ body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before{
   top:50%;
   width:102px;
   height:38px;
-  transform:translate(-50%,-50%) rotate(0deg);
+  transform:translate(-50%,-50%);
   border-radius:50%;
   pointer-events:none;
   opacity:0;
-  background:conic-gradient(from -90deg,transparent 0deg,transparent 235deg,rgba(155,118,255,.10) 248deg,#a87dff 278deg,#e0c2ff 304deg,#9b76ff 330deg,transparent 360deg);
+  --roulette-spin:0deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 230deg,rgba(155,118,255,.10) 246deg,#a87dff 274deg,#e0c2ff 302deg,#9b76ff 330deg,transparent 360deg);
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
   mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  will-change:transform,opacity,filter;
+  will-change:opacity,filter;
   filter:drop-shadow(0 0 4px rgba(201,153,255,.70)) drop-shadow(0 0 9px rgba(155,118,255,.28));
 }
-/* Segundo brilho curto, defasado, reforça a sensação de velocidade sem criar outra borda. */
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
   content:"";
   position:absolute;
@@ -171,23 +176,29 @@ body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
   top:50%;
   width:102px;
   height:38px;
-  transform:translate(-50%,-50%) rotate(0deg);
+  transform:translate(-50%,-50%);
   border-radius:50%;
   pointer-events:none;
   opacity:0;
-  background:conic-gradient(from -90deg,transparent 0deg,transparent 305deg,rgba(224,194,255,.18) 318deg,#d5adff 338deg,transparent 360deg);
+  --roulette-spin:180deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 314deg,rgba(224,194,255,.14) 324deg,#d5adff 342deg,transparent 360deg);
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
   mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));
-  will-change:transform,opacity,filter;
+  will-change:opacity,filter;
   filter:drop-shadow(0 0 5px rgba(224,194,255,.82));
 }
 @keyframes rouletteWheelSpin{
-  0%{opacity:.15;transform:translate(-50%,-50%) rotate(0deg)}
-  8%{opacity:1}
-  100%{opacity:1;transform:translate(-50%,-50%) rotate(360deg)}
+  0%{opacity:.18;--roulette-spin:0deg}
+  7%{opacity:1}
+  100%{opacity:1;--roulette-spin:360deg}
+}
+@keyframes rouletteWheelSpinTrail{
+  0%{opacity:.35;--roulette-spin:180deg}
+  7%{opacity:.88}
+  100%{opacity:.88;--roulette-spin:540deg}
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover{
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-spin-2')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-spin-3')!important;
   background-size:100% 100%,92% auto!important;
   filter:brightness(1.08) saturate(1.08)!important;
   border-color:#a98cff!important;
@@ -198,11 +209,10 @@ body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{
   text-shadow:0 0 8px rgba(197,158,255,.48),0 0 18px rgba(155,118,255,.28)!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{
-  animation:rouletteWheelSpin .34s linear infinite;
+  animation:rouletteWheelSpin .30s linear infinite;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{
-  animation:rouletteWheelSpin .34s linear infinite;
-  animation-delay:-.17s;
+  animation:rouletteWheelSpinTrail .30s linear infinite;
 }
 
 /* Times — vermelho */
