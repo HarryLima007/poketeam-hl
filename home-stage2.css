@@ -100,10 +100,10 @@ body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::before,
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>span::after{animation:pokedexTraceHalf .92s cubic-bezier(.22,.61,.36,1) forwards;filter:drop-shadow(0 0 4px rgba(100,216,255,.72)) drop-shadow(0 0 8px rgba(55,171,255,.22))}
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover>small{color:#bdd5eb!important;text-shadow:0 0 10px rgba(94,190,255,.15)!important}
 
-/* Roleta — linha forte, brilhante e giro vertical rápido */
+/* Roleta — mesma moldura retangular da Pokédex; o brilho gira ao redor dela. */
 @property --roulette-spin{syntax:"<angle>";inherits:false;initial-value:0deg}
 body[data-page="home"] #home .quick-grid button:nth-child(2){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-spin-4')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-roleta.png?v=roleta-card-rect-spin-5')!important;
   background-size:100% 100%,92% auto!important;
   background-position:center center,center center!important;
   background-repeat:no-repeat!important;
@@ -113,27 +113,45 @@ body[data-page="home"] #home .quick-grid button:nth-child(2){
 body[data-page="home"] #home .quick-grid button:nth-child(2)::before{background:#9b76ff;box-shadow:0 0 16px rgba(155,118,255,.55)}
 body[data-page="home"] #home .quick-grid button:nth-child(2)::after{color:#b59cff}
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span{color:#f5f0ff!important;letter-spacing:.15px!important;text-shadow:0 2px 12px rgba(155,118,255,.18)!important;transition:color .34s ease,text-shadow .34s ease!important}
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before,
+body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:98px;
+  height:34px;
+  box-sizing:border-box;
+  transform:translate(-50%,-50%);
+  border-radius:0;
+  padding:2px;
+  pointer-events:none;
+  opacity:0;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  will-change:opacity,filter;
+}
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::before{
-  content:"";position:absolute;left:50%;top:50%;width:104px;height:40px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:0;--roulette-spin:0deg;
-  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 115deg,rgba(176,126,255,.45) 130deg,#9b76ff 165deg,#d9b4ff 210deg,#ffffff 242deg,#d9b4ff 270deg,#9b76ff 305deg,rgba(176,126,255,.48) 335deg,transparent 360deg);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px));
-  will-change:opacity,filter;filter:drop-shadow(0 0 4px rgba(226,196,255,.98)) drop-shadow(0 0 10px rgba(172,115,255,.78)) drop-shadow(0 0 18px rgba(155,118,255,.38));
+  --roulette-spin:0deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 205deg,rgba(155,118,255,.18) 225deg,#9b76ff 255deg,#d9b4ff 286deg,#fff 307deg,#d9b4ff 326deg,#9b76ff 344deg,transparent 360deg);
+  filter:drop-shadow(0 0 4px rgba(226,196,255,.92)) drop-shadow(0 0 9px rgba(155,118,255,.62));
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2)>span::after{
-  content:"";position:absolute;left:50%;top:50%;width:104px;height:40px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:0;--roulette-spin:180deg;
-  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 275deg,rgba(210,171,255,.18) 292deg,#c28cff 322deg,#f0dcff 344deg,transparent 360deg);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 3px));
-  will-change:opacity,filter;filter:drop-shadow(0 0 6px rgba(235,214,255,.96)) drop-shadow(0 0 12px rgba(177,120,255,.66));
+  --roulette-spin:180deg;
+  background:conic-gradient(from var(--roulette-spin),transparent 0deg,transparent 314deg,rgba(216,181,255,.20) 326deg,#c995ff 344deg,#f1ddff 353deg,transparent 360deg);
+  filter:drop-shadow(0 0 5px rgba(226,196,255,.80));
 }
-@keyframes rouletteWheelSpin{0%{opacity:.72;--roulette-spin:0deg}5%{opacity:1}100%{opacity:1;--roulette-spin:360deg}}
-@keyframes rouletteWheelSpinTrail{0%{opacity:.60;--roulette-spin:180deg}5%{opacity:.95}100%{opacity:.95;--roulette-spin:540deg}}
+@keyframes rouletteRectSpin{0%{opacity:.82;--roulette-spin:0deg}100%{opacity:1;--roulette-spin:360deg}}
+@keyframes rouletteRectSpinTrail{0%{opacity:.55;--roulette-spin:180deg}100%{opacity:.82;--roulette-spin:540deg}}
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover{
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-spin-4')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-roleta.png?v=roleta-card-rect-spin-5')!important;
   background-size:100% 100%,92% auto!important;filter:brightness(1.08) saturate(1.08)!important;border-color:#b493ff!important;box-shadow:0 20px 46px rgba(111,78,207,.32),0 0 34px rgba(155,118,255,.24)!important
 }
 body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span{color:#e5d5ff!important;text-shadow:0 0 8px rgba(216,185,255,.62),0 0 20px rgba(155,118,255,.38)!important}
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{animation:rouletteWheelSpin .34s linear infinite}
-body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{animation:rouletteWheelSpinTrail .34s linear infinite}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::before{animation:rouletteRectSpin .34s linear infinite}
+body[data-page="home"] #home .quick-grid button:nth-child(2):hover>span::after{animation:rouletteRectSpinTrail .34s linear infinite}
 
 /* Times — vermelho */
 body[data-page="home"] #home .quick-grid button:nth-child(3)::before{background:#ff4f5f;box-shadow:0 0 16px rgba(255,79,95,.58)}
