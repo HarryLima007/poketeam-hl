@@ -8,9 +8,7 @@
     {key:'s100', label:'Shiny 100%', shiny:true, iv100:true, cls:'shiny100'}
   ];
 
-  function keyFor(id, variant){
-    return rouletteKey(id, variant.shiny, variant.iv100);
-  }
+  function keyFor(id, variant){ return rouletteKey(id, variant.shiny, variant.iv100); }
 
   function syncVariantButtons(card){
     const id = Number(card.dataset.catalogPokemon);
@@ -26,51 +24,25 @@
 
   function toggleVariant(id, variant, card){
     const key = keyFor(id, variant);
-    if(roulette.has(key)) roulette.delete(key);
-    else roulette.add(key);
-    save();
-    refreshRouletteCatalogCard(id);
-    syncVariantButtons(card);
-    drawWheel();
+    if(roulette.has(key)) roulette.delete(key); else roulette.add(key);
+    save(); refreshRouletteCatalogCard(id); syncVariantButtons(card); drawWheel();
   }
 
   function enhanceCard(card){
-    if(card.dataset.variantControlsReady === '1'){
-      syncVariantButtons(card);
-      return;
-    }
-    card.dataset.variantControlsReady = '1';
-    card.onclick = null;
-    card.removeAttribute('title');
-
+    if(card.dataset.variantControlsReady === '1'){ syncVariantButtons(card); return; }
+    card.dataset.variantControlsReady = '1'; card.onclick = null; card.removeAttribute('title');
     const controls = document.createElement('span');
-    controls.className = 'card-variant-controls';
-    controls.setAttribute('aria-label', 'Variantes do Pokémon');
-
+    controls.className = 'card-variant-controls'; controls.setAttribute('aria-label','Variantes do Pokémon');
     variants.forEach(variant => {
       const btn = document.createElement('span');
-      btn.className = `card-variant-option ${variant.cls}`;
-      btn.dataset.cardVariant = variant.key;
-      btn.setAttribute('role', 'button');
-      btn.setAttribute('tabindex', '0');
-      btn.textContent = variant.label;
-
-      const activate = event => {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleVariant(Number(card.dataset.catalogPokemon), variant, card);
-      };
+      btn.className = `card-variant-option ${variant.cls}`; btn.dataset.cardVariant = variant.key;
+      btn.setAttribute('role','button'); btn.setAttribute('tabindex','0'); btn.textContent = variant.label;
+      const activate = event => { event.preventDefault(); event.stopPropagation(); toggleVariant(Number(card.dataset.catalogPokemon), variant, card); };
       btn.addEventListener('click', activate);
-      btn.addEventListener('keydown', event => {
-        if(event.key === 'Enter' || event.key === ' '){
-          activate(event);
-        }
-      });
+      btn.addEventListener('keydown', event => { if(event.key === 'Enter' || event.key === ' ') activate(event); });
       controls.appendChild(btn);
     });
-
-    card.appendChild(controls);
-    syncVariantButtons(card);
+    card.appendChild(controls); syncVariantButtons(card);
   }
 
   function enhanceAll(){
@@ -79,77 +51,52 @@
     if(hint) hint.textContent = 'Clique em uma variante dentro de cada Pokémon para adicionar ou remover da roleta.';
   }
 
-  function normalizeDeg(value){
-    return ((value % 360) + 360) % 360;
-  }
-
-  function readRotateDeg(el){
-    const match = el?.style?.transform?.match(/rotate\((-?[\d.]+)deg\)/i);
-    return match ? Number(match[1]) : 0;
-  }
+  function normalizeDeg(value){ return ((value % 360) + 360) % 360; }
+  function readRotateDeg(el){ const match=el?.style?.transform?.match(/rotate\((-?[\d.]+)deg\)/i); return match?Number(match[1]):0; }
 
   function installSpinSyncFix(){
-    const spinButton = document.getElementById('spin');
-    const wheel = document.getElementById('wheel');
-    if(!spinButton || !wheel || typeof spinButton.onclick !== 'function') return;
-    if(spinButton.dataset.pointerSyncFixed === '1') return;
-
-    const originalSpin = spinButton.onclick;
-    spinButton.dataset.pointerSyncFixed = '1';
-
-    spinButton.onclick = function(event){
-      const before = readRotateDeg(wheel);
-      const entryCount = [...roulette].map(parseRouletteKey).filter(Boolean).length;
-
-      originalSpin.call(this, event);
-
-      if(entryCount < 1 || entryCount > 72) return;
-
-      const rawAfter = readRotateDeg(wheel);
-      if(!Number.isFinite(rawAfter) || rawAfter === before) return;
-
-      const fullTurns = 360 * 7;
-      const targetAngle = normalizeDeg(rawAfter - before - fullTurns);
-      const currentAngle = normalizeDeg(before);
-      const extraToTarget = normalizeDeg(targetAngle - currentAngle);
-      const correctedAfter = before + fullTurns + extraToTarget;
-
-      rotation = correctedAfter;
-      wheel.style.transform = `rotate(${correctedAfter}deg)`;
+    const spinButton=document.getElementById('spin'), wheel=document.getElementById('wheel');
+    if(!spinButton||!wheel||typeof spinButton.onclick!=='function'||spinButton.dataset.pointerSyncFixed==='1') return;
+    const originalSpin=spinButton.onclick; spinButton.dataset.pointerSyncFixed='1';
+    spinButton.onclick=function(event){
+      const before=readRotateDeg(wheel), entryCount=[...roulette].map(parseRouletteKey).filter(Boolean).length;
+      originalSpin.call(this,event);
+      if(entryCount<1||entryCount>72) return;
+      const rawAfter=readRotateDeg(wheel); if(!Number.isFinite(rawAfter)||rawAfter===before) return;
+      const fullTurns=360*7, targetAngle=normalizeDeg(rawAfter-before-fullTurns), currentAngle=normalizeDeg(before), extraToTarget=normalizeDeg(targetAngle-currentAngle), correctedAfter=before+fullTurns+extraToTarget;
+      rotation=correctedAfter; wheel.style.transform=`rotate(${correctedAfter}deg)`;
     };
   }
 
-  function fixHomeQuoteOverlap(){
-    const quote = document.querySelector('#home .hero-quote');
-    const quickCards = [...document.querySelectorAll('#home .quick-grid > button')];
-    if(!quote || !quickCards.length) return;
-
-    quote.style.visibility = 'visible';
-    quote.style.pointerEvents = 'none';
-
-    if(window.innerWidth < 1200) return;
-
-    const q = quote.getBoundingClientRect();
-    const overlaps = quickCards.some(card => {
-      const c = card.getBoundingClientRect();
-      return q.left < c.right && q.right > c.left && q.top < c.bottom && q.bottom > c.top;
-    });
-
-    quote.style.visibility = overlaps ? 'hidden' : 'visible';
+  function installHomeQuotePosition(){
+    if(document.getElementById('home-quote-bottom-right-fix')) return;
+    const style=document.createElement('style');
+    style.id='home-quote-bottom-right-fix';
+    style.textContent=`
+      @media (min-width:1200px){
+        body[data-page="home"] #home .hero-quote{
+          position:fixed!important;
+          top:auto!important;
+          left:auto!important;
+          right:24px!important;
+          bottom:24px!important;
+          width:190px!important;
+          margin:0!important;
+          z-index:40!important;
+          visibility:visible!important;
+          pointer-events:none!important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   function start(){
-    const picker = document.getElementById('roulettePicker');
-    if(picker){
-      enhanceAll();
-      const observer = new MutationObserver(() => requestAnimationFrame(enhanceAll));
-      observer.observe(picker, {childList:true, subtree:true});
-    }
+    installHomeQuotePosition();
+    const picker=document.getElementById('roulettePicker');
+    if(picker){ enhanceAll(); const observer=new MutationObserver(()=>requestAnimationFrame(enhanceAll)); observer.observe(picker,{childList:true,subtree:true}); }
     installSpinSyncFix();
-    requestAnimationFrame(fixHomeQuoteOverlap);
-    window.addEventListener('resize', () => requestAnimationFrame(fixHomeQuoteOverlap), {passive:true});
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
