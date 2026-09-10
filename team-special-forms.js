@@ -192,6 +192,11 @@
     console.error('Falha ao inicializar suporte a formas especiais nos times', err);
   }
 
+  const homeStage2Style = document.createElement('link');
+  homeStage2Style.rel = 'stylesheet';
+  homeStage2Style.href = 'home-stage2.css?v=home-stage2-visible-20260910-2';
+  document.head.appendChild(homeStage2Style);
+
   const favFormsScript = document.createElement('script');
   favFormsScript.src = 'favorite-special-forms.js?v=fav-card-remove-20260910-2';
   document.head.appendChild(favFormsScript);
