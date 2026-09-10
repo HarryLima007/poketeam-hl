@@ -20,14 +20,16 @@ body[data-page="home"] #home .quick-grid button:hover b{transform:scale(1.08);bo
 
 /* Pokédex — arte visual (primeiro card, teste isolado) */
 body[data-page="home"] #home .quick-grid button:nth-child(1){
-  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-pokedex.png?v=pokedex-card-shadow-2')!important;
-  background-size:cover!important;
-  background-position:center center!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.98) 0%,rgba(4,13,31,.94) 36%,rgba(4,13,31,.62) 69%,rgba(4,13,31,.50) 100%),url('home-card-pokedex.png?v=pokedex-card-size-3')!important;
+  background-size:100% 100%,92% auto!important;
+  background-position:center center,center center!important;
   background-repeat:no-repeat!important;
+  background-color:#040d1f!important;
   filter:brightness(.82) saturate(.92)!important;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1):hover{
-  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-pokedex.png?v=pokedex-card-shadow-2')!important;
+  background-image:linear-gradient(90deg,rgba(4,13,31,.96) 0%,rgba(4,13,31,.85) 36%,rgba(4,13,31,.28) 69%,rgba(4,13,31,.14) 100%),url('home-card-pokedex.png?v=pokedex-card-size-3')!important;
+  background-size:100% 100%,92% auto!important;
   filter:brightness(1.08) saturate(1.08)!important;
   box-shadow:0 20px 46px rgba(15,89,160,.32),0 0 30px rgba(58,160,255,.18)!important;
 }
