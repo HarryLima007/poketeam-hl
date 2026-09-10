@@ -1,3 +1,5 @@
+@import url('./home-visual-stage1.css?v=home-stage1-20260910-1');
+
 /* Roleta — controles de variante por Pokémon */
 #roulette .variant-toolbar{display:none!important}
 #roulette .roulette-poke-card{
