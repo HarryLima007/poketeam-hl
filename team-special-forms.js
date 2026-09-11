@@ -17,7 +17,7 @@
   const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-contrast-20260911-9';document.head.appendChild(homeRecentStyle);
   const homeHeroStyle=document.createElement('link');homeHeroStyle.rel='stylesheet';homeHeroStyle.href='home-hero-polish.css?v=home-hero-cyan-cta-20260911-11';document.head.appendChild(homeHeroStyle);
   const homeHeroShadowFix=document.createElement('link');homeHeroShadowFix.rel='stylesheet';homeHeroShadowFix.href='home-hero-shadow-fix.css?v=home-hero-shadow-fix-20260911-3';document.head.appendChild(homeHeroShadowFix);
-  const homeCardPresence=document.createElement('link');homeCardPresence.rel='stylesheet';homeCardPresence.href='home-card-presence.css?v=home-card-presence-20260911-1';document.head.appendChild(homeCardPresence);
+  const homeCardPresence=document.createElement('link');homeCardPresence.rel='stylesheet';homeCardPresence.href='home-card-presence.css?v=home-card-spacing-20260911-2';document.head.appendChild(homeCardPresence);
   const favFormsScript=document.createElement('script');favFormsScript.src='favorite-special-forms.js?v=fav-card-remove-20260910-2';document.head.appendChild(favFormsScript);
   const homeRecentScript=document.createElement('script');homeRecentScript.src='home-recent.js?v=home-recent-compact-names-20260910-7';document.head.appendChild(homeRecentScript);
 })();
