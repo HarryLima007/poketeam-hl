@@ -4,11 +4,18 @@ body[data-page="home"] #home .home-hero{
   background:
     radial-gradient(circle at 18% 24%,rgba(53,144,232,.10),transparent 32%),
     radial-gradient(circle at 78% 18%,rgba(255,201,74,.055),transparent 24%),
-    linear-gradient(135deg,rgba(10,24,48,.96),rgba(5,14,31,.98))!important;
-  border-color:rgba(74,143,217,.28)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 48px rgba(0,0,0,.16)!important;
+    linear-gradient(135deg,rgba(10,24,48,.28),rgba(5,14,31,.18))!important;
+  border-color:rgba(74,143,217,.20)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 18px 48px rgba(0,0,0,.10)!important;
 }
-body[data-page="home"] #home .hero-copy{z-index:2}
+/* Remove a antiga área decorativa vazia que aparecia como um retângulo escuro no centro. */
+body[data-page="home"] #home .home-hero::before,
+body[data-page="home"] #home .home-hero::after{content:none!important;display:none!important}
+body[data-page="home"] #home .hero-copy{
+  z-index:2;
+  width:min(690px,42vw)!important;
+  max-width:690px!important;
+}
 body[data-page="home"] #home .hero-copy>.eyebrow{
   display:inline-flex;
   align-items:center;
@@ -24,13 +31,18 @@ body[data-page="home"] #home .hero-copy>.eyebrow{
   text-shadow:0 0 12px rgba(69,169,235,.12);
 }
 body[data-page="home"] #home .hero-copy h1{
-  max-width:610px;
-  margin:14px 0 16px!important;
+  width:100%!important;
+  max-width:690px!important;
+  margin:14px 0 15px!important;
   color:#f6fbff;
-  letter-spacing:-3.2px!important;
+  font-size:clamp(54px,4.35vw,82px)!important;
+  line-height:.94!important;
+  letter-spacing:-3px!important;
   text-shadow:0 8px 28px rgba(0,0,0,.18);
 }
 body[data-page="home"] #home .hero-copy h1 em{
+  display:inline-block!important;
+  white-space:nowrap!important;
   color:#ffd85a!important;
   text-shadow:0 0 22px rgba(255,205,73,.18);
 }
@@ -38,15 +50,15 @@ body[data-page="home"] #home .hero-copy>p{
   max-width:520px;
   margin:0!important;
   color:#9fb3ca!important;
-  font-size:16px!important;
-  line-height:1.55;
+  font-size:15px!important;
+  line-height:1.5;
   letter-spacing:.02px;
 }
 body[data-page="home"] #home .hero-actions{
   display:flex!important;
   align-items:center;
   gap:11px!important;
-  margin-top:24px!important;
+  margin-top:20px!important;
 }
 body[data-page="home"] #home .hero-actions button{
   position:relative;
@@ -97,15 +109,20 @@ body[data-page="home"] #home .hero-actions button:not(.primary):hover{
   box-shadow:0 10px 24px rgba(29,101,158,.12)!important;
 }
 body[data-page="home"] #home .hero-quote{
-  position:relative;
-  max-width:340px;
+  position:absolute!important;
+  right:34px!important;
+  bottom:28px!important;
+  top:auto!important;
+  left:auto!important;
+  transform:none!important;
+  max-width:315px;
   margin:0!important;
-  padding:13px 16px 13px 42px!important;
+  padding:12px 15px 12px 40px!important;
   border:1px solid rgba(95,151,205,.18)!important;
   border-radius:14px!important;
   background:linear-gradient(135deg,rgba(8,27,52,.50),rgba(5,17,36,.38))!important;
   color:#8fa7bf!important;
-  font-size:12px!important;
+  font-size:11px!important;
   font-style:normal!important;
   line-height:1.45;
   letter-spacing:.05px;
@@ -114,11 +131,11 @@ body[data-page="home"] #home .hero-quote{
 body[data-page="home"] #home .hero-quote::before{
   content:"“";
   position:absolute;
-  left:15px;
+  left:14px;
   top:3px;
   color:#5eb9f1;
   font-family:Georgia,serif;
-  font-size:35px;
+  font-size:33px;
   line-height:1;
   opacity:.62;
 }
@@ -131,13 +148,21 @@ body[data-page="home"] #home.page.active .hero-copy>h1{animation:homeHeroReveal 
 body[data-page="home"] #home.page.active .hero-copy>p{animation:homeHeroReveal .48s .10s ease-out both}
 body[data-page="home"] #home.page.active .hero-actions{animation:homeHeroReveal .48s .15s ease-out both}
 body[data-page="home"] #home.page.active .hero-quote{animation:homeHeroReveal .48s .20s ease-out both}
+@media(max-width:1200px){
+  body[data-page="home"] #home .hero-copy{width:min(620px,48vw)!important;max-width:620px!important}
+  body[data-page="home"] #home .hero-copy h1{font-size:clamp(48px,5.2vw,68px)!important;max-width:620px!important}
+  body[data-page="home"] #home .hero-quote{right:24px!important;bottom:22px!important}
+}
 @media(max-width:800px){
+  body[data-page="home"] #home .hero-copy{width:100%!important;max-width:100%!important}
   body[data-page="home"] #home .hero-copy>.eyebrow{font-size:9px;letter-spacing:1.2px;padding:5px 8px}
+  body[data-page="home"] #home .hero-copy h1{font-size:clamp(42px,11vw,62px)!important;max-width:100%!important;letter-spacing:-2.4px!important}
+  body[data-page="home"] #home .hero-copy h1 em{white-space:normal!important}
   body[data-page="home"] #home .hero-copy>p{font-size:14px!important}
   body[data-page="home"] #home .hero-actions{flex-wrap:wrap}
   body[data-page="home"] #home .hero-actions button{min-height:42px;padding:0 15px!important}
   body[data-page="home"] #home .hero-actions .primary{padding-right:37px!important}
-  body[data-page="home"] #home .hero-quote{max-width:100%;font-size:11px!important}
+  body[data-page="home"] #home .hero-quote{position:relative!important;right:auto!important;bottom:auto!important;max-width:100%;margin-top:22px!important;font-size:11px!important}
 }
 @media(prefers-reduced-motion:reduce){
   body[data-page="home"] #home .hero-copy>.eyebrow,
