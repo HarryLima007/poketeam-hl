@@ -1,4 +1,11 @@
-/* Remove o sombreado retangular criado pelos pseudo-elementos do efeito ambiente. */
+/* Correção final: remove qualquer painel/sombra retangular do Hero sem mexer no conteúdo. */
+body[data-page="home"] #home .home-hero{
+  background:transparent!important;
+  background-image:none!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
 body[data-page="home"] #home .home-hero::before,
 body[data-page="home"] #home .home-hero::after{
   content:none!important;
