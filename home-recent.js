@@ -45,10 +45,18 @@
   function recentEmptyHTML(){
     return `<div class="recent-empty-v2" aria-live="polite"><span class="recent-empty-mark" aria-hidden="true"><i></i></span><div><strong>Sua jornada começa com uma busca.</strong><small>Os últimos Pokémon pesquisados aparecerão aqui.</small></div></div>`;
   }
-  function displayName(entry){
+  function fullDisplayName(entry){
     const base=state.list[entry.id-1]?.name||`#${entry.id}`;
     const name=entry.form?.label||cap(base);
     return `${name}${entry.shiny?' Shiny':''}`;
+  }
+  function compactDisplayName(entry){
+    let name=fullDisplayName(entry);
+    if(entry.form?.label&&name.includes(' — ')){
+      const suffix=entry.shiny?' Shiny':'';
+      name=entry.form.label.split(' — ')[0]+suffix;
+    }
+    return name;
   }
   function displayImage(entry){
     if(entry.form){if(entry.shiny&&entry.form.shinyArt)return entry.form.shinyArt;if(entry.form.art)return entry.form.art}
@@ -59,13 +67,13 @@
     return state.details.get(entry.id)?.types||[];
   }
   function recentCardHTML(entry,index){
-    const types=displayTypes(entry),name=displayName(entry),image=displayImage(entry);
+    const types=displayTypes(entry),name=compactDisplayName(entry),fullName=fullDisplayName(entry),image=displayImage(entry);
     const badges=[];
     if(entry.form?.category==='mega')badges.push('<i class="recent-variant mega">MEGA</i>');
     else if(entry.form?.category==='gmax')badges.push('<i class="recent-variant gmax">GMAX</i>');
     else if(entry.form)badges.push('<i class="recent-variant form">FORMA</i>');
     if(entry.shiny)badges.push('<i class="recent-variant shiny">SHINY</i>');
-    return `<button class="recent-poke-v2" data-recent-index="${index}" aria-label="Abrir ${name} na Pokédex"><span class="recent-art"><img loading="lazy" src="${image}" alt=""></span><span class="recent-copy"><small class="recent-number">#${pad(entry.id)}</small><strong>${name}</strong><span class="recent-types">${types.length?types.map(t=>`<i class="type ${t}">${typeNames[t]||cap(t)}</i>`).join(''):'<i class="recent-loading">carregando tipos…</i>'}${badges.join('')}</span></span><span class="recent-arrow" aria-hidden="true">→</span></button>`;
+    return `<button class="recent-poke-v2" data-recent-index="${index}" aria-label="Abrir ${fullName} na Pokédex" title="${fullName}"><span class="recent-art"><img loading="lazy" src="${image}" alt=""></span><span class="recent-copy"><small class="recent-number">#${pad(entry.id)}</small><strong>${name}</strong><span class="recent-types">${types.length?types.map(t=>`<i class="type ${t}">${typeNames[t]||cap(t)}</i>`).join(''):'<i class="recent-loading">carregando tipos…</i>'}${badges.join('')}</span></span><span class="recent-arrow" aria-hidden="true">→</span></button>`;
   }
   function openRecentEntry(entry){
     if(!entry)return;
