@@ -2,19 +2,19 @@
 body[data-page="home"] #home .home-hero{
   position:relative;
   background:
-    radial-gradient(circle at 18% 24%,rgba(53,144,232,.10),transparent 32%),
-    radial-gradient(circle at 78% 18%,rgba(255,201,74,.055),transparent 24%),
-    linear-gradient(135deg,rgba(10,24,48,.28),rgba(5,14,31,.18))!important;
-  border-color:rgba(74,143,217,.20)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 18px 48px rgba(0,0,0,.10)!important;
+    radial-gradient(circle at 18% 24%,rgba(53,144,232,.08),transparent 30%),
+    radial-gradient(circle at 78% 18%,rgba(255,201,74,.04),transparent 22%),
+    linear-gradient(135deg,rgba(10,24,48,.22),rgba(5,14,31,.12))!important;
+  border-color:rgba(74,143,217,.18)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.014),0 18px 48px rgba(0,0,0,.08)!important;
 }
 /* Remove a antiga área decorativa vazia que aparecia como um retângulo escuro no centro. */
 body[data-page="home"] #home .home-hero::before,
 body[data-page="home"] #home .home-hero::after{content:none!important;display:none!important}
 body[data-page="home"] #home .hero-copy{
   z-index:2;
-  width:min(690px,42vw)!important;
-  max-width:690px!important;
+  width:min(620px,38vw)!important;
+  max-width:620px!important;
 }
 body[data-page="home"] #home .hero-copy>.eyebrow{
   display:inline-flex;
@@ -32,12 +32,12 @@ body[data-page="home"] #home .hero-copy>.eyebrow{
 }
 body[data-page="home"] #home .hero-copy h1{
   width:100%!important;
-  max-width:690px!important;
-  margin:14px 0 15px!important;
+  max-width:620px!important;
+  margin:13px 0 14px!important;
   color:#f6fbff;
-  font-size:clamp(54px,4.35vw,82px)!important;
-  line-height:.94!important;
-  letter-spacing:-3px!important;
+  font-size:clamp(48px,3.55vw,68px)!important;
+  line-height:.95!important;
+  letter-spacing:-2.7px!important;
   text-shadow:0 8px 28px rgba(0,0,0,.18);
 }
 body[data-page="home"] #home .hero-copy h1 em{
@@ -47,44 +47,44 @@ body[data-page="home"] #home .hero-copy h1 em{
   text-shadow:0 0 22px rgba(255,205,73,.18);
 }
 body[data-page="home"] #home .hero-copy>p{
-  max-width:520px;
+  max-width:500px;
   margin:0!important;
   color:#9fb3ca!important;
-  font-size:15px!important;
+  font-size:14px!important;
   line-height:1.5;
   letter-spacing:.02px;
 }
 body[data-page="home"] #home .hero-actions{
   display:flex!important;
   align-items:center;
-  gap:11px!important;
-  margin-top:20px!important;
+  gap:10px!important;
+  margin-top:18px!important;
 }
 body[data-page="home"] #home .hero-actions button{
   position:relative;
-  min-height:44px;
-  padding:0 18px!important;
-  border-radius:13px!important;
-  font-size:13px!important;
+  min-height:42px;
+  padding:0 17px!important;
+  border-radius:12px!important;
+  font-size:12px!important;
   font-weight:850!important;
   letter-spacing:.05px;
   box-shadow:none!important;
   transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease,color .2s ease!important;
 }
 body[data-page="home"] #home .hero-actions .primary{
-  padding-right:41px!important;
+  padding-right:39px!important;
   border:1px solid rgba(255,121,111,.48)!important;
   background:linear-gradient(135deg,#f24d5e,#ff745e)!important;
   color:#fff!important;
-  box-shadow:0 10px 24px rgba(236,65,83,.20),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  box-shadow:0 9px 22px rgba(236,65,83,.18),inset 0 1px 0 rgba(255,255,255,.18)!important;
 }
 body[data-page="home"] #home .hero-actions .primary::after{
   content:"→";
   position:absolute;
-  right:16px;
+  right:15px;
   top:50%;
   transform:translateY(-51%);
-  font-size:16px;
+  font-size:15px;
   font-weight:900;
   opacity:.88;
   transition:transform .2s ease;
@@ -92,7 +92,7 @@ body[data-page="home"] #home .hero-actions .primary::after{
 body[data-page="home"] #home .hero-actions .primary:hover{
   transform:translateY(-2px)!important;
   border-color:rgba(255,158,145,.72)!important;
-  box-shadow:0 14px 30px rgba(236,65,83,.28),0 0 22px rgba(255,94,91,.10),inset 0 1px 0 rgba(255,255,255,.22)!important;
+  box-shadow:0 13px 28px rgba(236,65,83,.25),0 0 20px rgba(255,94,91,.09),inset 0 1px 0 rgba(255,255,255,.22)!important;
 }
 body[data-page="home"] #home .hero-actions .primary:hover::after{transform:translate(3px,-51%)}
 body[data-page="home"] #home .hero-actions button:not(.primary){
@@ -110,34 +110,34 @@ body[data-page="home"] #home .hero-actions button:not(.primary):hover{
 }
 body[data-page="home"] #home .hero-quote{
   position:absolute!important;
-  right:34px!important;
-  bottom:28px!important;
+  right:clamp(54px,4.4vw,88px)!important;
+  bottom:34px!important;
   top:auto!important;
   left:auto!important;
   transform:none!important;
-  max-width:315px;
+  max-width:300px;
   margin:0!important;
-  padding:12px 15px 12px 40px!important;
-  border:1px solid rgba(95,151,205,.18)!important;
-  border-radius:14px!important;
-  background:linear-gradient(135deg,rgba(8,27,52,.50),rgba(5,17,36,.38))!important;
-  color:#8fa7bf!important;
-  font-size:11px!important;
+  padding:11px 14px 11px 38px!important;
+  border:1px solid rgba(95,151,205,.17)!important;
+  border-radius:13px!important;
+  background:linear-gradient(135deg,rgba(8,27,52,.44),rgba(5,17,36,.32))!important;
+  color:#93a9bf!important;
+  font-size:10.5px!important;
   font-style:normal!important;
   line-height:1.45;
   letter-spacing:.05px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.018)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.015)!important;
 }
 body[data-page="home"] #home .hero-quote::before{
   content:"“";
   position:absolute;
-  left:14px;
+  left:13px;
   top:3px;
   color:#5eb9f1;
   font-family:Georgia,serif;
-  font-size:33px;
+  font-size:31px;
   line-height:1;
-  opacity:.62;
+  opacity:.58;
 }
 @keyframes homeHeroReveal{
   0%{opacity:0;transform:translateY(7px)}
@@ -149,20 +149,20 @@ body[data-page="home"] #home.page.active .hero-copy>p{animation:homeHeroReveal .
 body[data-page="home"] #home.page.active .hero-actions{animation:homeHeroReveal .48s .15s ease-out both}
 body[data-page="home"] #home.page.active .hero-quote{animation:homeHeroReveal .48s .20s ease-out both}
 @media(max-width:1200px){
-  body[data-page="home"] #home .hero-copy{width:min(620px,48vw)!important;max-width:620px!important}
-  body[data-page="home"] #home .hero-copy h1{font-size:clamp(48px,5.2vw,68px)!important;max-width:620px!important}
-  body[data-page="home"] #home .hero-quote{right:24px!important;bottom:22px!important}
+  body[data-page="home"] #home .hero-copy{width:min(560px,44vw)!important;max-width:560px!important}
+  body[data-page="home"] #home .hero-copy h1{font-size:clamp(44px,4.7vw,60px)!important;max-width:560px!important}
+  body[data-page="home"] #home .hero-quote{right:30px!important;bottom:24px!important}
 }
 @media(max-width:800px){
   body[data-page="home"] #home .hero-copy{width:100%!important;max-width:100%!important}
   body[data-page="home"] #home .hero-copy>.eyebrow{font-size:9px;letter-spacing:1.2px;padding:5px 8px}
-  body[data-page="home"] #home .hero-copy h1{font-size:clamp(42px,11vw,62px)!important;max-width:100%!important;letter-spacing:-2.4px!important}
+  body[data-page="home"] #home .hero-copy h1{font-size:clamp(40px,10.5vw,58px)!important;max-width:100%!important;letter-spacing:-2.2px!important}
   body[data-page="home"] #home .hero-copy h1 em{white-space:normal!important}
-  body[data-page="home"] #home .hero-copy>p{font-size:14px!important}
+  body[data-page="home"] #home .hero-copy>p{font-size:13px!important}
   body[data-page="home"] #home .hero-actions{flex-wrap:wrap}
-  body[data-page="home"] #home .hero-actions button{min-height:42px;padding:0 15px!important}
-  body[data-page="home"] #home .hero-actions .primary{padding-right:37px!important}
-  body[data-page="home"] #home .hero-quote{position:relative!important;right:auto!important;bottom:auto!important;max-width:100%;margin-top:22px!important;font-size:11px!important}
+  body[data-page="home"] #home .hero-actions button{min-height:40px;padding:0 14px!important}
+  body[data-page="home"] #home .hero-actions .primary{padding-right:36px!important}
+  body[data-page="home"] #home .hero-quote{position:relative!important;right:auto!important;bottom:auto!important;max-width:100%;margin-top:20px!important;font-size:10.5px!important}
 }
 @media(prefers-reduced-motion:reduce){
   body[data-page="home"] #home .hero-copy>.eyebrow,
