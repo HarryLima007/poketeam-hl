@@ -14,7 +14,7 @@
   if(typeof renderTeams==='function'){const originalRenderTeams=renderTeams;renderTeams=function(){const result=originalRenderTeams.apply(this,arguments);requestAnimationFrame(patchTeamSlots);return result}}
   try{teams.forEach(normalizeTeamForms);requestAnimationFrame(patchTeamSlots)}catch(err){console.error('Falha ao inicializar suporte a formas especiais nos times',err)}
   const homeStage2Style=document.createElement('link');homeStage2Style.rel='stylesheet';homeStage2Style.href='home-stage2.css?v=home-stage2-desejos-four-corners-20260910-16';document.head.appendChild(homeStage2Style);
-  const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-final-polish-20260910-8';document.head.appendChild(homeRecentStyle);
+  const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-contrast-20260911-9';document.head.appendChild(homeRecentStyle);
   const homeHeroStyle=document.createElement('link');homeHeroStyle.rel='stylesheet';homeHeroStyle.href='home-hero-polish.css?v=home-hero-cyan-cta-20260911-11';document.head.appendChild(homeHeroStyle);
   const homeHeroShadowFix=document.createElement('link');homeHeroShadowFix.rel='stylesheet';homeHeroShadowFix.href='home-hero-shadow-fix.css?v=home-hero-shadow-fix-20260911-3';document.head.appendChild(homeHeroShadowFix);
   const homeCardPresence=document.createElement('link');homeCardPresence.rel='stylesheet';homeCardPresence.href='home-card-presence.css?v=home-card-presence-20260911-1';document.head.appendChild(homeCardPresence);
