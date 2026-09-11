@@ -3,10 +3,17 @@
 body[data-page="home"] #home .quick-grid{
   transform:scale(1.06)!important;
   transform-origin:center center!important;
+  margin-bottom:14px!important;
 }
 @media(max-width:1200px){
-  body[data-page="home"] #home .quick-grid{transform:scale(1.035)!important}
+  body[data-page="home"] #home .quick-grid{
+    transform:scale(1.035)!important;
+    margin-bottom:10px!important;
+  }
 }
 @media(max-width:800px){
-  body[data-page="home"] #home .quick-grid{transform:none!important}
+  body[data-page="home"] #home .quick-grid{
+    transform:none!important;
+    margin-bottom:0!important;
+  }
 }
