@@ -14,7 +14,7 @@
   if(typeof renderTeams==='function'){const originalRenderTeams=renderTeams;renderTeams=function(){const result=originalRenderTeams.apply(this,arguments);requestAnimationFrame(patchTeamSlots);return result}}
   try{teams.forEach(normalizeTeamForms);requestAnimationFrame(patchTeamSlots)}catch(err){console.error('Falha ao inicializar suporte a formas especiais nos times',err)}
   const homeStage2Style=document.createElement('link');homeStage2Style.rel='stylesheet';homeStage2Style.href='home-stage2.css?v=home-stage2-desejos-four-corners-20260910-16';document.head.appendChild(homeStage2Style);
-  const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-empty-centered-20260910-3';document.head.appendChild(homeRecentStyle);
+  const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-empty-refined-20260910-4';document.head.appendChild(homeRecentStyle);
   const favFormsScript=document.createElement('script');favFormsScript.src='favorite-special-forms.js?v=fav-card-remove-20260910-2';document.head.appendChild(favFormsScript);
   const homeRecentScript=document.createElement('script');homeRecentScript.src='home-recent.js?v=home-recent-clear-history-20260910-2';document.head.appendChild(homeRecentScript);
 })();
