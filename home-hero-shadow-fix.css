@@ -1,0 +1,12 @@
+/* Remove o sombreado retangular criado pelos pseudo-elementos do efeito ambiente. */
+body[data-page="home"] #home .home-hero::before,
+body[data-page="home"] #home .home-hero::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  opacity:0!important;
+  animation:none!important;
+}
