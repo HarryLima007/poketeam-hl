@@ -1,0 +1,12 @@
+/* Home — refinamento final dos quatro cards centrais.
+   Aumenta somente a presença visual do conjunto, preservando seu centro e o layout ao redor. */
+body[data-page="home"] #home .quick-grid{
+  transform:scale(1.06)!important;
+  transform-origin:center center!important;
+}
+@media(max-width:1200px){
+  body[data-page="home"] #home .quick-grid{transform:scale(1.035)!important}
+}
+@media(max-width:800px){
+  body[data-page="home"] #home .quick-grid{transform:none!important}
+}
