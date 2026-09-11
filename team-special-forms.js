@@ -16,7 +16,7 @@
   const homeStage2Style=document.createElement('link');homeStage2Style.rel='stylesheet';homeStage2Style.href='home-stage2.css?v=home-stage2-desejos-four-corners-20260910-16';document.head.appendChild(homeStage2Style);
   const homeRecentStyle=document.createElement('link');homeRecentStyle.rel='stylesheet';homeRecentStyle.href='home-recent.css?v=home-recent-final-polish-20260910-8';document.head.appendChild(homeRecentStyle);
   const homeHeroStyle=document.createElement('link');homeHeroStyle.rel='stylesheet';homeHeroStyle.href='home-hero-polish.css?v=home-hero-no-center-overlay-20260911-10';document.head.appendChild(homeHeroStyle);
-  const homeHeroShadowFix=document.createElement('link');homeHeroShadowFix.rel='stylesheet';homeHeroShadowFix.href='home-hero-shadow-fix.css?v=home-hero-shadow-fix-20260911-2';document.head.appendChild(homeHeroShadowFix);
+  const homeHeroShadowFix=document.createElement('link');homeHeroShadowFix.rel='stylesheet';homeHeroShadowFix.href='home-hero-shadow-fix.css?v=home-hero-shadow-fix-20260911-3';document.head.appendChild(homeHeroShadowFix);
   const favFormsScript=document.createElement('script');favFormsScript.src='favorite-special-forms.js?v=fav-card-remove-20260910-2';document.head.appendChild(favFormsScript);
   const homeRecentScript=document.createElement('script');homeRecentScript.src='home-recent.js?v=home-recent-compact-names-20260910-7';document.head.appendChild(homeRecentScript);
 })();
