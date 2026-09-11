@@ -10,164 +10,27 @@ body[data-page="home"] #home .home-hero{
 }
 body[data-page="home"] #home .home-hero::before,
 body[data-page="home"] #home .home-hero::after{content:none!important;display:none!important}
-body[data-page="home"] #home .hero-copy{
-  z-index:2;
-  width:min(700px,42vw)!important;
-  max-width:700px!important;
-}
-body[data-page="home"] #home .hero-copy>.eyebrow{
-  display:inline-flex;
-  align-items:center;
-  width:max-content;
-  padding:6px 10px;
-  border:1px solid rgba(79,165,235,.22);
-  border-radius:999px;
-  background:rgba(9,35,66,.34);
-  color:#88c9f4;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:1.7px;
-  text-shadow:0 0 12px rgba(69,169,235,.12);
-}
-body[data-page="home"] #home .hero-copy h1{
-  width:100%!important;
-  max-width:700px!important;
-  margin:14px 0 15px!important;
-  color:#f6fbff;
-  font-size:clamp(56px,4.1vw,78px)!important;
-  line-height:.945!important;
-  letter-spacing:-3px!important;
-  text-shadow:0 8px 28px rgba(0,0,0,.18);
-}
-body[data-page="home"] #home .hero-copy h1 em{
-  display:inline-block!important;
-  white-space:nowrap!important;
-  color:#ffd85a!important;
-  text-shadow:0 0 22px rgba(255,205,73,.18);
-}
-body[data-page="home"] #home .hero-copy>p{
-  max-width:530px;
-  margin:0!important;
-  color:#9fb3ca!important;
-  font-size:15.5px!important;
-  line-height:1.52;
-  letter-spacing:.02px;
-}
-body[data-page="home"] #home .hero-actions{
-  display:flex!important;
-  align-items:center;
-  gap:11px!important;
-  margin-top:21px!important;
-}
-body[data-page="home"] #home .hero-actions button{
-  position:relative;
-  min-height:44px;
-  padding:0 18px!important;
-  border-radius:13px!important;
-  font-size:13px!important;
-  font-weight:850!important;
-  letter-spacing:.05px;
-  box-shadow:none!important;
-  transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease,color .2s ease!important;
-}
-body[data-page="home"] #home .hero-actions .primary{
-  padding-right:41px!important;
-  border:1px solid rgba(255,121,111,.48)!important;
-  background:linear-gradient(135deg,#f24d5e,#ff745e)!important;
-  color:#fff!important;
-  box-shadow:0 10px 24px rgba(236,65,83,.20),inset 0 1px 0 rgba(255,255,255,.18)!important;
-}
-body[data-page="home"] #home .hero-actions .primary::after{
-  content:"→";
-  position:absolute;
-  right:16px;
-  top:50%;
-  transform:translateY(-51%);
-  font-size:16px;
-  font-weight:900;
-  opacity:.88;
-  transition:transform .2s ease;
-}
-body[data-page="home"] #home .hero-actions .primary:hover{
-  transform:translateY(-2px)!important;
-  border-color:rgba(255,158,145,.72)!important;
-  box-shadow:0 14px 30px rgba(236,65,83,.28),0 0 22px rgba(255,94,91,.10),inset 0 1px 0 rgba(255,255,255,.22)!important;
-}
+body[data-page="home"] #home .hero-copy{z-index:2;width:min(805px,48.3vw)!important;max-width:805px!important}
+body[data-page="home"] #home .hero-copy>.eyebrow{display:inline-flex;align-items:center;width:max-content;padding:7px 12px;border:1px solid rgba(79,165,235,.22);border-radius:999px;background:rgba(9,35,66,.34);color:#88c9f4;font-size:11.5px;font-weight:900;letter-spacing:1.95px;text-shadow:0 0 12px rgba(69,169,235,.12)}
+body[data-page="home"] #home .hero-copy h1{width:100%!important;max-width:805px!important;margin:16px 0 17px!important;color:#f6fbff;font-size:clamp(64px,4.72vw,90px)!important;line-height:.945!important;letter-spacing:-3.45px!important;text-shadow:0 8px 28px rgba(0,0,0,.18)}
+body[data-page="home"] #home .hero-copy h1 em{display:inline-block!important;white-space:nowrap!important;color:#ffd85a!important;text-shadow:0 0 22px rgba(255,205,73,.18)}
+body[data-page="home"] #home .hero-copy>p{max-width:610px;margin:0!important;color:#9fb3ca!important;font-size:17.8px!important;line-height:1.52;letter-spacing:.02px}
+body[data-page="home"] #home .hero-actions{display:flex!important;align-items:center;gap:13px!important;margin-top:24px!important}
+body[data-page="home"] #home .hero-actions button{position:relative;min-height:51px;padding:0 21px!important;border-radius:15px!important;font-size:15px!important;font-weight:850!important;letter-spacing:.05px;box-shadow:none!important;transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease,color .2s ease!important}
+body[data-page="home"] #home .hero-actions .primary{padding-right:47px!important;border:1px solid rgba(255,121,111,.48)!important;background:linear-gradient(135deg,#f24d5e,#ff745e)!important;color:#fff!important;box-shadow:0 10px 24px rgba(236,65,83,.20),inset 0 1px 0 rgba(255,255,255,.18)!important}
+body[data-page="home"] #home .hero-actions .primary::after{content:"→";position:absolute;right:18px;top:50%;transform:translateY(-51%);font-size:18px;font-weight:900;opacity:.88;transition:transform .2s ease}
+body[data-page="home"] #home .hero-actions .primary:hover{transform:translateY(-2px)!important;border-color:rgba(255,158,145,.72)!important;box-shadow:0 14px 30px rgba(236,65,83,.28),0 0 22px rgba(255,94,91,.10),inset 0 1px 0 rgba(255,255,255,.22)!important}
 body[data-page="home"] #home .hero-actions .primary:hover::after{transform:translate(3px,-51%)}
-body[data-page="home"] #home .hero-actions button:not(.primary){
-  border:1px solid rgba(84,153,222,.34)!important;
-  background:rgba(7,25,49,.54)!important;
-  color:#b9d4e9!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
-}
-body[data-page="home"] #home .hero-actions button:not(.primary):hover{
-  transform:translateY(-2px)!important;
-  border-color:rgba(91,181,247,.58)!important;
-  background:rgba(13,42,75,.70)!important;
-  color:#e5f5ff!important;
-  box-shadow:0 10px 24px rgba(29,101,158,.12)!important;
-}
-body[data-page="home"] #home .hero-quote{
-  position:absolute!important;
-  right:clamp(86px,6vw,118px)!important;
-  bottom:42px!important;
-  top:auto!important;
-  left:auto!important;
-  transform:none!important;
-  max-width:310px;
-  margin:0!important;
-  padding:12px 15px 12px 40px!important;
-  border:1px solid rgba(95,151,205,.17)!important;
-  border-radius:13px!important;
-  background:linear-gradient(135deg,rgba(8,27,52,.44),rgba(5,17,36,.32))!important;
-  color:#93a9bf!important;
-  font-size:11px!important;
-  font-style:normal!important;
-  line-height:1.45;
-  letter-spacing:.05px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.015)!important;
-}
-body[data-page="home"] #home .hero-quote::before{
-  content:"“";
-  position:absolute;
-  left:14px;
-  top:3px;
-  color:#5eb9f1;
-  font-family:Georgia,serif;
-  font-size:32px;
-  line-height:1;
-  opacity:.58;
-}
-@keyframes homeHeroReveal{
-  0%{opacity:0;transform:translateY(7px)}
-  100%{opacity:1;transform:translateY(0)}
-}
+body[data-page="home"] #home .hero-actions button:not(.primary){border:1px solid rgba(84,153,222,.34)!important;background:rgba(7,25,49,.54)!important;color:#b9d4e9!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important}
+body[data-page="home"] #home .hero-actions button:not(.primary):hover{transform:translateY(-2px)!important;border-color:rgba(91,181,247,.58)!important;background:rgba(13,42,75,.70)!important;color:#e5f5ff!important;box-shadow:0 10px 24px rgba(29,101,158,.12)!important}
+body[data-page="home"] #home .hero-quote{position:absolute!important;right:clamp(86px,6vw,118px)!important;bottom:42px!important;top:auto!important;left:auto!important;transform:none!important;max-width:310px;margin:0!important;padding:12px 15px 12px 40px!important;border:1px solid rgba(95,151,205,.17)!important;border-radius:13px!important;background:linear-gradient(135deg,rgba(8,27,52,.44),rgba(5,17,36,.32))!important;color:#93a9bf!important;font-size:11px!important;font-style:normal!important;line-height:1.45;letter-spacing:.05px;box-shadow:inset 0 1px 0 rgba(255,255,255,.015)!important}
+body[data-page="home"] #home .hero-quote::before{content:"“";position:absolute;left:14px;top:3px;color:#5eb9f1;font-family:Georgia,serif;font-size:32px;line-height:1;opacity:.58}
+@keyframes homeHeroReveal{0%{opacity:0;transform:translateY(7px)}100%{opacity:1;transform:translateY(0)}}
 body[data-page="home"] #home.page.active .hero-copy>.eyebrow{animation:homeHeroReveal .42s ease-out both}
 body[data-page="home"] #home.page.active .hero-copy>h1{animation:homeHeroReveal .48s .05s ease-out both}
 body[data-page="home"] #home.page.active .hero-copy>p{animation:homeHeroReveal .48s .10s ease-out both}
 body[data-page="home"] #home.page.active .hero-actions{animation:homeHeroReveal .48s .15s ease-out both}
 body[data-page="home"] #home.page.active .hero-quote{animation:homeHeroReveal .48s .20s ease-out both}
-@media(max-width:1200px){
-  body[data-page="home"] #home .hero-copy{width:min(610px,47vw)!important;max-width:610px!important}
-  body[data-page="home"] #home .hero-copy h1{font-size:clamp(48px,5vw,66px)!important;max-width:610px!important}
-  body[data-page="home"] #home .hero-copy>p{font-size:14.5px!important}
-  body[data-page="home"] #home .hero-quote{right:38px!important;bottom:28px!important}
-}
-@media(max-width:800px){
-  body[data-page="home"] #home .hero-copy{width:100%!important;max-width:100%!important}
-  body[data-page="home"] #home .hero-copy>.eyebrow{font-size:9px;letter-spacing:1.2px;padding:5px 8px}
-  body[data-page="home"] #home .hero-copy h1{font-size:clamp(40px,10.5vw,58px)!important;max-width:100%!important;letter-spacing:-2.2px!important}
-  body[data-page="home"] #home .hero-copy h1 em{white-space:normal!important}
-  body[data-page="home"] #home .hero-copy>p{font-size:13px!important}
-  body[data-page="home"] #home .hero-actions{flex-wrap:wrap}
-  body[data-page="home"] #home .hero-actions button{min-height:40px;padding:0 14px!important;font-size:12px!important}
-  body[data-page="home"] #home .hero-actions .primary{padding-right:36px!important}
-  body[data-page="home"] #home .hero-quote{position:relative!important;right:auto!important;bottom:auto!important;max-width:100%;margin-top:20px!important;font-size:10.5px!important}
-}
-@media(prefers-reduced-motion:reduce){
-  body[data-page="home"] #home .hero-copy>.eyebrow,
-  body[data-page="home"] #home .hero-copy>h1,
-  body[data-page="home"] #home .hero-copy>p,
-  body[data-page="home"] #home .hero-actions,
-  body[data-page="home"] #home .hero-quote{animation:none!important;transition:none!important}
-}
+@media(max-width:1200px){body[data-page="home"] #home .hero-copy{width:min(670px,50vw)!important;max-width:670px!important}body[data-page="home"] #home .hero-copy h1{font-size:clamp(53px,5.45vw,72px)!important;max-width:670px!important}body[data-page="home"] #home .hero-copy>p{font-size:15.5px!important}body[data-page="home"] #home .hero-actions button{min-height:46px;font-size:13.5px!important}body[data-page="home"] #home .hero-quote{right:38px!important;bottom:28px!important}}
+@media(max-width:800px){body[data-page="home"] #home .hero-copy{width:100%!important;max-width:100%!important}body[data-page="home"] #home .hero-copy>.eyebrow{font-size:9px;letter-spacing:1.2px;padding:5px 8px}body[data-page="home"] #home .hero-copy h1{font-size:clamp(40px,10.5vw,58px)!important;max-width:100%!important;letter-spacing:-2.2px!important}body[data-page="home"] #home .hero-copy h1 em{white-space:normal!important}body[data-page="home"] #home .hero-copy>p{font-size:13px!important}body[data-page="home"] #home .hero-actions{flex-wrap:wrap}body[data-page="home"] #home .hero-actions button{min-height:40px;padding:0 14px!important;font-size:12px!important}body[data-page="home"] #home .hero-actions .primary{padding-right:36px!important}body[data-page="home"] #home .hero-quote{position:relative!important;right:auto!important;bottom:auto!important;max-width:100%;margin-top:20px!important;font-size:10.5px!important}}
+@media(prefers-reduced-motion:reduce){body[data-page="home"] #home .hero-copy>.eyebrow,body[data-page="home"] #home .hero-copy>h1,body[data-page="home"] #home .hero-copy>p,body[data-page="home"] #home .hero-actions,body[data-page="home"] #home .hero-quote{animation:none!important;transition:none!important}}
