@@ -1,0 +1,190 @@
+/* Home — Pesquisados recentemente V2. Mantém o painel na posição aprovada. */
+body[data-page="home"] #home .panel:has(#recentList){
+  overflow:hidden;
+  border-color:rgba(75,145,214,.24)!important;
+  background:linear-gradient(145deg,rgba(7,20,43,.78),rgba(4,13,31,.68))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 14px 32px rgba(0,0,0,.14)!important;
+}
+body[data-page="home"] #home .panel:has(#recentList) .section-title h2{
+  letter-spacing:.1px;
+}
+body[data-page="home"] #recentList.recent-list-v2{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px!important;
+  align-items:stretch;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  min-height:68px;
+}
+body[data-page="home"] #recentList.recent-list-v2 .recent-poke-v2{
+  position:relative;
+  min-width:0;
+  height:68px;
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:7px;
+  padding:5px 8px 5px 5px;
+  overflow:hidden;
+  text-align:left;
+  border:1px solid rgba(78,145,211,.22)!important;
+  border-radius:10px!important;
+  background:linear-gradient(135deg,rgba(12,31,59,.88),rgba(6,19,41,.92))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
+  transform:translateY(0);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease!important;
+}
+body[data-page="home"] #recentList.recent-list-v2 .recent-poke-v2::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  background:linear-gradient(105deg,rgba(55,171,255,.08),transparent 44%);
+  transition:opacity .2s ease;
+}
+body[data-page="home"] #recentList.recent-list-v2 .recent-poke-v2:hover{
+  transform:translateY(-3px)!important;
+  border-color:rgba(84,180,255,.62)!important;
+  box-shadow:0 9px 22px rgba(0,0,0,.22),0 0 18px rgba(58,160,255,.10)!important;
+}
+body[data-page="home"] #recentList.recent-list-v2 .recent-poke-v2:hover::before{opacity:1}
+body[data-page="home"] #recentList .recent-art{
+  position:relative;
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:radial-gradient(circle,rgba(57,139,215,.14),rgba(4,13,31,.05) 68%);
+}
+body[data-page="home"] #recentList .recent-art img{
+  width:54px!important;
+  height:54px!important;
+  object-fit:contain;
+  margin:0!important;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.28));
+  transform:scale(1);
+  transition:transform .2s ease,filter .2s ease;
+}
+body[data-page="home"] #recentList .recent-poke-v2:hover .recent-art img{
+  transform:scale(1.09);
+  filter:drop-shadow(0 5px 7px rgba(0,0,0,.32)) drop-shadow(0 0 6px rgba(72,177,255,.15));
+}
+body[data-page="home"] #recentList .recent-copy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  line-height:1.05;
+}
+body[data-page="home"] #recentList .recent-number{
+  margin:0 0 2px!important;
+  color:#6f8dab!important;
+  font-size:9px!important;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+body[data-page="home"] #recentList .recent-copy>strong{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#eaf5ff;
+  font-size:12px;
+  font-weight:850;
+}
+body[data-page="home"] #recentList .recent-types{
+  display:flex;
+  gap:3px;
+  max-width:100%;
+  margin-top:5px;
+  overflow:hidden;
+}
+body[data-page="home"] #recentList .recent-types .type{
+  display:inline-flex!important;
+  align-items:center;
+  width:auto!important;
+  height:15px!important;
+  min-height:15px!important;
+  padding:0 5px!important;
+  margin:0!important;
+  border-radius:5px!important;
+  font-size:7px!important;
+  font-style:normal!important;
+  font-weight:850!important;
+  line-height:15px!important;
+  white-space:nowrap;
+}
+body[data-page="home"] #recentList .recent-loading{
+  color:#6f8298;
+  font-size:8px;
+  font-style:normal;
+  white-space:nowrap;
+}
+body[data-page="home"] #recentList .recent-arrow{
+  color:#66bfff;
+  font-size:17px;
+  font-weight:900;
+  opacity:0;
+  transform:translateX(-5px);
+  transition:opacity .2s ease,transform .2s ease;
+}
+body[data-page="home"] #recentList .recent-poke-v2:hover .recent-arrow{
+  opacity:.95;
+  transform:translateX(0);
+}
+body[data-page="home"] #recentList.recent-list-v2.empty-state{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  min-height:68px!important;
+  color:inherit!important;
+}
+body[data-page="home"] #recentList .recent-empty-v2{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  text-align:left;
+}
+body[data-page="home"] #recentList .recent-empty-v2>div{display:flex;flex-direction:column;gap:3px}
+body[data-page="home"] #recentList .recent-empty-v2 strong{color:#cfe8fb;font-size:12px;font-weight:800}
+body[data-page="home"] #recentList .recent-empty-v2 small{color:#728ba5;font-size:10px}
+body[data-page="home"] #recentList .recent-empty-mark{
+  position:relative;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  border:1px solid rgba(86,174,241,.22);
+  border-radius:50%;
+  opacity:.62;
+}
+body[data-page="home"] #recentList .recent-empty-mark::before,
+body[data-page="home"] #recentList .recent-empty-mark::after{
+  content:"";
+  position:absolute;
+  left:4px;
+  right:4px;
+  top:50%;
+  height:1px;
+  background:rgba(96,188,255,.48);
+}
+body[data-page="home"] #recentList .recent-empty-mark::after{transform:rotate(90deg)}
+body[data-page="home"] #recentList .recent-empty-mark i{
+  position:absolute;
+  width:8px;
+  height:8px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(127,207,255,.65);
+  border-radius:50%;
+  background:#071a32;
+}
+@media(max-width:1050px){body[data-page="home"] #recentList.recent-list-v2{grid-template-columns:repeat(4,minmax(0,1fr))}body[data-page="home"] #recentList .recent-poke-v2:nth-child(5){display:none}}
+@media(max-width:800px){body[data-page="home"] #recentList.recent-list-v2{grid-template-columns:repeat(2,minmax(0,1fr))}body[data-page="home"] #recentList .recent-poke-v2:nth-child(n+3){display:none}}
+@media(prefers-reduced-motion:reduce){body[data-page="home"] #recentList .recent-poke-v2,body[data-page="home"] #recentList .recent-art img,body[data-page="home"] #recentList .recent-arrow{transition:none!important}}
