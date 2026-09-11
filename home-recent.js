@@ -30,9 +30,39 @@
     box.querySelectorAll('[data-recent]').forEach(b=>b.onclick=()=>openPokemon(+b.dataset.recent));
   }
 
+  function ensureClearButton(){
+    const panel = document.querySelector('#home .panel:has(#recentList)');
+    const title = panel?.querySelector('.section-title');
+    if(!title) return null;
+    let button = title.querySelector('#clearRecentHistory');
+    if(!button){
+      button = document.createElement('button');
+      button.id = 'clearRecentHistory';
+      button.type = 'button';
+      button.className = 'clear-recent-history';
+      button.textContent = 'Limpar Histórico';
+      button.setAttribute('aria-label','Limpar histórico de Pokémon pesquisados');
+      title.appendChild(button);
+      button.onclick = async()=>{
+        if(!recent.length) return;
+        const ok = typeof siteConfirm === 'function'
+          ? await siteConfirm('Limpar todos os Pokémon pesquisados recentemente?',{title:'Limpar Histórico',confirmText:'Limpar',icon:'⌛',danger:true})
+          : window.confirm('Limpar todos os Pokémon pesquisados recentemente?');
+        if(!ok) return;
+        recent = [];
+        store.set('recent',recent);
+        renderRecentV2();
+        if(typeof toast === 'function') toast('Histórico limpo.');
+      };
+    }
+    button.hidden = !recent.length;
+    return button;
+  }
+
   function renderRecentV2(){
     const box = document.querySelector('#recentList');
     if(!box) return;
+    ensureClearButton();
     if(!recent.length){
       box.className = 'mini-list recent-list-v2 empty-state';
       box.innerHTML = recentEmptyHTML();
