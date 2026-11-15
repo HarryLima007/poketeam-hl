@@ -17,3 +17,17 @@ body[data-page="home"] #home .quick-grid{
     margin-bottom:0!important;
   }
 }
+/* Correção de centralização (Etapa 2A).
+   Em >=1200px o CSS principal centraliza o .quick-grid com margin 50% + translateX(-50%).
+   O scale() acima, com !important e maior especificidade, substituía esse translateX e
+   deslocava o conjunto para a direita. Aqui a translação é recomposta com a escala. */
+@media(min-width:1200px){
+  body[data-page="home"] #home .quick-grid{
+    transform:translateX(-50%) scale(1.06)!important;
+  }
+}
+@media(min-width:1200px) and (max-width:1200px){
+  body[data-page="home"] #home .quick-grid{
+    transform:translateX(-50%) scale(1.035)!important;
+  }
+}
