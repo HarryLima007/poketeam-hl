@@ -19,6 +19,11 @@
   let anaTab = 'overview';
   let selectedSlot = null, lastTeamId = null;
   let recOffset = 0, recSig = '';
+  let recMode = 'selected';            // 'selected' (membro escolhido) | 'best' (melhor oportunidade da equipe)
+  let recView = 'add';                 // equipe incompleta: 'add' (novo integrante) | 'swap' (substituição)
+  let showNon = false;                 // mostrar opções sem melhoria
+  // Membro efetivamente selecionado (comparador + assistente + destaque nos slots usam o mesmo valor)
+  const effSlot = t => (selectedSlot != null && selectedSlot < t.members.length) ? selectedSlot : 0;
   let cmp = null;                      // { teamId, index, sel }
 
   /* =============== ANÁLISE EM ABAS =============== */
@@ -134,7 +139,7 @@
     const filter = state.teamRecFilter || 'no-legend';
     const regionOptions = REGIONS.map(r => `<option value="region:${r[0]}" ${filter === `region:${r[0]}` ? 'selected' : ''}>${r[0]}</option>`).join('');
     const select = `<select id="teamRecFilter" aria-label="Filtro de recomendações"><option value="no-legend" ${filter === 'no-legend' ? 'selected' : ''}>Sem Lendários/Míticos</option><option value="all" ${filter === 'all' ? 'selected' : ''}>Todos</option><option value="legendary" ${filter === 'legendary' ? 'selected' : ''}>Lendários</option><option value="mythical" ${filter === 'mythical' ? 'selected' : ''}>Míticos</option>${regionOptions}</select>`;
-    const head = `<div class="side-head"><h3>✨ Recomendação do Assistente</h3>${select}</div>`;
+    const head = `<div class="side-head"><h3>✨ Recomendação do Assistente</h3>${select}</div>${viewToggle(t, 'add')}`;
     const list = E.infoList(t);
     if (!list) return `<section class="side-panel assistant">${head}<p class="muted">Carregando dados para gerar recomendações…</p></section>`;
     const sig = t.id + '|' + t.members.join(',') + '|' + (t.memberForms || []).map(f => f?.formName || '').join(',') + '|' + filter;
@@ -161,16 +166,28 @@
   const artOf = (id, shiny, form) => form ? ((shiny && form.shinyArt) ? form.shinyArt : (form.art || sprite(id, shiny))) : sprite(id, shiny);
   const nameOf = (id, form) => form?.label || cap(state.list[id - 1]?.name || ('#' + id));
   const MINUS = '\u2212';
+  const pad2 = n => String(n + 1).padStart(2, '0');
 
+  // Compara atual x simulada com a MESMA regra de atributos: se algum lado não tem atributos base, os dois usam só tipos.
+  function evalPair(curList, simList) {
+    const full = l => l.every(x => x.stats && x.stats.atk != null && x.stats.hp != null);
+    if (full(curList) && full(simList)) return { cur: E.evaluate(curList), sim: E.evaluate(simList), typesOnly: false };
+    const strip = l => l.map(x => ({ ...x, stats: null }));
+    return { cur: E.evaluate(strip(curList)), sim: E.evaluate(strip(simList)), typesOnly: true };
+  }
+  function candOf(sel) {
+    const d = state.details.get(sel.id);
+    if (!d?.types?.length) return null;
+    const f = sel.form;
+    return { id: sel.id, types: (f && f.types && f.types.length) ? [...f.types] : [...d.types], stats: d.stats || null, form: f || null };
+  }
   function simulate(t) {
     if (!cmp || cmp.teamId !== t.id || cmp.index >= t.members.length) return null;
     const list = E.infoList(t);
-    const d = state.details.get(cmp.sel.id);
-    if (!list || !d?.types?.length) return null;
-    const f = cmp.sel.form;
-    const cand = { id: cmp.sel.id, types: (f && f.types && f.types.length) ? [...f.types] : [...d.types], stats: d.stats || null, form: f };
-    const sim = list.slice(); sim[cmp.index] = cand;
-    return { cur: E.evaluate(list), sim: E.evaluate(sim), cand };
+    const cand = candOf(cmp.sel);
+    if (!list || !cand) return null;
+    const simList = list.slice(); simList[cmp.index] = cand;
+    return { ...evalPair(list, simList), cand };
   }
   function deltaHTML(d) {
     const kind = d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
@@ -179,28 +196,38 @@
     const word = d > 0 ? 'ganho' : d < 0 ? 'perda' : 'sem mudança';
     return `<span class="delta ${kind}"><i aria-hidden="true">${icon}</i><b>${txt}</b><span class="sr-only"> ${word}</span></span>`;
   }
+  // Tabela Indicador | Atual | Simulado | Diferença (mesmos números das barras e da análise)
+  function cmpTableHTML(cur, sim, typesOnly) {
+    const row = (icon, label, key) => `<div class="cmp-tr" role="row"><span class="cmp-label" role="rowheader"><span aria-hidden="true">${icon}</span> ${label}</span><span class="cmp-from" role="cell">${cur[key]}</span><b class="cmp-to" role="cell">${sim[key]}</b><span role="cell">${deltaHTML(sim[key] - cur[key])}</span></div>`;
+    return `<div class="cmp-table" role="table" aria-label="Comparação entre a equipe atual e a simulada">
+      <div class="cmp-tr cmp-th" role="row"><span role="columnheader">Indicador</span><span role="columnheader">Atual</span><span role="columnheader">Simulado</span><span role="columnheader">Diferença</span></div>
+      ${row('⚔️', 'Ataque', 'attack')}${row('🛡️', 'Defesa', 'defense')}${row('⚖️', 'Equilíbrio', 'balance')}</div>
+      ${typesOnly ? '<p class="muted cmp-foot">Atributos base indisponíveis para algum Pokémon: Ataque e Defesa comparados só por tipos.</p>' : ''}`;
+  }
+  function divergeNote(cur, sim) {
+    const dA = sim.attack - cur.attack, dD = sim.defense - cur.defense, dB = sim.balance - cur.balance;
+    const sg = Math.sign;
+    const diverge = (dA !== 0 || dD !== 0) && (sg(dB) !== sg(dA) || sg(dB) !== sg(dD));
+    return diverge ? `<p class="cmp-note" role="note"><b>Por que os números divergem?</b> O Equilíbrio usa apenas critérios de tipos (cobertura elemental, resistências/imunidades e fraquezas compartilhadas). Ataque e Defesa também incluem os atributos base dos Pokémon, por isso podem variar de forma diferente. Avalie os três indicadores antes de decidir.</p>` : '';
+  }
 
   function comparatorHTML(t) {
-    const idx = cmp && cmp.teamId === t.id ? cmp.index : (selectedSlot != null && selectedSlot < t.members.length ? selectedSlot : 0);
-    const options = t.members.map((id, i) => `<option value="${i}" ${i === idx ? 'selected' : ''}>${String(i + 1).padStart(2, '0')} · ${esc(nameOf(id, t.memberForms?.[i]))}</option>`).join('');
+    const idx = effSlot(t);
+    const options = t.members.map((id, i) => `<option value="${i}" ${i === idx ? 'selected' : ''}>${pad2(i)} · ${esc(nameOf(id, t.memberForms?.[i]))}</option>`).join('');
     const sim = simulate(t);
     let result = '<p class="muted cmp-hint">Escolha um Pokémon da equipe e um candidato para ver o efeito na composição. A simulação não altera a equipe salva.</p>';
     if (sim) {
       const i = cmp.index, outId = t.members[i], outForm = t.memberForms?.[i] || null;
       const outShiny = !!t.memberShiny?.[i], outIV = !!t.memberIV100?.[i];
-      const row = (icon, label, key) => { const a = sim.cur[key], b = sim.sim[key]; return `<div class="cmp-row"><span class="cmp-label"><span aria-hidden="true">${icon}</span> ${label}</span><span class="cmp-vals"><span class="cmp-from">${a}</span><span aria-hidden="true">→</span><b class="cmp-to">${b}</b></span>${deltaHTML(b - a)}</div>`; };
-      const dA = sim.sim.attack - sim.cur.attack, dD = sim.sim.defense - sim.cur.defense, dB = sim.sim.balance - sim.cur.balance;
-      const sgn = x => Math.sign(x);
-      const diverge = (dA !== 0 || dD !== 0) && (sgn(dB) !== sgn(dA) || sgn(dB) !== sgn(dD));
-      const note = diverge ? `<p class="cmp-note" role="note"><b>Por que os números divergem?</b> O Equilíbrio usa apenas critérios de tipos (cobertura elemental, resistências/imunidades e fraquezas compartilhadas). Ataque e Defesa também incluem os atributos base dos Pokémon, por isso podem variar de forma diferente.</p>` : '';
+      const dB = sim.sim.balance - sim.cur.balance;
       result = `<div class="cmp-swap">
-          <div class="cmp-poke out"><img src="${artOf(outId, outShiny, outForm)}" alt=""><small>Sai · slot ${String(i + 1).padStart(2, '0')}</small><b>${esc(nameOf(outId, outForm))}${outShiny ? ' ✨' : ''}${outIV ? ' 💯' : ''}</b></div>
+          <div class="cmp-poke out"><span class="cmp-tag out">SAI</span><img src="${artOf(outId, outShiny, outForm)}" alt=""><small>Slot ${pad2(i)}</small><b>${esc(nameOf(outId, outForm))}${outShiny ? ' ✨' : ''}${outIV ? ' 💯' : ''}</b></div>
           <span class="cmp-arrow" aria-hidden="true">→</span>
-          <div class="cmp-poke in"><img src="${artOf(sim.cand.id, cmp.sel.shiny, cmp.sel.form)}" alt=""><small>Entra</small><b>${esc(nameOf(sim.cand.id, cmp.sel.form))}${cmp.sel.shiny ? ' ✨' : ''}${cmp.sel.iv100 ? ' 💯' : ''}</b></div>
+          <div class="cmp-poke in"><span class="cmp-tag in">ENTRA</span><img src="${artOf(sim.cand.id, cmp.sel.shiny, cmp.sel.form)}" alt=""><small>#${pad(sim.cand.id)}</small><b>${esc(nameOf(sim.cand.id, cmp.sel.form))}${cmp.sel.shiny ? ' ✨' : ''}${cmp.sel.iv100 ? ' 💯' : ''}</b></div>
         </div>
         <div class="cmp-scores"><div class="cur"><small>Equipe atual</small><b>${sim.cur.balance}<span>/100</span></b></div><span class="cmp-arrow" aria-hidden="true">→</span><div class="sim ${dB > 0 ? 'up' : dB < 0 ? 'down' : ''}"><small>Equipe simulada</small><b>${sim.sim.balance}<span>/100</span></b>${deltaHTML(dB)}</div></div>
-        <div class="cmp-rows" role="group" aria-label="Diferenças por indicador">${row('⚔️', 'Ataque', 'attack')}${row('🛡️', 'Defesa', 'defense')}${row('⚖️', 'Equilíbrio', 'balance')}</div>
-        ${note}
+        ${cmpTableHTML(sim.cur, sim.sim, sim.typesOnly)}
+        ${divergeNote(sim.cur, sim.sim)}
         <div class="cmp-actions"><button type="button" id="cmpConfirm" class="primary">Confirmar substituição</button><button type="button" id="cmpCancel">Cancelar comparação</button></div>`;
     } else if (cmp && cmp.teamId === t.id) {
       result = '<p class="muted cmp-hint">Calculando comparação…</p><div class="cmp-actions"><button type="button" id="cmpCancel">Cancelar comparação</button></div>';
@@ -209,90 +236,156 @@
       <div class="cmp-controls"><label for="cmpMember">Substituir</label><select id="cmpMember">${options}</select><button type="button" id="cmpPick">${cmp && cmp.teamId === t.id ? 'Trocar candidato' : 'Escolher candidato'}</button></div>${result}</section>`;
   }
 
-  /* ---- Assistente para equipe COMPLETA: sugere substituições (usa os mesmos cálculos de tipos; nunca altera a equipe) ---- */
-  let swapCache = { sig: '', data: null };
-  function computeSwapRecs(t, filter, limit) {
-    const list = E.infoList(t);
-    if (!list) return null;
-    const sig = [t.id, t.members.join(','), (t.memberForms || []).map(f => f?.formName || '').join(','), filter, state.details.size].join('|');
-    if (swapCache.sig === sig) return swapCache.data;
+  /* =============== ASSISTENTE DE SUBSTITUIÇÃO =============== */
+  const filterSelect = filter => {
+    const regionOptions = REGIONS.map(r => `<option value="region:${r[0]}" ${filter === `region:${r[0]}` ? 'selected' : ''}>${r[0]}</option>`).join('');
+    return `<select id="teamRecFilter" aria-label="Filtro de recomendações"><option value="no-legend" ${filter === 'no-legend' ? 'selected' : ''}>Sem Lendários/Míticos</option><option value="all" ${filter === 'all' ? 'selected' : ''}>Todos</option><option value="legendary" ${filter === 'legendary' ? 'selected' : ''}>Lendários</option><option value="mythical" ${filter === 'mythical' ? 'selected' : ''}>Míticos</option>${regionOptions}</select>`;
+  };
+  const filterLabel = f => f === 'no-legend' ? 'sem Lendários/Míticos' : f === 'all' ? 'todos' : f === 'legendary' ? 'Lendários' : f === 'mythical' ? 'Míticos' : f.startsWith('region:') ? f.slice(7) : f;
+  function viewToggle(t, view) {
+    if (t.members.length >= 6) return '';
+    return `<div class="seg" role="group" aria-label="Tipo de recomendação"><button type="button" data-rec-view="add" aria-pressed="${view === 'add'}" class="${view === 'add' ? 'on' : ''}">Novo integrante</button><button type="button" data-rec-view="swap" aria-pressed="${view === 'swap'}" class="${view === 'swap' ? 'on' : ''}">Substituição</button></div>`;
+  }
+  function modeToggle() {
+    return `<div class="seg" role="group" aria-label="Modo das sugestões"><button type="button" data-rec-mode="selected" aria-pressed="${recMode === 'selected'}" class="${recMode === 'selected' ? 'on' : ''}">Pokémon selecionado</button><button type="button" data-rec-mode="best" aria-pressed="${recMode === 'best'}" class="${recMode === 'best' ? 'on' : ''}">Melhor oportunidade</button></div>`;
+  }
+
+  // Núcleo síncrono: testa candidatos com os cálculos de tipos existentes (teamMetricsFromTypes).
+  function computeSwapCore(list, memberIds, filter, mode, index) {
     const curTypes = list.map(x => x.types);
     const cur = teamMetricsFromTypes(curTypes);
-    const existing = new Set(t.members);
-    const found = [];
+    const existing = new Set(memberIds);
+    const idxs = mode === 'selected' ? [index] : list.map((_, i) => i);
+    const all = [];
+    let analyzed = 0, eligible = 0;
     for (const p of state.list) {
       if (existing.has(p.id) || !recommendationFilterMatch(p, filter)) continue;
+      eligible++;
       const types = state.details.get(p.id)?.types;
       if (!types?.length) continue;
+      analyzed++;
       let best = null;
-      for (let i = 0; i < list.length; i++) {
+      for (const i of idxs) {
         const next = teamMetricsFromTypes(curTypes.map((x, k) => k === i ? types : x));
         const gain = next.score - cur.score;
-        if (gain <= 0) continue;
         const utility = gain * 100 + (next.covered.length - cur.covered.length) * 16 + (next.defensiveCovered - cur.defensiveCovered) * 8;
         if (!best || utility > best.utility) best = { index: i, p, types, next, gain, utility };
       }
-      if (best) found.push(best);
+      all.push(best);
     }
-    found.sort((a, b) => b.utility - a.utility || b.next.score - a.next.score || a.p.id - b.p.id);
-    const data = { cur, items: found.slice(0, limit).map(r => {
-      const newCov = r.next.covered.filter(x => !cur.covered.includes(x));
-      const fixed = cur.shared.filter(w => !r.next.shared.some(n => n.type === w.type && n.weak >= w.weak));
-      const reasons = [];
-      if (newCov.length) reasons.push(`Amplia a cobertura em +${newCov.length} ${newCov.length === 1 ? 'tipo' : 'tipos'} (${newCov.slice(0, 3).map(x => TYPE_PT[x]).join(', ')}${newCov.length > 3 ? '…' : ''})`);
-      if (fixed.length) reasons.push(`Reduz fraquezas compartilhadas: ${fixed.map(x => TYPE_PT[x.type]).join(', ')}`);
-      if (r.next.defensiveCovered > cur.defensiveCovered) reasons.push(`Resistência ou imunidade a +${r.next.defensiveCovered - cur.defensiveCovered} ${r.next.defensiveCovered - cur.defensiveCovered === 1 ? 'tipo' : 'tipos'}`);
-      if (!reasons.length) reasons.push(`Melhora o equilíbrio em +${r.gain}`);
-      return { ...r, reasons: reasons.slice(0, 4) };
-    }) };
-    swapCache = { sig, data };
-    return data;
+    all.sort((a, b) => b.utility - a.utility || b.next.score - a.next.score || a.p.id - b.p.id);
+    return { cur, improving: all.filter(r => r.gain > 0).slice(0, 8), others: all.filter(r => r.gain <= 0).slice(0, 6), analyzed, eligible };
+  }
+  function swapReasons(cur, r) {
+    const newCov = r.next.covered.filter(x => !cur.covered.includes(x));
+    const fixed = cur.shared.filter(w => !r.next.shared.some(n => n.type === w.type && n.weak >= w.weak));
+    const out = [];
+    if (newCov.length) out.push(`Amplia a cobertura em +${newCov.length} ${newCov.length === 1 ? 'tipo' : 'tipos'} (${newCov.slice(0, 3).map(x => TYPE_PT[x]).join(', ')}${newCov.length > 3 ? '…' : ''})`);
+    if (fixed.length) out.push(`Reduz fraquezas compartilhadas: ${fixed.map(x => TYPE_PT[x.type]).join(', ')}`);
+    const dd = r.next.defensiveCovered - cur.defensiveCovered;
+    if (dd > 0) out.push(`Resistência ou imunidade a +${dd} ${dd === 1 ? 'tipo' : 'tipos'}`);
+    if (dd < 0) out.push(`Perde resistência ou imunidade a ${-dd} ${dd === -1 ? 'tipo' : 'tipos'}`);
+    const lost = cur.covered.filter(x => !r.next.covered.includes(x));
+    if (lost.length) out.push(`Perde cobertura contra ${lost.slice(0, 3).map(x => TYPE_PT[x]).join(', ')}${lost.length > 3 ? '…' : ''}`);
+    if (!out.length) out.push(r.gain > 0 ? `Melhora o equilíbrio em +${r.gain}` : 'Não altera a cobertura nem as defesas por tipo');
+    return out.slice(0, 4);
   }
 
-  function swapAssistantHTML(t) {
+  // Pedido assíncrono protegido contra respostas fora de ordem (token) e com tratamento de falha.
+  let swapReq = { key: '', token: 0, status: 'idle', data: null, error: null };
+  function swapKey(t, filter) {
+    return [t.id, t.members.join(','), (t.memberForms || []).map(f => f?.formName || '').join(','), filter, recMode, recMode === 'selected' ? effSlot(t) : '-', Math.floor(state.details.size / 100)].join('|');
+  }
+  function requestSwap(t, key, filter) {
+    const token = ++swapReq.token;
+    swapReq = { key, token, status: 'loading', data: null, error: null };
+    const memberIds = [...t.members], mode = recMode, index = effSlot(t);
+    (async () => {
+      try {
+        await new Promise(r => setTimeout(r, 0));                 // cede o quadro para a interface exibir "Analisando…"
+        if (token !== swapReq.token) return;
+        const list = E.infoList(t);
+        if (!list) throw new Error('Dados da equipe ainda carregando');
+        const core = computeSwapCore(list, memberIds, filter, mode, index);
+        const shown = [...core.improving, ...core.others];
+        await Promise.allSettled(shown.filter(r => !state.details.get(r.p.id)?.stats).map(r => getDetail(r.p.id)));
+        if (token !== swapReq.token) return;
+        const decorateItem = r => {
+          const cand = candOf({ id: r.p.id, form: null });
+          const simList = list.slice(); simList[r.index] = cand || { id: r.p.id, types: r.types, stats: null, form: null };
+          return { ...r, pair: evalPair(list, simList), reasons: swapReasons(core.cur, r) };
+        };
+        swapReq.data = { cur: core.cur, mode, index, analyzed: core.analyzed, eligible: core.eligible, improving: core.improving.map(decorateItem), others: core.others.map(decorateItem) };
+        swapReq.status = 'ready';
+      } catch (e) {
+        if (token !== swapReq.token) return;
+        console.warn('Falha ao analisar substituições', e);
+        swapReq.status = 'error'; swapReq.error = e;
+      }
+      if (token === swapReq.token && document.getElementById('teams')?.classList.contains('active') && activeTeam() && swapKey(activeTeam(), filter) === key) renderTeams();
+    })();
+  }
+
+  function swapAssistantHTML(t, view) {
     const filter = state.teamRecFilter || 'no-legend';
-    const regionOptions = REGIONS.map(r => `<option value="region:${r[0]}" ${filter === `region:${r[0]}` ? 'selected' : ''}>${r[0]}</option>`).join('');
-    const select = `<select id="teamRecFilter" aria-label="Filtro de recomendações"><option value="no-legend" ${filter === 'no-legend' ? 'selected' : ''}>Sem Lendários/Míticos</option><option value="all" ${filter === 'all' ? 'selected' : ''}>Todos</option><option value="legendary" ${filter === 'legendary' ? 'selected' : ''}>Lendários</option><option value="mythical" ${filter === 'mythical' ? 'selected' : ''}>Míticos</option>${regionOptions}</select>`;
-    const head = `<div class="side-head"><h3>✨ Sugestões de substituição</h3>${select}</div><p class="muted side-lead">Equipe completa (6/6): o assistente testa trocar cada membro por outro Pokémon. Nada é alterado sem a sua confirmação.</p>`;
-    const data = computeSwapRecs(t, filter, 8);
-    if (!data) return `<section class="side-panel assistant">${head}<p class="muted">Carregando dados para gerar sugestões…</p></section>`;
-    const sig = t.id + '|' + t.members.join(',') + '|' + filter + '|swap';
+    const head = `<div class="side-head"><h3>✨ Sugestões de substituição</h3>${filterSelect(filter)}</div>${viewToggle(t, view)}${modeToggle()}`;
+    const list = E.infoList(t);
+    if (!list) return `<section class="side-panel assistant" aria-busy="true">${head}<p class="muted">Carregando dados da equipe…</p></section>`;
+    const key = swapKey(t, filter);
+    if (swapReq.key !== key) requestSwap(t, key, filter);
+    const target = recMode === 'selected' ? `Pokémon selecionado: <b>${pad2(effSlot(t))} ${esc(nameOf(t.members[effSlot(t)], t.memberForms?.[effSlot(t)]))}</b>` : 'Avaliando todos os membros da equipe';
+    const lead = `<p class="muted side-lead">${target}. Nada é alterado sem a sua confirmação.</p>`;
+    if (swapReq.status === 'loading') return `<section class="side-panel assistant" aria-busy="true">${head}${lead}<div class="rec-loading" role="status"><span class="spinner" aria-hidden="true"></span> Analisando substituições…</div></section>`;
+    if (swapReq.status === 'error') return `<section class="side-panel assistant">${head}${lead}<div class="empty-state">Não foi possível analisar as substituições agora.</div><div class="rec-actions"><button type="button" data-rec-retry="1">Tentar novamente</button></div></section>`;
+    const d = swapReq.data;
+    const sig = key + '|' + showNon;
     if (sig !== recSig) { recSig = sig; recOffset = 0; }
-    if (!data.items.length) return `<section class="side-panel assistant">${head}<div class="empty-state">Nenhuma substituição melhora a pontuação com este filtro. (Os dados dos Pokémon ainda podem estar carregando.)</div></section>`;
-    const i = recOffset % data.items.length, r = data.items[i];
-    const m = E.memberInfo(t, r.index);
-    const outName = nameOf(t.members[r.index], t.memberForms?.[r.index]);
-    const others = data.items.map((x, k) => [x, k]).filter(([, k]) => k !== i).slice(0, 4);
-    return `<section class="side-panel assistant">${head}
+    const items = showNon ? d.others : d.improving;
+    const scope = d.analyzed < state.list.length ? `Analisados ${d.analyzed} Pokémon com dados carregados (filtro: ${filterLabel(filter)}).` : `Analisados ${d.analyzed} Pokémon (filtro: ${filterLabel(filter)}).`;
+    const foot = `<p class="muted swap-hint">${scope} Pontuação = Equilíbrio (critérios de tipos); a tabela mostra também Ataque e Defesa.</p>`;
+    if (!items.length) {
+      const none = showNon ? 'Nenhuma outra opção disponível com este filtro.' : (recMode === 'selected' ? 'Nenhuma substituição vantajosa encontrada para este Pokémon.' : 'Nenhuma substituição vantajosa encontrada para a equipe.');
+      const alt = !showNon && d.others.length ? '<button type="button" data-rec-nonimp="1">Ver opções que reduzem a pontuação</button>' : (showNon ? '<button type="button" data-rec-nonimp="0">Voltar às sugestões</button>' : '');
+      return `<section class="side-panel assistant">${head}${lead}<div class="empty-state rec-none">${none}</div>${alt ? `<div class="rec-actions single">${alt}</div>` : ''}${foot}</section>`;
+    }
+    const i = recOffset % items.length, r = items[i];
+    const outId = t.members[r.index], outForm = t.memberForms?.[r.index] || null;
+    const others = items.map((x, k) => [x, k]).filter(([, k]) => k !== i).slice(0, 4);
+    const tone = r.gain > 0 ? 'up' : r.gain < 0 ? 'down' : 'zero';
+    return `<section class="side-panel assistant">${head}${lead}
+      ${showNon ? '<p class="cmp-note warn" role="note"><b>Atenção:</b> estas opções reduzem ou não alteram a pontuação de Equilíbrio.</p>' : ''}
       <article class="rec-featured swap">
         <div class="swap-line">
-          <span class="swap-poke"><img src="${artOf(t.members[r.index], !!t.memberShiny?.[r.index], t.memberForms?.[r.index])}" alt=""><small>Sai · ${String(r.index + 1).padStart(2, '0')}</small><b>${esc(outName)}</b></span>
+          <span class="swap-poke out"><span class="cmp-tag out">SAI</span><img src="${artOf(outId, !!t.memberShiny?.[r.index], outForm)}" alt=""><small>Slot ${pad2(r.index)}</small><b>${esc(nameOf(outId, outForm))}</b></span>
           <span class="cmp-arrow" aria-hidden="true">→</span>
-          <span class="swap-poke"><img src="${sprite(r.p.id, false)}" alt=""><small>Entra · #${pad(r.p.id)}</small><b>${esc(cap(r.p.name))}</b></span>
+          <span class="swap-poke in"><span class="cmp-tag in">ENTRA</span><img src="${sprite(r.p.id, false)}" alt=""><small>#${pad(r.p.id)}</small><b>${esc(cap(r.p.name))}</b></span>
         </div>
         <div class="types swap-types">${r.types.map(typeChip).join('')}</div>
-        <div class="swap-scores"><span>Pontuação atual <b>${data.cur.score}</b></span><span aria-hidden="true">→</span><span>Simulada <b>${r.next.score}</b></span>${deltaHTML(r.gain)}</div>
+        <div class="swap-scores ${tone}"><span>Equilíbrio <b>${d.cur.score}</b></span><span aria-hidden="true">→</span><span><b>${r.next.score}</b></span>${deltaHTML(r.gain)}</div>
       </article>
+      ${cmpTableHTML(r.pair.cur, r.pair.sim, r.pair.typesOnly)}
       <div class="rec-why"><h4>Por que esta sugestão?</h4><ul>${r.reasons.map(x => `<li>${x}</li>`).join('')}</ul></div>
-      <p class="muted swap-hint">Pontuação = Equilíbrio (critérios de tipos). Use “Comparar” para ver também Ataque e Defesa.</p>
       <div class="rec-actions"><button type="button" class="primary" data-rec-compare="${r.p.id}:${r.index}">Comparar</button><button type="button" data-rec-next="1">Ver outras opções</button></div>
-      <p class="rec-count" aria-live="polite">Sugestão ${i + 1} de ${data.items.length}</p>
-      <h4 class="side-sub">🏆 Outras substituições</h4>
-      <div class="rec-top">${others.map(([x, k]) => `<button type="button" class="rec-mini" data-rec-show="${k}" title="Substituir ${String(x.index + 1).padStart(2, '0')} por ${esc(cap(x.p.name))} — ${data.cur.score} → ${x.next.score}"><img src="${sprite(x.p.id, false)}" alt="" loading="lazy"><b>${esc(cap(x.p.name))}</b><small class="rec-mini-sub">no lugar do ${String(x.index + 1).padStart(2, '0')}</small><small>${data.cur.score} → ${x.next.score}</small></button>`).join('')}</div>
+      <p class="rec-count" aria-live="polite">${showNon ? 'Opção' : 'Sugestão'} ${i + 1} de ${items.length}</p>
+      ${others.length ? `<h4 class="side-sub">${showNon ? 'Outras opções (sem melhoria)' : '🏆 Outras substituições'}</h4><div class="rec-top">${others.map(([x, k]) => `<button type="button" class="rec-mini ${x.gain > 0 ? 'up' : 'down'}" data-rec-show="${k}" title="Substituir ${pad2(x.index)} por ${esc(cap(x.p.name))} — Equilíbrio ${d.cur.score} → ${x.next.score}"><img src="${sprite(x.p.id, false)}" alt="" loading="lazy"><b>${esc(cap(x.p.name))}</b><small class="rec-mini-sub">no lugar do ${pad2(x.index)}</small><small class="rec-mini-score">${d.cur.score} → ${x.next.score}</small></button>`).join('')}</div>` : ''}
+      <div class="rec-actions single">${showNon ? '<button type="button" data-rec-nonimp="0">Voltar às sugestões</button>' : (d.others.length ? '<button type="button" class="ghost" data-rec-nonimp="1">Ver opções que reduzem a pontuação</button>' : '')}</div>
+      ${foot}
     </section>`;
   }
 
   teamRecommendationsHTML = function (t) {
     if (!t.members.length) return '';
-    return `<div class="team-recommendations team-side">${comparatorHTML(t)}${t.members.length < 6 ? assistantHTML(t) : swapAssistantHTML(t)}</div>`;
+    const view = t.members.length >= 6 ? 'swap' : recView;
+    return `<div class="team-recommendations team-side">${comparatorHTML(t)}${view === 'swap' ? swapAssistantHTML(t, view) : assistantHTML(t)}</div>`;
   };
   /* =============== DECORAÇÃO DO DOM APÓS CADA RENDER =============== */
   function decorate() {
     const t = activeTeam();
-    if (t && t.id !== lastTeamId) { lastTeamId = t.id; selectedSlot = null; if (cmp && cmp.teamId !== t.id) cmp = null; }
+    if (t && t.id !== lastTeamId) { lastTeamId = t.id; selectedSlot = t.members.length ? 0 : null; showNon = false; recOffset = 0; if (cmp && cmp.teamId !== t.id) cmp = null; }
     if (!t) { cmp = null; return; }
     if (cmp && cmp.index >= t.members.length) cmp = null;
-    if (selectedSlot != null && selectedSlot >= t.members.length) selectedSlot = null;
+    if (selectedSlot != null && selectedSlot >= t.members.length) selectedSlot = t.members.length ? t.members.length - 1 : null;
+    if (selectedSlot == null && t.members.length) selectedSlot = 0;
     document.querySelectorAll('#teamTabs button[data-team]').forEach(b => {
       const tm = teams.find(x => String(x.id) === b.dataset.team);
       if (!tm || b.querySelector('.tab-count')) return;
@@ -308,8 +401,12 @@
     }
     document.querySelectorAll('#teamArea .slot.filled').forEach((slot, i) => {
       slot.dataset.slotIndex = String(i);
-      slot.classList.toggle('selected', selectedSlot === i);
-      slot.setAttribute('aria-pressed', selectedSlot === i ? 'true' : 'false');
+      const isSel = effSlot(t) === i;
+      slot.classList.toggle('selected', isSel);
+      slot.classList.toggle('cmp-out', !!cmp && cmp.teamId === t.id && cmp.index === i);
+      slot.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+      slot.setAttribute('role', 'button'); slot.tabIndex = 0;
+      slot.setAttribute('aria-label', `Selecionar slot ${pad2(i)}: ${nameOf(t.members[i], t.memberForms?.[i])}`);
       let box = slot.querySelector('.slot-types');
       const m = E.memberInfo(t, i);
       if (!box) { box = document.createElement('div'); box.className = 'slot-types'; (slot.querySelector('h4') || slot.firstChild).after(box); }
@@ -340,6 +437,13 @@
     const pick = tgt.closest?.('[data-rec-pick]');
     if (pick) { e.preventDefault(); await P.applySelection(t, null, { id: Number(pick.dataset.recPick), shiny: false, iv100: false, form: null }); return; }
     if (tgt.closest?.('[data-rec-next]')) { recOffset++; renderTeams(); return; }
+    const modeBtn = tgt.closest?.('[data-rec-mode]');
+    if (modeBtn) { recMode = modeBtn.dataset.recMode; showNon = false; recOffset = 0; renderTeams(); return; }
+    const viewBtn = tgt.closest?.('[data-rec-view]');
+    if (viewBtn) { recView = viewBtn.dataset.recView; showNon = false; recOffset = 0; renderTeams(); return; }
+    const nonBtn = tgt.closest?.('[data-rec-nonimp]');
+    if (nonBtn) { showNon = nonBtn.dataset.recNonimp === '1'; recOffset = 0; renderTeams(); return; }
+    if (tgt.closest?.('[data-rec-retry]')) { swapReq.key = ''; renderTeams(); return; }
     const cmpBtn = tgt.closest?.('[data-rec-compare]');
     if (cmpBtn) {
       // inicia uma comparação a partir da sugestão (não altera a equipe)
@@ -375,10 +479,20 @@
     // seleção de slot preenchido (ignora cliques em botões)
     const slot = tgt.closest?.('#teamArea .slot.filled');
     if (slot && !tgt.closest('button')) {
-      const i = Number(slot.dataset.slotIndex);
-      selectedSlot = selectedSlot === i ? null : i;
-      document.querySelectorAll('#teamArea .slot.filled').forEach((s, k) => { s.classList.toggle('selected', selectedSlot === k); s.setAttribute('aria-pressed', selectedSlot === k ? 'true' : 'false'); });
-      const sel = document.getElementById('cmpMember'); if (sel && selectedSlot != null) sel.value = String(selectedSlot);
+      selectSlot(t, Number(slot.dataset.slotIndex));
+    }
+  });
+  // Seleção de slot: sincroniza comparador, sugestões de substituição e destaque (uma única fonte: selectedSlot)
+  function selectSlot(t, i) {
+    if (selectedSlot === i) return;
+    selectedSlot = i;
+    if (cmp && cmp.teamId === t.id && cmp.index !== i) cmp = null;   // o candidato foi escolhido para outro slot
+    renderTeams();
+  }
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('#teamArea .slot.filled')) {
+      const t = activeTeam(); if (!t) return;
+      e.preventDefault(); selectSlot(t, Number(e.target.dataset.slotIndex));
     }
   });
   // navegação por teclado nas abas da análise (←/→/Home/End)

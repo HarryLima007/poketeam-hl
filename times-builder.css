@@ -254,3 +254,83 @@ body[data-page="teams"] #teams .slot.empty-slot{min-height:300px}
   body[data-page="teams"] #teams .strategy-meters{flex:0 0 clamp(290px,34%,360px)!important}
 }
 body[data-page="teams"] #teams .team-side{align-items:start}
+
+/* ================= Pacote 02.2 FINAL ================= */
+/* --- moldura por bloco (sem painel vazio abaixo da análise) --- */
+body[data-page="teams"] #teams .team-card{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;backdrop-filter:none!important;gap:0 18px!important}
+body[data-page="teams"] #teams .team-card>.team-head,
+body[data-page="teams"] #teams .team-card>.team-slots{
+  background:linear-gradient(160deg,rgba(26,6,12,.88),rgba(11,3,7,.92));
+  border:1px solid rgba(255,70,86,.55);
+  box-shadow:0 0 22px rgba(255,40,60,.16),0 16px 40px rgba(0,0,0,.4);
+  backdrop-filter:blur(3px);
+}
+body[data-page="teams"] #teams .team-card>.team-head{border-bottom:0;border-radius:22px 22px 0 0;padding:20px 22px 10px;margin:0}
+body[data-page="teams"] #teams .team-card>.team-slots{border-top:0;border-radius:0 0 22px 22px;padding:8px 22px 22px;margin:0}
+body[data-page="teams"] #teams .team-card>.team-analysis,
+body[data-page="teams"] #teams .team-card>.team-side{margin-top:16px}
+@container tw (min-width: 1180px){
+  body[data-page="teams"] #teams .team-card:has(.team-side){grid-template-columns:minmax(0,1fr) clamp(360px,27%,430px)!important;grid-template-rows:auto auto 1fr!important}
+  body[data-page="teams"] #teams .team-card:has(.team-side)>.team-head{grid-column:1!important;grid-row:1}
+  body[data-page="teams"] #teams .team-card:has(.team-side)>.team-slots{grid-column:1!important;grid-row:2}
+  body[data-page="teams"] #teams .team-card:has(.team-side)>.team-analysis{grid-column:1!important;grid-row:3;align-self:start}
+  body[data-page="teams"] #teams .team-card:has(.team-side)>.team-side{grid-column:2!important;grid-row:1 / span 3!important;align-self:start;margin-top:0}
+}
+/* painel lateral esquerdo: não fixa em telas de pouca altura (evita cortar o troféu) */
+@media(max-height:820px){ body[data-page="teams"] #teams .teams-side{position:static!important} }
+
+/* --- seletores segmentados --- */
+.seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);margin:0 0 10px}
+.seg button{flex:1;padding:8px 8px;border-radius:9px;border:1px solid transparent;background:transparent;color:#ecd9dc;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}
+.seg button:hover{background:rgba(255,70,86,.14)}
+.seg button.on{background:linear-gradient(135deg,rgba(176,30,48,.9),rgba(230,56,76,.65));border-color:#ff8792;color:#fff}
+.seg button:focus-visible,.cmp-actions button:focus-visible,.rec-actions button:focus-visible,.rec-mini:focus-visible,#teams .slot:focus-visible{outline:2px solid #ffd0d5;outline-offset:2px}
+
+/* --- tabela de comparação --- */
+.cmp-table{display:grid;gap:5px;margin:8px 0}
+.cmp-tr{display:grid;grid-template-columns:minmax(0,1.35fr) .55fr .65fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.05);font-size:13.5px}
+.cmp-tr.cmp-th{background:none;padding:0 10px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#d3b2b8;font-weight:800}
+.cmp-tr .cmp-from{color:#d3b2b8;text-align:center}
+.cmp-tr .cmp-to{color:#fff;text-align:center;font-size:15px}
+.cmp-th span:not(:first-child){text-align:center}
+.cmp-foot{font-size:11.5px;margin:2px 0 6px}
+.cmp-note.warn{border-color:rgba(255,170,60,.5);background:rgba(255,160,40,.10);color:#ffe2b8}
+
+/* --- SAI / ENTRA --- */
+.cmp-tag{display:inline-block;font-size:10px;font-weight:900;letter-spacing:.9px;padding:2px 9px;border-radius:999px;color:#fff}
+.cmp-tag.out{background:#c61d31}
+.cmp-tag.in{background:#1d9d55}
+.swap-poke{padding:8px 6px;border-radius:12px;border:1px solid transparent}
+.swap-poke.out{border-color:rgba(255,120,130,.5);background:rgba(255,70,86,.08)}
+.swap-poke.in{border-color:rgba(110,240,160,.5);background:rgba(60,200,120,.08)}
+body[data-page="teams"] #teams .slot.filled.cmp-out{border-color:#ff4757!important;box-shadow:0 0 0 2px rgba(255,71,87,.65),0 0 26px rgba(255,60,80,.55)!important}
+body[data-page="teams"] #teams .slot.filled.cmp-out::after{content:"SAI";position:absolute;top:6px;right:8px;font-size:10px;font-weight:900;letter-spacing:.8px;background:#c61d31;color:#fff;padding:2px 8px;border-radius:999px}
+
+/* --- carregamento / vazio --- */
+.rec-loading{display:flex;align-items:center;gap:10px;padding:18px 6px;font-size:14px;color:#f4e4e7}
+.spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:#ff6b78;animation:ptspin .8s linear infinite}
+@keyframes ptspin{to{transform:rotate(360deg)}}
+.rec-none{font-size:14px;line-height:1.45;color:#f4e4e7;padding:16px 10px}
+.rec-actions.single{grid-template-columns:1fr}
+.rec-actions .ghost,.rec-actions.single button{background:transparent;border:1px solid rgba(255,120,132,.5);color:#ffe3e6}
+.rec-mini.up .rec-mini-score{color:#8cf5b4!important}
+.rec-mini.down .rec-mini-score{color:#ff9aa4!important}
+.rec-mini-score{font-size:12px!important;font-weight:800}
+.swap-scores.down b{color:#ff9aa4}.swap-scores.up b{color:#fff}
+
+/* --- legibilidade --- */
+body[data-page="teams"] #teams .side-panel{font-size:14px}
+body[data-page="teams"] #teams .side-panel .muted,body[data-page="teams"] #teams .side-lead,body[data-page="teams"] #teams .cmp-hint{color:#dcc3c8!important;font-size:13px}
+.rec-why li,.cmp-note{font-size:13.5px!important}
+.rec-why h4,.side-sub{font-size:14px}
+.swap-poke b,.cmp-poke b{font-size:14px}
+.swap-poke small,.cmp-poke small{font-size:11px}
+.analysis-pill{font-size:13.5px}
+.analysis-pill b{font-size:13.5px}
+.ana-fold .analysis-pills{gap:8px}
+.ana-fold>summary{font-size:14.5px}
+.mx-table{font-size:12.5px}
+body[data-page="teams"] #teams .meter b{font-size:14px}
+.cmp-scores .sim,.cmp-scores .cur{display:flex;flex-direction:column;align-items:center;gap:2px}
+.cmp-scores b{display:block}
+.cmp-scores .sim .delta{margin-top:4px}
