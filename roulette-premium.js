@@ -113,25 +113,38 @@
   }
 
   /* ---------- Sprites e rótulos (sempre na vertical, dentro do setor) ---------- */
-  function fitText(text, maxW, px) {
+  /* Ajusta o rótulo ao espaço: reduz a fonte até um mínimo legível e, se ainda não couber, trunca com reticências. */
+  function fitLabel(text, maxW, px) {
     let f = px; ctx.font = '800 ' + f + 'px system-ui,Segoe UI,sans-serif';
-    while (f > 9 && ctx.measureText(text).width > maxW) { f -= 1; ctx.font = '800 ' + f + 'px system-ui,Segoe UI,sans-serif'; }
-    return f;
+    while (f > 14 && ctx.measureText(text).width > maxW) { f -= 1; ctx.font = '800 ' + f + 'px system-ui,Segoe UI,sans-serif'; }
+    let t = text;
+    if (ctx.measureText(text).width > maxW) {
+      while (t.length > 2 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+      t = t.replace(/\s+$/, '') + '…';
+    }
+    return { text: t, f, w: ctx.measureText(t).width };
   }
+  let layout = [];                                    // caixas desenhadas no último quadro (usadas na verificação de limites)
   function drawSprites(entries, angRad) {
+    layout = [];
     const n = entries.length; if (!n || n > 60) return;
     const step = Math.PI * 2 / n;
     const d = n <= 6 ? R_SECTOR * .6 : R_SECTOR * .7;
     const chord = n === 1 ? R_SECTOR * 1.2 : 2 * d * Math.sin(Math.min(step, Math.PI) / 2);
-    const s = Math.max(14, Math.min(R_SECTOR * (n <= 4 ? .46 : .36), chord * (n <= 12 ? .56 : .66)));
-    const showName = n <= 12, showTag = n <= 24, tagFull = n <= 10;
+    let showName = n <= 20; const showTag = n <= 24, tagFull = n <= 10;
+    const nameH = n <= 6 ? 30 : n <= 12 ? 26 : 24, tagH = n <= 6 ? 26 : 22;
+    let s = Math.max(14, Math.min(R_SECTOR * (n <= 4 ? .46 : .36), chord * (n <= 12 ? .56 : .66)));
+    // pilha (sprite + nome + variante) precisa caber na largura do setor; se não couber, reduz o sprite e, por último, tira o nome
+    const room = chord * .9, need = () => s + (showName ? nameH : 0) + (showTag ? tagH : 0) + 4;
+    if (n > 1 && need() > room) s = Math.max(14, room - (showName ? nameH : 0) - (showTag ? tagH : 0) - 4);
+    if (n > 1 && showName && s < 30) { showName = false; s = Math.max(14, Math.min(s + nameH, room - (showTag ? tagH : 0) - 4)); }
     for (let i = 0; i < n; i++) {
       const e = entries[i], k = vkey(e), a = -Math.PI / 2 + (i + .5) * step + angRad;
       const cx = C + Math.cos(a) * d, cy = C + Math.sin(a) * d;
       // recorte no setor: o conteúdo nunca ultrapassa as bordas
       ctx.save();
       ctx.beginPath(); ctx.moveTo(C, C); ctx.arc(C, C, R_SECTOR - 4, -Math.PI / 2 + i * step + angRad, -Math.PI / 2 + (i + 1) * step + angRad); ctx.closePath(); ctx.clip();
-      const labelH = (showName ? 22 : 0) + (showTag ? 20 : 0);
+      const labelH = (showName ? nameH : 0) + (showTag ? tagH : 0);
       const spriteY = cy - labelH / 2;
       const img = typeof getRouletteImage === 'function' ? getRouletteImage(e.id, e.shiny, e.iv100) : null;
       if (e.iv100) { ctx.beginPath(); ctx.arc(cx, spriteY, s * .56, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,214,112,.95)'; ctx.lineWidth = Math.max(2, s * .04); ctx.stroke(); }
@@ -141,19 +154,23 @@
       }
       let ty = spriteY + s / 2 + 4;
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      const rec = { i, boxes: [{ k: 'sprite', x: cx - s / 2, y: spriteY - s / 2, w: s, h: s }] };
       if (showName) {
-        const text = nameOf(e.id), f = fitText(text, chord * .92, Math.min(19, Math.max(10, s * .2)));
-        ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(12,4,34,.85)'; ctx.strokeText(text, cx, ty);
-        ctx.fillStyle = '#fff'; ctx.fillText(text, cx, ty); ty += f + 5;
+        const lab = fitLabel(nameOf(e.id), chord * .8, Math.min(n <= 6 ? 26 : 22, Math.max(14, s * .24)));
+        ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(12,4,34,.9)'; ctx.strokeText(lab.text, cx, ty);
+        ctx.fillStyle = '#fff'; ctx.fillText(lab.text, cx, ty);
+        rec.boxes.push({ k: 'name', x: cx - lab.w / 2, y: ty, w: lab.w, h: lab.f }); ty += lab.f + 6;
       }
       if (showTag) {
-        const v = VARIANTS[k], text = tagFull ? v.label : v.short, f = Math.max(9, Math.min(13, s * .16));
+        const v = VARIANTS[k], text = tagFull ? v.label : v.short, f = Math.max(12, Math.min(n <= 6 ? 16 : 14, s * .16 + 3));
         ctx.font = '900 ' + f + 'px system-ui,Segoe UI,sans-serif';
         const w = ctx.measureText(text).width + 12, h = f + 6, x = cx - w / 2;
         ctx.fillStyle = v.tagBg; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, ty, w, h, h / 2) : ctx.rect(x, ty, w, h); ctx.fill();
         ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.fillStyle = v.tagFg; ctx.fillText(text, cx, ty + 3);
+        rec.boxes.push({ k: 'tag', x, y: ty, w, h });
       }
+      layout.push(rec);
       ctx.restore();
     }
     ctx.textBaseline = 'alphabetic';
@@ -280,14 +297,35 @@
   const panel = document.querySelector('#roulette .wheel-panel'), cat = document.querySelector('#roulette .roulette-catalog');
   function syncHeights() {
     if (!panel || !cat) return;
-    if (window.innerWidth <= 1000) { cat.style.maxHeight = ''; return; }
+    if (window.innerWidth <= 1100) { cat.style.maxHeight = ''; return; }
     const h = panel.offsetHeight; if (h > 200) cat.style.maxHeight = h + 'px';
   }
   if (window.ResizeObserver && panel) new ResizeObserver(syncHeights).observe(panel);
   window.addEventListener('resize', syncHeights);
 
   // gancho para testes
-  window.PTRoulette = { entries: entriesNow, angle: () => angle, pointerIndex, lastRun: () => lastRun, winnerIdx: () => winnerIdx, render: () => render(angle) };
+  /* Verifica se todas as caixas (sprite/nome/variante) estão dentro do seu setor e sem sobreposição; usado nos testes. */
+  function checkLayout() {
+    const entries = currentEntries(), n = entries.length, step = Math.PI * 2 / n, angRad = angle * Math.PI / 180, problems = [];
+    layout.forEach(rec => {
+      const a0 = -Math.PI / 2 + rec.i * step + angRad, a1 = a0 + step;
+      rec.boxes.forEach(b0 => {
+        const m = b0.k === 'sprite' ? b0.w * .1 : 0, b = { k: b0.k, x: b0.x + m, y: b0.y + m, w: b0.w - 2 * m, h: b0.h - 2 * m };   // a arte ocupa ~80% da caixa quadrada do sprite
+        [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]].forEach(([px, py]) => {
+          const dx = px - C, dy = py - C, r = Math.hypot(dx, dy);
+          let t = Math.atan2(dy, dx); while (t < a0 - 1e-6) t += Math.PI * 2; while (t > a0 + Math.PI * 2) t -= Math.PI * 2;
+          const inside = n === 1 ? r > R_HUB && r < R_SECTOR : (t <= a1 + 1e-3 && r > R_HUB && r < R_SECTOR);
+          if (!inside) problems.push(`entrada ${rec.i} ${b.k}`);
+        });
+      });
+      for (let p = 0; p < rec.boxes.length; p++) for (let q = p + 1; q < rec.boxes.length; q++) {
+        const A = rec.boxes[p], B = rec.boxes[q];
+        if (A.x < B.x + B.w && B.x < A.x + A.w && A.y < B.y + B.h && B.y < A.y + A.h && !(A.k === 'sprite' && B.k !== 'sprite' && B.y >= A.y + A.h - 2)) problems.push(`sobreposição ${rec.i} ${A.k}/${B.k}`);
+      }
+    });
+    return [...new Set(problems)];
+  }
+  window.PTRoulette = { setAngle: d => { angle = d; render(angle); }, checkLayout, boxes: () => layout, entries: entriesNow, angle: () => angle, pointerIndex, lastRun: () => lastRun, winnerIdx: () => winnerIdx, render: () => render(angle) };
 
   showIdleResult(); renderHistory(); updateRouletteSummary(); drawWheel();
 })();

@@ -55,6 +55,9 @@
 #roulette .roulette-layout{
   display:grid!important;grid-template-columns:minmax(380px,.86fr) minmax(0,1.14fr)!important;gap:22px!important;align-items:start!important
 }
+@media(min-width:1280px){
+  #roulette .roulette-layout{grid-template-columns:minmax(430px,1fr) minmax(0,1fr)!important}
+}
 #roulette .wheel-panel,#roulette .roulette-catalog,#roulette .rp-result,#roulette .rp-history{
   border:1px solid rgba(170,120,255,.5)!important;border-radius:26px!important;
   background:linear-gradient(160deg,rgba(30,16,70,.88),rgba(12,8,32,.94))!important;
@@ -63,7 +66,7 @@
 #roulette .wheel-panel{position:relative!important;top:auto!important;padding:22px 22px 24px!important;text-align:center}
 
 /* roda + ponteiro */
-#roulette .rp-wheel-wrap{position:relative;width:min(100%,560px);margin:8px auto 14px;aspect-ratio:1/1}
+#roulette .rp-wheel-wrap{position:relative;width:min(100%,660px);margin:8px auto 14px;aspect-ratio:1/1}
 #roulette .rp-wheel-wrap canvas{width:100%!important;height:100%!important;margin:0!important;display:block;transition:none!important;transform:none!important}
 #roulette .rp-wheel-wrap .pointer{
   position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:52px;height:64px;z-index:3;height:64px;font-size:0;
@@ -189,13 +192,43 @@
 #roulette .rp-vtag{font-style:normal;font-size:11px;font-weight:900;padding:2px 8px;border-radius:999px;margin-left:4px;color:#fff;background:#5a2fb8}
 #roulette .rp-v-n100{background:#3a46c8;color:#ffe9a8}#roulette .rp-v-s{background:#c4249f}#roulette .rp-v-s100{background:#a8761f;color:#fff6d6}
 
+/* ---------- Pacote 04.1: destaque do vencedor (discreto) ---------- */
+#roulette .rp-win-art{box-shadow:0 0 26px rgba(255,214,112,.28)}
+#roulette .rp-result-win .rp-win-art{animation:rpGlowIn 1.5s ease-out both}
+@keyframes rpGlowIn{0%{box-shadow:0 0 0 rgba(255,214,112,0);transform:scale(.92)}45%{box-shadow:0 0 52px rgba(255,214,112,.6);transform:scale(1.04)}100%{box-shadow:0 0 26px rgba(255,214,112,.28);transform:scale(1)}}
+#roulette .rp-result-win .rp-win-info h2{animation:rpNameGlow 2s ease-out both}
+@keyframes rpNameGlow{0%{text-shadow:0 0 0 rgba(255,226,122,0);color:#fff4c4}30%{text-shadow:0 0 18px rgba(255,214,112,.75)}100%{text-shadow:0 0 0 rgba(255,226,122,0);color:#fff}}
+#roulette .rp-result-win .roulette-variant-badge{animation:rpBadge 1.6s ease-out both;border-color:rgba(255,214,112,.6)}
+@keyframes rpBadge{0%{background:#5a3b10;color:#fff3c0}100%{background:#172238;color:#d9e4f4}}
+
+/* ---------- Pacote 04.1: catálogo (alinhamento, hover, contraste) ---------- */
+#roulette .roulette-poke-card{transition:border-color .15s,box-shadow .15s,transform .15s;cursor:default}
+#roulette .roulette-poke-card:hover{border-color:#d2b4ff!important;transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 18px rgba(170,110,255,.3)!important}
+#roulette .roulette-poke-card.selected:hover{box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 22px rgba(255,200,90,.35)!important}
+#roulette .roulette-poke-card .catalog-poke-num{justify-self:start;font-size:13px;color:#e6d9ff;letter-spacing:.03em}
+#roulette .roulette-poke-card>strong{justify-self:start;max-width:100%;font-size:15px!important;line-height:1.15;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important}
+#roulette .roulette-poke-card>small{justify-self:start;font-size:12px!important;color:#cdbfef!important}
+#roulette .card-variant-option{color:#f1e9ff!important;border-color:rgba(190,150,255,.6)!important;background:rgba(10,6,30,.8)!important;cursor:pointer;transition:background .12s,border-color .12s}
+#roulette .card-variant-option:hover{border-color:#ffe27a!important;background:rgba(60,34,120,.9)!important}
+#roulette .roulette-poke-card>img{width:84px!important;height:84px!important}
+#roulette .roulette-poke-card{grid-template-columns:84px minmax(0,1fr) auto}
+#roulette .roulette-poke-card>small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#roulette .card-variant-option{min-width:100px}
+
+/* ---------- Pacote 04.1: resultado + histórico ---------- */
+#roulette .rp-bottom{align-items:stretch}
+#roulette #rpHistory{max-height:460px;overflow:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:#8a5cf0 #150b34}
+#roulette #rpHistory li{min-height:50px}
+#roulette #rpHistory li b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#roulette #rpHistory li>span{min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
 /* ---------- Movimento reduzido ---------- */
 @media(prefers-reduced-motion:reduce){
   #roulette *{animation:none!important;transition:none!important}
 }
 
 /* ---------- Responsivo ---------- */
-@media(max-width:1000px){
+@media(max-width:1100px){
   #roulette .roulette-layout{grid-template-columns:1fr!important}
   #roulette .roulette-catalog{max-height:min(80vh,760px)!important;overflow:auto!important}
   #roulette .rp-bottom{grid-template-columns:1fr}
@@ -214,6 +247,13 @@
   #roulette .wheel-panel{padding:14px 12px 18px!important}
   #roulette .rp-wheel-wrap .pointer{width:40px;height:50px;top:-10px}
   #roulette .roulette-card-grid{grid-template-columns:1fr!important;padding:12px!important}
+  /* toque: variantes em 2×2 com alvos de 44px */
+  #roulette .roulette-poke-card{grid-template-columns:84px minmax(0,1fr)!important;grid-template-rows:auto auto auto auto!important;row-gap:4px}
+  #roulette .roulette-poke-card>img{grid-row:1/4}
+  #roulette .roulette-poke-card .card-variant-controls{grid-column:1/-1!important;grid-row:4!important;grid-template-columns:1fr 1fr;gap:8px!important;margin-top:6px;width:100%!important}
+  #roulette .card-variant-option{min-height:44px!important;min-width:0;font-size:13px!important;padding:6px 10px!important}
+  #roulette .catalog-actions button{min-height:44px}
+  #roulette .roulette-categories button{min-height:44px}
   #roulette .catalog-head{flex-direction:column;padding:16px 16px 4px!important}
   #roulette .catalog-actions{padding:10px 16px 14px!important}
   #roulette .rp-result-win,#roulette .rp-result-idle{flex-direction:column;text-align:center}
