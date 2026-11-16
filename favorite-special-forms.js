@@ -243,8 +243,12 @@
       });
       const root=document.getElementById('favResults');if(!root)return;
       ensureFavoriteRemoveStyle();
-      root.innerHTML=filtered.length?filtered.map(favoriteCardHTML).join(''):'<div class="empty-state">Sua lista de desejos está vazia.</div>';
+      // Pacote 03: a camada Golden Collection (wishes-golden.js) pode filtrar/ordenar sem alterar os dados salvos.
+      const view=window.PTFavView;
+      const shown=view?view.apply(filtered,entries):filtered;
+      root.innerHTML=shown.length?shown.map(favoriteCardHTML).join(''):(view?view.emptyHTML(entries.length,q):'<div class="empty-state">Sua lista de desejos está vazia.</div>');
       bindCards(root);patchDexStars(root);
+      if(view)view.after(entries,shown);
     });
   };
 

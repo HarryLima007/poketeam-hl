@@ -1,0 +1,128 @@
+/* PokéTeam — Desejos / Golden Collection (Pacote 03). Escopo: página Desejos. Carregado por último. */
+
+/* ---------- Wallpaper ---------- */
+html:has(body[data-page="wishes"]){background:#050302!important}
+html body[data-page="wishes"]{
+  background-color:#050302!important;
+  background-image:url("desejos-golden-wallpaper.webp?v=1")!important;
+  background-size:cover!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+  color:#f7ecd0!important;
+}
+@media(max-width:900px){
+  html body[data-page="wishes"]{background-attachment:scroll!important;background-size:auto 100vh!important}
+}
+body[data-page="wishes"] #wishes.page{max-width:min(1780px,100%)!important}
+body[data-page="wishes"] #wishes .wishes-hero{display:none!important}
+
+/* ---------- Banner (imagem aprovada, sem distorção) ---------- */
+body[data-page="wishes"] #wishes .gc-banner{
+  container-type:inline-size;position:relative;width:min(100%,1240px);height:clamp(120px,15.7vw,197px);
+  margin:0 auto 22px;display:grid;place-items:center;
+  background:url("desejos-golden-banner.webp?v=1") center/cover no-repeat;
+}
+.gc-banner-text{text-align:center;width:min(34%,440px);display:grid;gap:2px;justify-items:center}
+.gc-eyebrow{font-size:clamp(9px,1.25cqw,13px);letter-spacing:.5em;font-weight:900;color:#f3c75a}
+.gc-banner-text h1{margin:0;font-size:clamp(21px,3.9cqw,48px);line-height:1.05;font-weight:900;white-space:nowrap;
+  background:linear-gradient(180deg,#fff1c2 0%,#f4bf45 58%,#c98a1d 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 10px rgba(255,170,30,.35))}
+.gc-banner-text p{margin:2px 0 0;font-size:clamp(10px,1.05cqw,13.5px);line-height:1.35;color:#f1dfae}
+@container (max-width: 520px){
+  .gc-banner-text{width:min(58%,230px)}
+  .gc-banner-text p{font-size:10px}
+  .gc-eyebrow{letter-spacing:.35em}
+}
+
+/* ---------- Estrutura ---------- */
+body[data-page="wishes"] #wishes .wishes-shell{
+  display:grid!important;grid-template-columns:clamp(320px,21vw,400px) minmax(0,1fr)!important;gap:22px!important;align-items:start!important;
+}
+
+/* ---------- Card lateral (imagem aprovada; números ficam nas áreas vazias da arte) ---------- */
+.gc-side{
+  container-type:inline-size;position:sticky;top:92px;width:100%;aspect-ratio:1024/1536;
+  background:url("desejos-golden-card-lateral.webp?v=1") center/100% 100% no-repeat;
+}
+.gc-total{position:absolute;left:17.3%;width:65.3%;top:36.2%;height:13.6%;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.gc-total b{font-size:12.5cqw;font-weight:900;color:#fff4d4;text-shadow:0 0 18px rgba(255,190,60,.55);font-variant-numeric:tabular-nums}
+.gc-total span{font-size:4.6cqw;font-weight:800;color:#f2c14e;margin-top:1cqw}
+.gc-stats{position:absolute;left:17.3%;width:65.3%;top:52.1%;height:15%;margin:0;padding:0;list-style:none;display:grid;grid-template-rows:repeat(3,1fr)}
+.gc-stats li{display:flex;align-items:center;justify-content:space-between;padding:0 6.5cqw;font-size:4.1cqw;line-height:1;color:#f3dca0;font-weight:700;min-height:0}
+.gc-stats b{font-size:4.8cqw;color:#fff4d4;font-variant-numeric:tabular-nums}
+@media(max-height:820px){.gc-side{position:relative;top:auto}}
+
+/* ---------- Painel da coleção ---------- */
+body[data-page="wishes"] #wishes .wishes-gallery{
+  background:linear-gradient(160deg,rgba(20,13,4,.84),rgba(8,5,2,.90))!important;
+  border:1px solid rgba(240,190,60,.55)!important;border-radius:24px!important;padding:22px!important;
+  box-shadow:0 0 30px rgba(240,180,40,.14),0 20px 50px rgba(0,0,0,.5)!important;backdrop-filter:blur(3px);min-width:0;
+}
+body[data-page="wishes"] #wishes .gallery-toolbar{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px;margin-bottom:14px;border:0!important;padding:0!important;background:none!important}
+body[data-page="wishes"] #wishes .gallery-toolbar .eyebrow{letter-spacing:.35em;color:#f3c75a!important;font-weight:900}
+body[data-page="wishes"] #wishes .gallery-toolbar h2{margin:2px 0 0;font-size:26px;color:#fff4d4!important}
+body[data-page="wishes"] #wishes .gallery-actions{display:flex!important;flex-wrap:wrap;gap:10px;align-items:center;flex:1 1 360px;justify-content:flex-end}
+body[data-page="wishes"] #wishes #favSearch{width:auto!important;flex:1 1 240px;min-width:0;max-width:340px;height:42px;padding:0 14px;border-radius:12px}
+body[data-page="wishes"] #wishes #clearFavs{height:42px;padding:0 16px;border-radius:12px;font-weight:800}
+.gc-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 18px;margin-bottom:8px}
+.gc-filters{display:flex;flex-wrap:wrap;gap:8px}
+.gc-filters button{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid rgba(240,190,60,.5);background:rgba(25,17,6,.8);color:#f3dca0;font-weight:800;font-size:14px;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
+.gc-filters button:hover{background:rgba(60,42,12,.9);transform:translateY(-1px)}
+.gc-filters button.on{background:linear-gradient(135deg,#f5c24d,#e29a1e);border-color:#ffe08a;color:#1b1103;box-shadow:0 0 18px rgba(245,190,70,.4)}
+.gc-filters em{font-style:normal;font-size:12.5px;opacity:.85;font-weight:800}
+.gc-sort{display:flex;align-items:center;gap:8px;color:#e9d39c;font-size:13.5px;font-weight:700}
+.gc-sort select{height:40px;padding:0 10px;border-radius:10px;background:#14100a;border:1px solid rgba(240,190,60,.5);color:#fbf0d4;font-size:13.5px}
+.gc-filters button:focus-visible,.gc-sort select:focus-visible,#favSearch:focus-visible,#clearFavs:focus-visible{outline:2px solid #ffe7a8;outline-offset:2px}
+.gc-count{margin:6px 2px 14px;font-size:12.5px;color:#cdb784}
+
+/* ---------- Cards ---------- */
+body[data-page="wishes"] #wishes #favResults{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;gap:18px!important}
+body[data-page="wishes"] #wishes #favResults .poke-card{
+  position:relative;display:flex!important;flex-direction:column;align-items:center;text-align:center;min-height:0!important;
+  padding:16px 14px 66px!important;border-radius:22px!important;
+  background:
+    radial-gradient(ellipse 62% 8% at 50% 60%,rgba(255,205,80,.42),transparent 72%),
+    radial-gradient(circle at 50% 34%,rgba(255,200,80,.14),transparent 60%),
+    linear-gradient(165deg,#1a1206,#0a0703)!important;
+  border:2px solid rgba(240,185,55,.78)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,225,140,.12),0 0 22px rgba(240,180,40,.20),0 14px 30px rgba(0,0,0,.5)!important;
+  color:#fff4d4!important;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+body[data-page="wishes"] #wishes #favResults .poke-card:hover{transform:translateY(-4px);border-color:#ffd978!important;box-shadow:inset 0 0 0 1px rgba(255,225,140,.2),0 0 34px rgba(250,190,60,.38),0 18px 34px rgba(0,0,0,.55)!important}
+body[data-page="wishes"] #wishes #favResults .poke-card .num{position:absolute;top:12px;left:16px;color:#ffd770!important;font-weight:900;font-size:15px}
+body[data-page="wishes"] #wishes #favResults .poke-card .card-actions{position:absolute;top:8px;right:10px}
+body[data-page="wishes"] #wishes #favResults .poke-card>img{width:100%;height:170px!important;object-fit:contain;margin:28px 0 8px;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55)) drop-shadow(0 0 16px rgba(240,190,60,.16))}
+body[data-page="wishes"] #wishes #favResults .poke-card h3{display:flex;justify-content:center;align-items:center;font-size:18px!important;line-height:1.2;margin:2px 0 8px;color:#fff4d4!important;min-height:2.4em;overflow:hidden}
+body[data-page="wishes"] #wishes #favResults .poke-card h3 .nm{white-space:normal;text-align:center;overflow-wrap:anywhere}
+body[data-page="wishes"] #wishes #favResults .poke-card .types{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+body[data-page="wishes"] #wishes #favResults .poke-card .types .type{font-size:12px;padding:4px 11px;border-radius:999px;font-weight:800}
+/* identificação de Shiny e de forma especial */
+body[data-page="wishes"] #wishes #favResults .poke-card[data-shiny="1"]::after{content:"SHINY";position:absolute;top:42px;left:14px;font-size:10.5px;font-weight:900;letter-spacing:.8px;color:#1b1103;background:linear-gradient(135deg,#ffe58f,#f0b02e);padding:3px 9px;border-radius:999px;box-shadow:0 0 12px rgba(255,200,70,.5)}
+body[data-page="wishes"] #wishes #favResults .poke-card[data-special-category="mega"]::before{content:"MEGA"}
+body[data-page="wishes"] #wishes #favResults .poke-card[data-special-category="gmax"]::before{content:"GMAX"}
+body[data-page="wishes"] #wishes #favResults .poke-card[data-special-category="transform"]::before{content:"FORMA"}
+body[data-page="wishes"] #wishes #favResults .poke-card[data-special-category]::before{position:absolute;top:42px;right:14px;font-size:10.5px;font-weight:900;letter-spacing:.8px;color:#fff4d4;background:rgba(150,30,40,.9);border:1px solid rgba(255,140,150,.6);padding:3px 9px;border-radius:999px}
+/* remover */
+body[data-page="wishes"] #wishes #favResults .fav-card-remove{left:14px!important;right:14px!important;bottom:14px!important;width:calc(100% - 28px)!important;min-height:38px!important;border-radius:12px!important;background:rgba(95,24,30,.55)!important;border:1px solid rgba(255,130,120,.55)!important;color:#ffcfc7!important;font-size:13px!important;font-weight:800}
+body[data-page="wishes"] #wishes #favResults .fav-card-remove:hover{background:rgba(140,32,40,.75)!important;color:#fff!important}
+body[data-page="wishes"] #wishes #favResults .poke-card .card-actions button{background:rgba(30,20,6,.85)!important;border:1px solid rgba(240,190,60,.55)!important;color:#f6d27a!important}
+.gc-empty{grid-column:1/-1;display:grid;gap:6px;justify-items:center;text-align:center;padding:46px 16px;border:1px dashed rgba(240,190,60,.45);border-radius:18px;background:rgba(20,13,4,.55)}
+.gc-empty b{font-size:19px;color:#fff4d4}
+.gc-empty span{font-size:14px;color:#dcc592;max-width:46ch}
+
+/* ---------- Responsivo ---------- */
+@media(max-width:1000px){
+  body[data-page="wishes"] #wishes .wishes-shell{grid-template-columns:minmax(0,1fr)!important}
+  .gc-side{position:relative;top:auto;width:min(100%,340px);margin:0 auto}
+}
+@media(max-width:560px){
+  body[data-page="wishes"] #wishes .wishes-gallery{padding:16px!important;border-radius:20px!important}
+  body[data-page="wishes"] #wishes #favResults{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:12px!important}
+  body[data-page="wishes"] #wishes #favResults .poke-card>img{height:128px!important}
+  body[data-page="wishes"] #wishes #favResults .poke-card h3{font-size:15.5px!important}
+  .gc-filters button{padding:8px 12px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-page="wishes"] *{transition:none!important;animation:none!important}
+}
