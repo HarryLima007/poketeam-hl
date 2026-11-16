@@ -77,7 +77,10 @@ body[data-page="wishes"] #wishes #clearFavs{height:42px;padding:0 16px;border-ra
 .gc-count{margin:6px 2px 14px;font-size:12.5px;color:#cdb784}
 
 /* ---------- Cards ---------- */
-body[data-page="wishes"] #wishes #favResults{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;gap:18px!important}
+/* Pacote 03.1: flex centralizado (a última fileira incompleta também fica centralizada; cards com largura única) */
+body[data-page="wishes"] #wishes #favResults{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:stretch;gap:18px!important}
+body[data-page="wishes"] #wishes #favResults>.poke-card{flex:0 0 212px;width:212px;max-width:100%;box-sizing:border-box}
+body[data-page="wishes"] #wishes #favResults>.gc-empty{flex:1 1 100%}
 body[data-page="wishes"] #wishes #favResults .poke-card{
   position:relative;display:flex!important;flex-direction:column;align-items:center;text-align:center;min-height:0!important;
   padding:16px 14px 66px!important;border-radius:22px!important;
@@ -118,7 +121,8 @@ body[data-page="wishes"] #wishes #favResults .poke-card .card-actions button{bac
 }
 @media(max-width:560px){
   body[data-page="wishes"] #wishes .wishes-gallery{padding:16px!important;border-radius:20px!important}
-  body[data-page="wishes"] #wishes #favResults{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:12px!important}
+  body[data-page="wishes"] #wishes #favResults{gap:12px!important}
+  body[data-page="wishes"] #wishes #favResults>.poke-card{flex:0 0 calc((100% - 12px) / 2);width:calc((100% - 12px) / 2)}
   body[data-page="wishes"] #wishes #favResults .poke-card>img{height:128px!important}
   body[data-page="wishes"] #wishes #favResults .poke-card h3{font-size:15.5px!important}
   .gc-filters button{padding:8px 12px;font-size:13px}
