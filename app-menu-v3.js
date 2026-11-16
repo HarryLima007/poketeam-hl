@@ -371,7 +371,7 @@ async function initData(){
           const p=state.list[Number(card.dataset.id)-1],h=card.querySelector('h3');
           if(p&&h&&!card.dataset.specialCategory){
             const suffix=card.dataset.shiny==='1'?' ✨':'';
-            h.textContent=cap(p.name)+suffix;
+            setCardTitle(h,cap(p.name),!!suffix);
           }
         });
       }
@@ -498,13 +498,16 @@ async function ensureDexTypeDetails(base){
   await Promise.allSettled(Array.from({length:10},worker));
 }
 let dexToken=0;async function renderDex(){const token=++dexToken,q=$('#dexSearch').value;const base=state.list.filter(p=>matchesSearch(p,q)&&(state.activeRegion==='all'||regionOf(p.id)===state.activeRegion));await ensureDexTypeDetails(base);if(token!==dexToken)return;const list=base.filter(p=>categoryMatch(p)&&typeMatch(p)).sort((a,b)=>a.id-b.id);updateActiveDexFilters();if(state.activeCategory!=='all'&&list.length){await Promise.allSettled(list.map(p=>getDetail(p.id)))}if(['mega','gmax'].includes(state.activeCategory)&&list.length){await ensureSpecialCategoryArt(list,state.activeCategory)}if(state.activeCategory==='transform'&&list.length){await ensureTransformationArt(list)}if(token!==dexToken)return;preserveViewportDuring(()=>{$('#dexResults').innerHTML=list.length?(state.activeCategory==='paradox'?paradoxSections(list):state.activeCategory==='transform'?transformationSections(list):REGIONS.map(r=>{const arr=list.filter(p=>regionOf(p.id)===r[0]);if(!arr.length)return '';const cards=['mega','gmax','transform'].includes(state.activeCategory)?arr.flatMap(p=>{const forms=specialFormsFor(p.id);return forms.length?forms.map((f,i)=>cardHTML(p,state.dexShiny,{category:state.activeCategory,formIndex:i,form:f})):[]}):arr.map(p=>cardHTML(p,state.dexShiny));return cards.length?`<section class="region-section"><div class="region-title"><h2>${r[0]}</h2><span>${cards.length} forma${cards.length===1?'':'s'}</span></div><div class="card-grid">${cards.join('')}</div></section>`:''}).join('')):'<div class="empty-state">Nenhum Pokémon encontrado.</div>';bindCards($('#dexResults'))})}
+// Nome + indicador Shiny na mesma linha (o indicador nunca cria linha extra).
+function cardTitleHTML(name,shiny){return `<span class="nm">${name}</span>${shiny?'<span class="shiny-mark" aria-hidden="true"> ✨</span>':''}`}
+function setCardTitle(h,name,shiny){h.innerHTML=cardTitleHTML(name,shiny);h.title=name}
 function cardHTML(p,shiny=false,special=null){
   const d=state.details.get(p.id),baseTypes=d?.types||[],baseName=d?.name||p.name||`#${p.id}`;
   const types=special?.form?.types?.length?special.form.types:baseTypes;
   const name=special?.form?(special.form.label||specialFormLabel(special.form.formName,baseName)):cap(baseName);
   const img=special?.form?(shiny&&special.form.shinyArt?special.form.shinyArt:special.form.art):sprite(p.id,shiny);
   const attrs=special?.form?` data-special-category="${special.category}" data-special-index="${special.formIndex}"`:'';
-  return `<article class="poke-card" data-id="${p.id}" data-shiny="${shiny?'1':'0'}"${attrs}><div class="card-actions"><button class="fav ${favs.has(p.id)?'on':''}" data-fav="${p.id}" aria-label="Favoritar">★</button><button data-add="${p.id}" aria-label="Adicionar ao time">＋</button></div><span class="num">#${pad(p.id)}</span><img loading="lazy" src="${img}" onerror="this.src='${sprite(p.id,shiny)}';this.onerror=null" alt="${name}"><h3>${name}${shiny?' ✨':''}</h3><div class="types">${types.length?types.map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join(''):'<span class="muted">carregando tipos…</span>'}</div></article>`;
+  return `<article class="poke-card" data-id="${p.id}" data-shiny="${shiny?'1':'0'}"${attrs}><div class="card-actions"><button class="fav ${favs.has(p.id)?'on':''}" data-fav="${p.id}" aria-label="Favoritar">★</button><button data-add="${p.id}" aria-label="Adicionar ao time">＋</button></div><span class="num">#${pad(p.id)}</span><img loading="lazy" src="${img}" onerror="this.src='${sprite(p.id,shiny)}';this.onerror=null" alt="${name}"><h3 title="${name}">${cardTitleHTML(name,shiny)}</h3><div class="types">${types.length?types.map(t=>`<span class="type ${t}">${TYPE_PT[t]||t}</span>`).join(''):'<span class="muted">carregando tipos…</span>'}</div></article>`;
 }
 function bindCards(root){root.querySelectorAll('.poke-card').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;openPokemon(+c.dataset.id,c.dataset.shiny==='1',c.dataset.specialCategory||null,Number(c.dataset.specialIndex||0))});root.querySelectorAll('[data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');toggleFav(+b.dataset.fav,card?.dataset.shiny==='1');b.classList.toggle('on',favs.has(+b.dataset.fav))});root.querySelectorAll('[data-add]').forEach(b=>b.onclick=e=>{e.stopPropagation();const card=b.closest('.poke-card');addToTeam(+b.dataset.add,card?.dataset.shiny==='1')})}
 function toggleFav(id,shiny=false){if(favs.has(id)){favs.delete(id);delete favShiny[id]}else{favs.add(id);favShiny[id]=!!shiny}save();toast(favs.has(id)?'Adicionado aos desejos ⭐':'Removido dos desejos')}
@@ -1110,8 +1113,8 @@ function applyDexShinyInPlace(){
       }else img.src=sprite(id,state.dexShiny);
     }
     if(title){
-      const base=title.textContent.replace(/\s*✨\s*$/,'');
-      title.textContent=base+(state.dexShiny?' ✨':'');
+      const base=(title.querySelector('.nm')?.textContent??title.textContent).replace(/\s*✨\s*$/,'');
+      setCardTitle(title,base,state.dexShiny);
     }
   });
 }

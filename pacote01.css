@@ -1,0 +1,240 @@
+/* Pacote de Atualização 01 — carregado por último no <head>. */
+
+/* ============ M01 — Cards da Pokédex: geometria fixa Normal/Shiny ============ */
+#pokedex .poke-card{
+  height:220px!important;
+  min-height:0!important;
+  box-sizing:border-box;
+}
+#pokedex .poke-card img{
+  width:100%!important;
+  height:105px!important;
+  object-fit:contain!important;
+  object-position:center center;
+}
+#pokedex .poke-card h3{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  height:26px!important;
+  min-height:26px!important;
+  max-height:26px!important;
+  font-size:15px!important;
+  line-height:26px!important;
+  margin-left:0;
+  margin-right:0;
+  overflow:hidden;
+  white-space:nowrap!important;
+}
+#pokedex .poke-card h3 .nm{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#pokedex .poke-card h3 .shiny-mark{flex:0 0 auto;white-space:pre}
+#pokedex .poke-card .types{min-height:22px;flex-wrap:nowrap;overflow:hidden}
+
+/* ============ M02 — Seletor de Pokémon nos slots ============ */
+#teams .slot.empty-slot{cursor:pointer}
+#teams .slot.empty-slot:hover,#teams .slot.empty-slot:focus-visible{outline:none;border-color:#ff5a64;box-shadow:0 0 0 1px rgba(255,90,100,.35),0 10px 26px rgba(255,60,75,.14);transform:translateY(-2px)}
+#teams .slot .slot-swap{margin-top:8px;margin-right:6px;padding:6px 10px;border-radius:9px;border:1px solid rgba(255,120,128,.45);background:rgba(120,26,38,.45);color:#ffd0d4;font-size:12px;font-weight:800;cursor:pointer}
+#teams .slot .slot-swap:hover{background:rgba(160,34,48,.7);color:#fff}
+
+#slotPicker{z-index:90}
+#slotPicker .slot-picker-card{width:min(1040px,calc(100vw - 24px));max-width:none;max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;padding:22px 22px 18px}
+#slotPicker .sp-head h2{margin:2px 0 2px;font-size:22px}
+#slotPicker .sp-head p{margin:0 0 12px;color:#aab6cc;font-size:13px}
+#slotPicker .sp-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;min-height:0;flex:1}
+#slotPicker .sp-browse{display:flex;flex-direction:column;min-height:0;min-width:0}
+#slotPicker .sp-filters{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:8px;margin-bottom:8px}
+#slotPicker .sp-filters input,#slotPicker .sp-filters select{min-width:0;width:100%;height:40px;padding:0 10px;border-radius:10px;border:1px solid #34425e;background:#0b1424;color:#eef3fb;font-size:13px}
+#slotPicker .sp-count{font-size:12px;color:#9fb0c9;margin:2px 2px 8px}
+#slotPicker .sp-grid{overflow-y:auto;min-height:240px;max-height:calc(100vh - 290px);display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;padding:2px 4px 4px 2px;align-content:start}
+#slotPicker .sp-card{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px 8px;border-radius:12px;border:1px solid #2a3a58;background:linear-gradient(160deg,#101b30,#0a1222);color:#eef3fb;cursor:pointer;text-align:center;height:150px;overflow:hidden}
+#slotPicker .sp-card:hover{border-color:#ff6b75;transform:translateY(-1px)}
+#slotPicker .sp-card.selected{border-color:#ff4757;box-shadow:0 0 0 2px rgba(255,71,87,.35)}
+#slotPicker .sp-card img{width:72px;height:72px;object-fit:contain}
+#slotPicker .sp-card b{font-size:10px;color:#9fb0c9;font-weight:800}
+#slotPicker .sp-card .sp-name{font-size:12px;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#slotPicker .sp-card .sp-types{display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;min-height:16px}
+#slotPicker .sp-card .sp-types .type{font-size:9px;padding:1px 5px;border-radius:5px;font-style:normal}
+#slotPicker .sp-more{margin-top:8px;align-self:center;padding:8px 18px;border-radius:10px;border:1px solid #34425e;background:#13203a;color:#eef3fb;cursor:pointer}
+#slotPicker .sp-preview{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;border:1px solid #3a2a38;background:linear-gradient(165deg,#1a0f16,#0d0a10);overflow-y:auto;max-height:calc(100vh - 210px)}
+#slotPicker .sp-preview-art{display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 auto;height:170px;border-radius:12px;background:radial-gradient(circle,rgba(255,71,87,.16),transparent 70%)}
+#slotPicker .sp-preview-art img{height:100%;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.4))}
+#slotPicker .sp-preview-info h3{margin:2px 0 6px;font-size:18px}
+#slotPicker .sp-toggles{display:flex;gap:8px}
+#slotPicker .sp-toggles button{flex:1;padding:8px;border-radius:10px;border:1px solid #4a3040;background:#150d14;color:#e6d6dc;font-weight:800;cursor:pointer}
+#slotPicker .sp-toggles button.on{background:linear-gradient(135deg,#a3202f,#e03a4a);border-color:#ff7c88;color:#fff}
+#slotPicker .sp-forms-label{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#b9a3ab;font-weight:800}
+#slotPicker .sp-forms{display:flex;flex-wrap:wrap;gap:6px}
+#slotPicker .sp-form{padding:6px 9px;border-radius:9px;border:1px solid #47323c;background:#140d13;color:#e6d6dc;font-size:12px;font-weight:700;cursor:pointer;text-align:left}
+#slotPicker .sp-form.active{border-color:#ff6b75;background:#3a1119;color:#fff}
+#slotPicker .sp-actions{display:flex;gap:8px;margin-top:auto}
+#slotPicker .sp-actions button{flex:1;padding:11px;border-radius:11px;font-weight:800;cursor:pointer}
+#slotPicker .sp-empty{display:flex;flex-direction:column;gap:6px;padding:26px 8px;text-align:center;color:#b9a3ab}
+#slotPicker .sp-empty b{color:#fff}
+@media(max-width:820px){
+  #slotPicker .slot-picker-card{padding:16px 12px 12px;max-height:calc(100vh - 16px)}
+  #slotPicker .sp-body{display:block;overflow-y:auto;min-height:0}
+  #slotPicker .sp-browse{display:block}
+  #slotPicker .sp-preview{margin-top:12px}
+  #slotPicker .sp-filters{grid-template-columns:1fr 1fr}
+  #slotPicker .sp-filters input{grid-column:1/-1}
+  #slotPicker .sp-grid{max-height:300px;grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+  #slotPicker .sp-preview{max-height:none}
+  #slotPicker .sp-preview-art{height:130px}
+}
+
+/* ============ M03 — Identidade visual: Times VERMELHO ============ */
+html:has(body[data-page="teams"]){background:#0a0507!important}
+html body[data-page="teams"]{
+  background:
+    radial-gradient(circle at 80% 6%,rgba(255,71,87,.15),transparent 26%),
+    radial-gradient(circle at 8% 92%,rgba(150,18,34,.20),transparent 32%),
+    linear-gradient(180deg,#0f0709,#080507)!important;
+  color:#f8eaec!important;
+}
+body[data-page="teams"] #teams{color:#f8eaec}
+body[data-page="teams"] #teams .eyebrow{color:#ff6b78!important}
+body[data-page="teams"] #teams .teams-side{
+  background:radial-gradient(circle at 50% 90%,rgba(255,71,87,.10),transparent 28%),linear-gradient(165deg,#170c0f,#0c0709)!important;
+  border-color:rgba(205,58,74,.42)!important;
+  box-shadow:0 18px 44px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,140,150,.05)!important;
+}
+body[data-page="teams"] #teams .teams-side h1,
+body[data-page="teams"] #teams .team-head h2{color:#fff3f4!important}
+body[data-page="teams"] #teams .teams-side p,
+body[data-page="teams"] #teams .teams-side-label{color:#d6a9af!important}
+body[data-page="teams"] #newTeam{
+  background:linear-gradient(135deg,#c61d31,#ff4757)!important;
+  border-color:#ff8792!important;color:#fff!important;
+  box-shadow:0 12px 30px rgba(220,40,60,.28)!important;
+}
+body[data-page="teams"] #teamTabs button{
+  background:#1c0e12!important;border-color:rgba(190,56,70,.38)!important;color:#f4dadd!important;
+}
+body[data-page="teams"] #teamTabs button:hover{border-color:#ff6b78!important}
+body[data-page="teams"] #teamTabs button.active{
+  background:linear-gradient(135deg,#a41a2b,#e23a4a)!important;border-color:#ff8792!important;color:#fff!important;
+}
+body[data-page="teams"] #teams .workspace-head{
+  background:linear-gradient(135deg,#1d0c11,#2a0f17 60%,#14080b)!important;
+  border:1px solid rgba(205,58,74,.42)!important;
+  box-shadow:0 18px 44px rgba(0,0,0,.3)!important;
+}
+body[data-page="teams"] #teams .workspace-head h2{color:#fff3f4!important}
+body[data-page="teams"] #teams .workspace-mark{color:#ff8792!important;border-color:rgba(255,107,120,.6)!important}
+body[data-page="teams"] #teams .team-card,
+body[data-page="teams"] #teams .team-analysis,
+body[data-page="teams"] #teams .team-recommendations{
+  background:linear-gradient(160deg,#170b0e,#0c0709)!important;
+  border-color:rgba(190,52,66,.40)!important;color:#f6e6e8!important;
+}
+body[data-page="teams"] #teams .slot.filled{
+  background:linear-gradient(180deg,#1a0d11,#0e080a)!important;border-color:rgba(190,52,66,.42)!important;
+}
+body[data-page="teams"] #teams .slot.empty-slot{
+  background:#130a0d!important;border:1px dashed rgba(205,58,74,.5)!important;color:#d9aeb4!important;
+}
+body[data-page="teams"] #teams .slot.empty-slot .empty-plus{color:#ff6b78!important}
+body[data-page="teams"] #teams .balance-card,
+body[data-page="teams"] #teams .analysis-pill,
+body[data-page="teams"] #teams .recommendation-card{
+  background:#1a0d11!important;border-color:rgba(170,48,62,.38)!important;color:#f6e6e8!important;
+}
+body[data-page="teams"] #teams .synergy-badge{background:#3a1119!important;border-color:#a8283a!important;color:#ffc7cd!important}
+body[data-page="teams"] #teams .team-head button,
+body[data-page="teams"] #teams .slot button[data-remove-member],
+body[data-page="teams"] #teams .rec-score button{
+  background:#1f0f13!important;border-color:rgba(190,52,66,.5)!important;color:#ffcfd3!important;
+}
+body[data-page="teams"] #teams .team-head button.danger{color:#ff7b86!important}
+body[data-page="teams"] #teams .team-head button:hover,
+body[data-page="teams"] #teams .rec-score button:hover{border-color:#ff6b78!important;color:#fff!important}
+body[data-page="teams"] #teams .analysis-note,
+body[data-page="teams"] #teams .muted{color:#bf9ba1!important}
+body[data-page="teams"] #teams h3,body[data-page="teams"] #teams h4{color:#fff0f1}
+body[data-page="teams"] #teamRecFilter{background:#1a0d11!important;border-color:rgba(190,52,66,.5)!important;color:#f6e6e8!important}
+/* modais de Times (escolha de equipe / nome) */
+#teamChooser .modal-card{border-color:rgba(205,58,74,.45)}
+#teamChooser .eyebrow{color:#ff6b78}
+#teamChooser .team-choice{border-color:rgba(190,52,66,.4)}
+#teamChooser .team-choice:hover{border-color:#ff6b78}
+#teamChooser .primary,#teamChooser #confirmTeamCreate{background:linear-gradient(135deg,#c61d31,#ff4757);border-color:#ff8792;color:#fff}
+
+/* ============ M03 — Identidade visual: Desejos DOURADO ============ */
+html:has(body[data-page="wishes"]){background:#090705!important}
+html body[data-page="wishes"]{
+  background:
+    radial-gradient(circle at 82% 6%,rgba(236,186,58,.17),transparent 28%),
+    radial-gradient(circle at 8% 94%,rgba(168,118,22,.15),transparent 32%),
+    linear-gradient(180deg,#0e0b06,#080705)!important;
+  background-color:#090705!important;
+  background-attachment:scroll!important;
+  color:#f7edd2!important;
+}
+body[data-page="wishes"] #wishes{background:transparent!important;color:#f7edd2!important}
+/* menu superior volta ao visual escuro padrão nesta página */
+body[data-page="wishes"] .topbar{
+  background:rgba(2,8,22,.96)!important;border-bottom:1px solid rgba(82,151,235,.20)!important;
+}
+body[data-page="wishes"] .brand{color:#fff!important}
+body[data-page="wishes"] .topbar #nav button{color:#d2dced!important}
+body[data-page="wishes"] .topbar #nav button:hover{color:#fff!important;background:rgba(15,38,73,.66)!important;border-color:rgba(75,146,234,.28)!important}
+body[data-page="wishes"] .topbar #nav button.active{
+  color:#fff!important;background:linear-gradient(135deg,rgba(17,62,105,.98),rgba(10,42,82,.98))!important;border-color:rgba(52,179,255,.72)!important;
+}
+/* painel lateral decorativo: ouro (os arquivos desejos-*.png continuam no repositório) */
+#wishes .wishes-hero{
+  position:sticky!important;top:92px!important;min-height:620px!important;padding:0!important;overflow:hidden!important;
+  border-radius:30px!important;
+  background:
+    radial-gradient(circle at 50% 34%,rgba(255,214,102,.30),transparent 38%),
+    radial-gradient(circle at 50% 100%,rgba(184,126,24,.28),transparent 46%),
+    linear-gradient(165deg,#1d1608,#0d0a05 70%)!important;
+  border:1px solid rgba(222,172,52,.50)!important;
+  box-shadow:0 28px 70px rgba(0,0,0,.45),0 0 60px rgba(230,176,48,.10),inset 0 1px 0 rgba(255,225,140,.10)!important;
+}
+#wishes .wishes-hero::before{
+  content:"★";position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);
+  font-size:min(190px,34vw);line-height:1;color:#f3c64a;
+  text-shadow:0 0 42px rgba(255,205,80,.55),0 0 110px rgba(255,190,50,.30);
+}
+#wishes .wishes-hero::after{
+  content:"SUA COLEÇÃO";position:absolute;left:0;right:0;bottom:46px;text-align:center;
+  font-size:15px;font-weight:900;letter-spacing:6px;color:#e9c55f;
+}
+@media(max-width:1000px){body[data-page="wishes"] #wishes .wishes-hero{position:relative!important;top:auto!important;min-height:300px!important}}
+@media(max-width:680px){body[data-page="wishes"] #wishes .wishes-hero{min-height:220px!important}#wishes .wishes-hero::before{font-size:120px}}
+body[data-page="wishes"] #wishes .eyebrow{color:#e8c45a!important}
+body[data-page="wishes"] #wishes .wishes-gallery,
+body[data-page="wishes"] #wishes .gallery-toolbar{background:transparent!important;border-color:rgba(222,172,52,.30)!important}
+body[data-page="wishes"] #wishes .gallery-toolbar h2{color:#fff4d6!important}
+body[data-page="wishes"] #wishes input[type="search"]{background:#14100a!important;border:1px solid rgba(222,172,52,.45)!important;color:#fbf0d4!important}
+body[data-page="wishes"] #wishes input[type="search"]::placeholder{color:#a8977a}
+body[data-page="wishes"] #wishes #clearFavs{background:#1d1408!important;border-color:rgba(222,172,52,.55)!important;color:#f0cf73!important}
+body[data-page="wishes"] #wishes #clearFavs:hover{background:#2a1d0a!important;color:#fff0c0!important;border-color:#f0c34b!important}
+body[data-page="wishes"] #wishes #favResults .poke-card{
+  background:linear-gradient(160deg,#1c1508,#0e0b06)!important;
+  border:1px solid rgba(222,172,52,.38)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,225,140,.06)!important;color:#fff4d6!important;
+}
+body[data-page="wishes"] #wishes #favResults .poke-card:hover{border-color:#f0c34b!important;box-shadow:0 16px 40px rgba(240,190,60,.16)!important}
+body[data-page="wishes"] #wishes #favResults .poke-card h3{color:#fff4d6!important}
+body[data-page="wishes"] #wishes #favResults .poke-card .num{color:#d8b45c!important}
+body[data-page="wishes"] #wishes #favResults .poke-card .card-actions button{background:#1d1408!important;border-color:rgba(222,172,52,.45)!important;color:#f0cf73!important}
+body[data-page="wishes"] #wishes #favResults .poke-card img{filter:drop-shadow(0 10px 14px rgba(0,0,0,.45)) drop-shadow(0 0 14px rgba(240,190,60,.12))}
+body[data-page="wishes"] #wishes .empty-state,
+body[data-page="wishes"] #wishes .muted{color:#b8a67e!important}
+#siteDialog .site-dialog-card{border-color:rgba(222,172,52,.35)}
+
+/* ajustes finos da identidade vermelha de Times */
+body[data-page="teams"] #teams .workspace-head::after{
+  border-color:#c42a3b!important;
+  background-image:linear-gradient(rgba(0,0,0,0) 45%,#c42a3b 46%,#c42a3b 54%,rgba(0,0,0,0) 55%)!important;
+}
+body[data-page="teams"] #teams .empty-plus{border-color:rgba(255,107,120,.55)!important}
+#wishes .wishes-hero::after{top:auto!important;bottom:46px!important;height:auto!important;width:auto!important;background:none!important;border:0!important;opacity:1!important}
+#wishes .wishes-hero::before{background:none!important;border:0!important;width:auto!important;height:auto!important;opacity:1!important}

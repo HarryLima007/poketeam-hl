@@ -70,14 +70,14 @@ body[data-page="home"] #home .quick-grid button:nth-child(1)>span::before{
   transform:translate(-100%,-50%);
   background-image:linear-gradient(90deg,#42c7ff,#64d8ff),linear-gradient(#42c7ff,#64d8ff),linear-gradient(90deg,#64d8ff,#42c7ff);
   background-position:right bottom,left bottom,left top;
-  background-size:14px 2px,2px 0,0 2px;
+  background-size:0 2px,2px 0,0 2px;
 }
 body[data-page="home"] #home .quick-grid button:nth-child(1)>span::after{
   left:50%;
   transform:translate(0,-50%);
   background-image:linear-gradient(90deg,#64d8ff,#42c7ff),linear-gradient(#42c7ff,#64d8ff),linear-gradient(90deg,#42c7ff,#64d8ff);
   background-position:left bottom,right bottom,right top;
-  background-size:14px 2px,2px 0,0 2px;
+  background-size:0 2px,2px 0,0 2px;
 }
 @keyframes pokedexTraceHalf{
   0%{background-size:14px 2px,2px 0,0 2px}
