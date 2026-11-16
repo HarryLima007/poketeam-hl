@@ -4,30 +4,26 @@
   max-width:min(1480px,100%)
 }
 
-/* ---------- Banner ---------- */
+/* ---------- Banner (Pacote 04.2: arte panorâmica aprovada; textos em HTML por cima) ----------
+   O PNG/WebP tem margem transparente em cima e embaixo (área visível: y 143–490 de 667, largura total 2000).
+   O recorte é feito só por CSS (aspect-ratio + background-size/position); o arquivo não é modificado. */
 #roulette .rp-banner{
-  position:relative;width:min(100%,1180px);margin:6px auto 22px;padding:20px 64px;text-align:center;border-radius:999px;
-  border:4px solid transparent;
-  background:
-    radial-gradient(120% 160% at 50% 0%,rgba(140,80,255,.45),transparent 60%) padding-box,
-    linear-gradient(180deg,#2c1070,#170a3c) padding-box,
-    linear-gradient(90deg,#b57a1e,#f7e08f 20%,#c48a26 40%,#fff0b0 55%,#c48a26 72%,#f7e08f 88%,#b57a1e) border-box;
-  box-shadow:0 0 0 1px rgba(255,235,170,.25),0 0 42px rgba(150,80,255,.55),0 14px 40px rgba(0,0,0,.45)
+  --rp-bw:2000;--rp-bh:667;--rp-top:143;--rp-vh:348;   /* dimensões do asset e da área visível */
+  container-type:inline-size;position:relative;width:100%;margin:6px 0 22px;
+  aspect-ratio:calc(var(--rp-bw)/var(--rp-vh));
+  background:url("poketeam-roleta-banner-paisagem-roxa-dourada-v1.webp") no-repeat;
+  background-size:100% auto;
+  background-position:0 calc(var(--rp-top)/(var(--rp-bh) - var(--rp-vh))*100%);
+  display:grid;place-items:center;text-align:center;padding:0 12% .8%;box-sizing:border-box
 }
-#roulette .rp-banner:before,#roulette .rp-banner:after{
-  content:"";position:absolute;top:50%;width:46px;height:46px;transform:translateY(-50%);opacity:.9;
-  background:radial-gradient(circle at 50% 50%,#fff6cf 0 6px,transparent 7px),conic-gradient(from 0deg,#f1c85c,#8a5a12,#f1c85c,#8a5a12,#f1c85c);
-  -webkit-mask:radial-gradient(circle,#000 0 55%,transparent 58%);mask:radial-gradient(circle,#000 0 55%,transparent 58%);border-radius:50%
-}
-#roulette .rp-banner:before{left:26px}#roulette .rp-banner:after{right:26px}
-#roulette .rp-banner .eyebrow{display:block;color:#ffe6a3;letter-spacing:.34em;font-size:11px;font-weight:900;margin-bottom:2px}
+#roulette .rp-banner-text{display:grid;justify-items:center;gap:.4cqw;max-width:100%}
+#roulette .rp-banner .eyebrow{display:block;color:#fff0c0;letter-spacing:.34em;font-size:clamp(10px,.95cqw,14px);font-weight:900;margin:0;text-shadow:0 1px 4px rgba(20,6,50,.95),0 0 10px rgba(20,6,50,.8)}
 #roulette .rp-banner h1{
-  margin:0;font-size:clamp(28px,4.6vw,56px);line-height:1.05;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
-  background:linear-gradient(180deg,#fff6cf 0%,#f4c95a 55%,#c98a1d 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 2px 8px rgba(255,170,40,.35))
+  margin:0;font-size:clamp(26px,5.4cqw,78px);line-height:1.05;font-weight:900;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;
+  background:linear-gradient(180deg,#fffbe6 0%,#ffe9a0 48%,#f2c04e 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 3px rgba(20,6,50,.9)) drop-shadow(0 0 14px rgba(20,6,50,.7))
 }
-#roulette .rp-banner p{margin:6px auto 0;color:#f3e8ff;font-size:clamp(12px,1.35vw,16px);font-weight:600;max-width:70ch}
-
+#roulette .rp-banner p{margin:0;color:#fff4d6;font-size:clamp(12px,1.3cqw,19px);font-weight:700;max-width:60ch;text-shadow:0 1px 4px rgba(20,6,50,.95),0 0 12px rgba(20,6,50,.85)}
 /* ---------- Filtros ---------- */
 #roulette .roulette-controls{
   border:1px solid rgba(170,120,255,.5)!important;border-radius:24px!important;padding:18px 20px!important;
@@ -222,6 +218,15 @@
 #roulette #rpHistory li b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #roulette #rpHistory li>span{min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 
+/* banner em telas estreitas: altura fixa; a arte mantém proporção (sem distorcer) e é recortada nas laterais, priorizando a lua à direita */
+@media(max-width:900px){
+  #roulette .rp-banner{--rp-h:clamp(140px,34vw,190px);aspect-ratio:auto;height:var(--rp-h);padding:0 8% 1%;
+    background-size:auto calc(var(--rp-h)*var(--rp-bh)/var(--rp-vh));
+    background-position:80% calc(var(--rp-h)*var(--rp-top)/var(--rp-vh)*-1)}
+  #roulette .rp-banner h1{font-size:clamp(24px,7.4cqw,44px)}
+  #roulette .rp-banner p{font-size:clamp(11px,2.5cqw,15px)}
+  #roulette .rp-banner .eyebrow{font-size:clamp(9px,1.8cqw,12px)}
+}
 /* ---------- Movimento reduzido ---------- */
 @media(prefers-reduced-motion:reduce){
   #roulette *{animation:none!important;transition:none!important}
@@ -236,8 +241,6 @@
   #roulette .roulette-toolbar input{grid-column:1/-1}
 }
 @media(max-width:640px){
-  #roulette .rp-banner{padding:16px 22px;border-radius:30px;border-width:3px}
-  #roulette .rp-banner:before,#roulette .rp-banner:after{display:none}
   #roulette .roulette-controls{padding:14px!important}
   #roulette .roulette-toolbar{grid-template-columns:1fr 1fr!important;gap:10px!important}
   #roulette .roulette-toolbar input,#roulette .roulette-toolbar select{height:42px;font-size:14px;padding:0 12px}
