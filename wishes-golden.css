@@ -35,13 +35,19 @@ body[data-page="wishes"] #wishes .gc-banner{
   .gc-eyebrow{letter-spacing:.35em}
 }
 
+/* Pacote 03.3: medidas compartilhadas pelo banner e pelo conjunto (card lateral + painel).
+   --gc-inset = fracao da largura do card lateral ocupada pela margem transparente da arte (moldura dourada visivel comeca em ~10,4%). */
+body[data-page="wishes"] #wishes{--gc-side-w:clamp(320px,21vw,400px);--gc-inset:.104}
+/* Desktop: o banner ocupa exatamente da moldura do card lateral ate a borda direita do painel, mantendo a proporcao original da imagem (2000x314), sem corte nem distorcao. */
+@media(min-width:1001px){
+  body[data-page="wishes"] #wishes .gc-banner{width:auto;height:auto;aspect-ratio:2000/314;margin:0 calc(var(--gc-side-w) * var(--gc-inset)) 22px;background-size:100% 100%}
+}
 /* ---------- Estrutura ---------- */
 body[data-page="wishes"] #wishes .wishes-shell{
-  --gc-side-w:clamp(320px,21vw,400px);
   display:grid!important;grid-template-columns:var(--gc-side-w) minmax(0,1fr)!important;gap:22px!important;align-items:start!important;
   /* Pacote 03.2: a arte do card lateral tem ~9,8% de margem transparente à esquerda; o mesmo recuo é reservado à direita,
      para que o conjunto VISÍVEL (troféu + painel) fique centrado na área útil, junto com o banner. Sem left/transform/margens negativas. */
-  padding-inline-end:calc(var(--gc-side-w) * .098);box-sizing:border-box;
+  padding-inline-end:calc(var(--gc-side-w) * var(--gc-inset));box-sizing:border-box;
 }
 
 /* ---------- Card lateral (imagem aprovada; números ficam nas áreas vazias da arte) ---------- */
