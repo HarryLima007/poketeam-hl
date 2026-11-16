@@ -5,15 +5,15 @@
 body[data-page="teams"] #teams .teams-workspace{container-type:inline-size;container-name:tw;min-width:0}
 body[data-page="teams"] #teams .team-card{display:grid!important;grid-template-columns:minmax(0,1fr);gap:16px 18px;align-items:start}
 body[data-page="teams"] #teams .team-card>.team-head{grid-column:1/-1}
-@container tw (min-width: 1060px){
-  body[data-page="teams"] #teams .team-card:has(.team-side){grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto auto 1fr}
+@container tw (min-width: 1180px){
+  body[data-page="teams"] #teams .team-card:has(.team-side){grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto auto 1fr}
   body[data-page="teams"] #teams .team-card:has(.team-side)>.team-slots,
   body[data-page="teams"] #teams .team-card:has(.team-side)>.team-analysis{grid-column:1}
   body[data-page="teams"] #teams .team-card:has(.team-side)>.team-side{grid-column:2;grid-row:2 / span 2}
 }
-@container tw (max-width: 1059px){
+@container tw (max-width: 1179px){
   body[data-page="teams"] #teams .team-side{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
-  body[data-page="teams"] #teams .ana-overview{grid-template-columns:minmax(0,1fr)}
+  
 }
 
 /* ---------- Painel lateral: lista de equipes ---------- */
@@ -53,7 +53,9 @@ body[data-page="teams"] #clearTeam::before{content:"🧹 "}
 body[data-page="teams"] #deleteTeam::before{content:"🗑️ "}
 
 /* ---------- Slots ---------- */
-body[data-page="teams"] #teams .team-slots{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(102px,1fr))!important;gap:10px}
+body[data-page="teams"] #teams .team-slots{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px}
+@container tw (min-width: 560px){ body[data-page="teams"] #teams .team-slots{grid-template-columns:repeat(3,minmax(0,1fr))!important} }
+@container tw (min-width: 900px){ body[data-page="teams"] #teams .team-slots{grid-template-columns:repeat(6,minmax(0,1fr))!important} }
 body[data-page="teams"] #teams .slot{min-width:0;transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}
 body[data-page="teams"] #teams .slot.filled{cursor:pointer;text-align:center;padding:34px 6px 12px!important;display:flex!important;flex-direction:column;align-items:stretch}
 body[data-page="teams"] #teams .slot.filled:hover{transform:translateY(-2px);border-color:rgba(255,120,132,.8)!important}
@@ -63,7 +65,8 @@ body[data-page="teams"] #teams .slot.filled.selected{
   background:linear-gradient(180deg,rgba(86,14,28,.78),rgba(22,5,10,.92))!important;
 }
 body[data-page="teams"] #teams .slot.filled>small{display:none!important}   /* substituído por .slot-types (tipos coloridos) */
-body[data-page="teams"] #teams .slot.filled h4{font-size:14px;line-height:1.25;margin:4px 0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body[data-page="teams"] #teams .slot.filled h4{font-size:15px;line-height:1.25;margin:6px 0 4px;min-height:2.5em;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal!important;word-break:break-word}
+body[data-page="teams"] #teams .slot.filled>img{display:block;width:100%;max-width:124px;height:112px;object-fit:contain;margin:0 auto}
 body[data-page="teams"] #teams .slot-types{display:grid;justify-items:center;align-content:start;gap:4px;margin-bottom:6px;min-height:46px}
 body[data-page="teams"] #teams .slot-num{font-size:11px;color:#d9aeb4;font-weight:700}
 body[data-page="teams"] #teams .slot-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
@@ -80,8 +83,19 @@ body[data-page="teams"] #teams .slot [data-remove-member]::before{content:"🗑 
 .ana-tab.active{background:linear-gradient(135deg,rgba(150,22,36,.85),rgba(225,52,72,.55));border-color:#ff7a88;color:#fff;box-shadow:0 0 16px rgba(255,60,80,.35)}
 .ana-panel{margin-top:14px}
 .ana-panel[hidden]{display:none!important}
-.ana-overview{align-items:start;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.ana-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:stretch}
 .ana-summary{display:grid;gap:10px}
+body[data-page="teams"] #teams .team-analysis{container-type:inline-size;container-name:ana}
+@container ana (min-width: 700px){
+  .ana-overview{grid-template-columns:minmax(230px,.85fr) minmax(0,1fr) minmax(0,1fr)}
+  .ana-summary{display:contents}
+}
+.ana-overview .balance-card{display:flex;flex-direction:column;justify-content:space-between;gap:12px;padding:18px}
+.ana-overview .balance-card strong{font-size:46px;line-height:1}
+.ana-overview .balance-card small{font-size:14px}
+.ana-sum{padding:14px 16px}
+.ana-sum h4{font-size:15px;margin-bottom:8px}
+.ana-sum ul{font-size:13.5px;gap:6px}
 .ana-sum{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,70,86,.3);background:rgba(18,4,9,.6)}
 .ana-sum.good{border-color:rgba(80,200,120,.4)}
 .ana-sum.bad{border-color:rgba(255,170,60,.4)}
@@ -163,3 +177,80 @@ body[data-page="teams"] #teams .team-recommendations.team-side{background:none!i
 @media(prefers-reduced-motion:reduce){
   body[data-page="teams"] *,.ana-tab,.rec-mini,#meterPop{transition:none!important;animation:none!important}
 }
+
+/* ================= Pacote 02.1 — refinamento ================= */
+/* mais área útil em telas largas e painel lateral proporcional */
+body[data-page="teams"] #teams.page{max-width:min(1780px,100%)!important}
+@media(min-width:1001px){
+  body[data-page="teams"] #teams .teams-shell{grid-template-columns:clamp(280px,17vw,340px) minmax(0,1fr)!important}
+}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* banner: valores e ícones ⓘ mais legíveis (imagem inalterada) */
+body[data-page="teams"] #teams .strategy-meters{background:rgba(12,2,6,.74)!important}
+body[data-page="teams"] #teams .meter{grid-template-columns:22px 80px minmax(0,1fr) 38px 28px!important;font-size:14px!important}
+body[data-page="teams"] #teams .meter-val{font-size:16px!important;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+body[data-page="teams"] #teams .meter-info{width:28px!important;height:28px!important;font-size:19px!important}
+
+/* cards dos seis Pokémon */
+body[data-page="teams"] #teams .slot.filled{padding:36px 10px 12px!important}
+body[data-page="teams"] #teams .slot-num{font-size:12px}
+body[data-page="teams"] #teams .slot-chips .type{font-size:11px!important;padding:3px 8px!important}
+body[data-page="teams"] #teams .slot.filled.selected{transform:translateY(-1px)}
+body[data-page="teams"] #teams .slot.empty-slot{min-height:300px}
+
+/* comparador */
+.cmp-swap{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;margin:4px 0 10px}
+.cmp-poke{display:grid;justify-items:center;gap:2px;padding:8px 6px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);text-align:center;min-width:0}
+.cmp-poke.out{border-color:rgba(255,120,130,.45)}
+.cmp-poke.in{border-color:rgba(110,240,160,.5)}
+.cmp-poke img{width:64px;height:64px;object-fit:contain}
+.cmp-poke small{font-size:10.5px;color:#d9aeb4;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.cmp-poke b{font-size:13px;line-height:1.2;max-width:100%;overflow-wrap:anywhere}
+.cmp-scores .cur b,.cmp-scores .sim b{font-size:26px;line-height:1.1}
+.cmp-scores b span{font-size:12px;opacity:.7;font-weight:600}
+.cmp-scores .sim.down{border-color:rgba(255,120,130,.6);box-shadow:0 0 14px rgba(255,80,96,.2)}
+.cmp-scores .sim.down b{color:#ff9aa4}
+.cmp-scores .sim .delta{margin-top:2px}
+.delta{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12.5px;font-weight:800;border:1px solid transparent;white-space:nowrap}
+.delta i{font-style:normal;font-size:10px}
+.delta.up{color:#8cf5b4;background:rgba(60,200,120,.16);border-color:rgba(110,240,160,.5)}
+.delta.down{color:#ff9aa4;background:rgba(255,80,96,.16);border-color:rgba(255,120,130,.5)}
+.delta.zero{color:#d9d9e6;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.cmp-rows{gap:6px!important}
+.cmp-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:10px!important;align-items:center;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.04)}
+.cmp-label{font-weight:700}
+.cmp-vals{display:inline-flex;gap:6px;align-items:center;color:#c9a5aa;font-size:13px}
+.cmp-vals .cmp-to{color:#fff;font-size:15px}
+.cmp-note{margin:10px 0;padding:10px 12px;border-radius:10px;border:1px solid rgba(120,170,255,.4);background:rgba(60,110,220,.12);font-size:12.5px;line-height:1.45;color:#dce6ff}
+.cmp-note b{display:block;margin-bottom:2px;color:#fff}
+
+/* assistente para equipe completa */
+.side-lead{font-size:12.5px;margin:0 0 10px}
+.rec-featured.swap{display:block;padding:12px}
+.swap-line{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
+.swap-poke{display:grid;justify-items:center;gap:2px;text-align:center;min-width:0}
+.swap-poke img{width:68px;height:68px;object-fit:contain}
+.swap-poke small{font-size:10.5px;color:#d9aeb4;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.swap-poke b{font-size:13px;overflow-wrap:anywhere}
+.swap-types{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0 6px}
+.swap-types .type{font-size:10.5px;padding:2px 8px;border-radius:6px}
+.swap-scores{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;font-size:13px;color:#e8cfd3}
+.swap-scores b{color:#fff;font-size:16px}
+.swap-hint{font-size:11.5px;margin:6px 0 0}
+.rec-mini-sub{color:#d9aeb4!important;font-weight:600!important}
+.cmp-arrow{align-self:center}
+
+/* banner em espaço de trabalho estreito: barras abaixo do título (imagem preservada, com leve escurecimento para leitura) */
+@container tw (max-width: 760px){
+  body[data-page="teams"] #teams .workspace-head{
+    flex-direction:column;align-items:stretch;padding:20px 18px!important;min-height:0;
+    background:linear-gradient(180deg,rgba(8,2,5,.42),rgba(8,2,5,.16)),url("times-card-estrategia.webp?v=1") 82% center/cover no-repeat!important;
+  }
+  body[data-page="teams"] #teams .strategy-copy{flex:0 0 auto}
+  body[data-page="teams"] #teams .strategy-meters{flex:0 0 auto;width:100%}
+}
+@container tw (min-width: 761px) and (max-width: 1179px){
+  body[data-page="teams"] #teams .strategy-meters{flex:0 0 clamp(290px,34%,360px)!important}
+}
+body[data-page="teams"] #teams .team-side{align-items:start}

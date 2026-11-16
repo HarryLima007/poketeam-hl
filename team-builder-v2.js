@@ -158,6 +158,10 @@
   }
 
   /* =============== COMPARADOR =============== */
+  const artOf = (id, shiny, form) => form ? ((shiny && form.shinyArt) ? form.shinyArt : (form.art || sprite(id, shiny))) : sprite(id, shiny);
+  const nameOf = (id, form) => form?.label || cap(state.list[id - 1]?.name || ('#' + id));
+  const MINUS = '\u2212';
+
   function simulate(t) {
     if (!cmp || cmp.teamId !== t.id || cmp.index >= t.members.length) return null;
     const list = E.infoList(t);
@@ -168,30 +172,120 @@
     const sim = list.slice(); sim[cmp.index] = cand;
     return { cur: E.evaluate(list), sim: E.evaluate(sim), cand };
   }
+  function deltaHTML(d) {
+    const kind = d > 0 ? 'up' : d < 0 ? 'down' : 'zero';
+    const icon = d > 0 ? '▲' : d < 0 ? '▼' : '●';
+    const txt = d > 0 ? `+${d}` : d < 0 ? `${MINUS}${Math.abs(d)}` : '0';
+    const word = d > 0 ? 'ganho' : d < 0 ? 'perda' : 'sem mudança';
+    return `<span class="delta ${kind}"><i aria-hidden="true">${icon}</i><b>${txt}</b><span class="sr-only"> ${word}</span></span>`;
+  }
+
   function comparatorHTML(t) {
     const idx = cmp && cmp.teamId === t.id ? cmp.index : (selectedSlot != null && selectedSlot < t.members.length ? selectedSlot : 0);
-    const options = t.members.map((id, i) => `<option value="${i}" ${i === idx ? 'selected' : ''}>${String(i + 1).padStart(2, '0')} · ${esc(cap(state.list[id - 1]?.name || '#' + id))}${t.memberForms?.[i]?.label ? ' (' + esc(t.memberForms[i].label) + ')' : ''}</option>`).join('');
+    const options = t.members.map((id, i) => `<option value="${i}" ${i === idx ? 'selected' : ''}>${String(i + 1).padStart(2, '0')} · ${esc(nameOf(id, t.memberForms?.[i]))}</option>`).join('');
     const sim = simulate(t);
     let result = '<p class="muted cmp-hint">Escolha um Pokémon da equipe e um candidato para ver o efeito na composição. A simulação não altera a equipe salva.</p>';
     if (sim) {
-      const row = (label, key) => { const a = sim.cur[key], b = sim.sim[key], d = b - a; return `<div class="cmp-row"><span>${label}</span><b class="${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '+' : ''}${d}</b><small>(${a} → ${b})</small></div>`; };
-      const nm = sim.cand.form?.label || cap(state.list[sim.cand.id - 1]?.name || '');
-      result = `<div class="cmp-scores"><div><small>Equipe atual</small><b>${sim.cur.balance}/100</b></div><span class="cmp-arrow" aria-hidden="true">→</span><div class="sim"><small>Com substituição</small><b>${sim.sim.balance}/100</b></div></div>
-        <p class="cmp-cand">Substituir <b>${String(cmp.index + 1).padStart(2, '0')}</b> por <b>${esc(nm)}</b>${cmp.sel.shiny ? ' ✨' : ''}${cmp.sel.iv100 ? ' 💯' : ''}</p>
-        <div class="cmp-rows">${row('⚔️ Ataque', 'attack')}${row('🛡️ Defesa', 'defense')}${row('⚖️ Equilíbrio', 'balance')}</div>
+      const i = cmp.index, outId = t.members[i], outForm = t.memberForms?.[i] || null;
+      const outShiny = !!t.memberShiny?.[i], outIV = !!t.memberIV100?.[i];
+      const row = (icon, label, key) => { const a = sim.cur[key], b = sim.sim[key]; return `<div class="cmp-row"><span class="cmp-label"><span aria-hidden="true">${icon}</span> ${label}</span><span class="cmp-vals"><span class="cmp-from">${a}</span><span aria-hidden="true">→</span><b class="cmp-to">${b}</b></span>${deltaHTML(b - a)}</div>`; };
+      const dA = sim.sim.attack - sim.cur.attack, dD = sim.sim.defense - sim.cur.defense, dB = sim.sim.balance - sim.cur.balance;
+      const sgn = x => Math.sign(x);
+      const diverge = (dA !== 0 || dD !== 0) && (sgn(dB) !== sgn(dA) || sgn(dB) !== sgn(dD));
+      const note = diverge ? `<p class="cmp-note" role="note"><b>Por que os números divergem?</b> O Equilíbrio usa apenas critérios de tipos (cobertura elemental, resistências/imunidades e fraquezas compartilhadas). Ataque e Defesa também incluem os atributos base dos Pokémon, por isso podem variar de forma diferente.</p>` : '';
+      result = `<div class="cmp-swap">
+          <div class="cmp-poke out"><img src="${artOf(outId, outShiny, outForm)}" alt=""><small>Sai · slot ${String(i + 1).padStart(2, '0')}</small><b>${esc(nameOf(outId, outForm))}${outShiny ? ' ✨' : ''}${outIV ? ' 💯' : ''}</b></div>
+          <span class="cmp-arrow" aria-hidden="true">→</span>
+          <div class="cmp-poke in"><img src="${artOf(sim.cand.id, cmp.sel.shiny, cmp.sel.form)}" alt=""><small>Entra</small><b>${esc(nameOf(sim.cand.id, cmp.sel.form))}${cmp.sel.shiny ? ' ✨' : ''}${cmp.sel.iv100 ? ' 💯' : ''}</b></div>
+        </div>
+        <div class="cmp-scores"><div class="cur"><small>Equipe atual</small><b>${sim.cur.balance}<span>/100</span></b></div><span class="cmp-arrow" aria-hidden="true">→</span><div class="sim ${dB > 0 ? 'up' : dB < 0 ? 'down' : ''}"><small>Equipe simulada</small><b>${sim.sim.balance}<span>/100</span></b>${deltaHTML(dB)}</div></div>
+        <div class="cmp-rows" role="group" aria-label="Diferenças por indicador">${row('⚔️', 'Ataque', 'attack')}${row('🛡️', 'Defesa', 'defense')}${row('⚖️', 'Equilíbrio', 'balance')}</div>
+        ${note}
         <div class="cmp-actions"><button type="button" id="cmpConfirm" class="primary">Confirmar substituição</button><button type="button" id="cmpCancel">Cancelar comparação</button></div>`;
     } else if (cmp && cmp.teamId === t.id) {
       result = '<p class="muted cmp-hint">Calculando comparação…</p><div class="cmp-actions"><button type="button" id="cmpCancel">Cancelar comparação</button></div>';
     }
-    return `<section class="side-panel comparator"><div class="side-head"><h3>⚖️ Comparador de Composição</h3></div>
+    return `<section class="side-panel comparator" id="comparatorPanel"><div class="side-head"><h3>⚖️ Comparador de Composição</h3></div>
       <div class="cmp-controls"><label for="cmpMember">Substituir</label><select id="cmpMember">${options}</select><button type="button" id="cmpPick">${cmp && cmp.teamId === t.id ? 'Trocar candidato' : 'Escolher candidato'}</button></div>${result}</section>`;
+  }
+
+  /* ---- Assistente para equipe COMPLETA: sugere substituições (usa os mesmos cálculos de tipos; nunca altera a equipe) ---- */
+  let swapCache = { sig: '', data: null };
+  function computeSwapRecs(t, filter, limit) {
+    const list = E.infoList(t);
+    if (!list) return null;
+    const sig = [t.id, t.members.join(','), (t.memberForms || []).map(f => f?.formName || '').join(','), filter, state.details.size].join('|');
+    if (swapCache.sig === sig) return swapCache.data;
+    const curTypes = list.map(x => x.types);
+    const cur = teamMetricsFromTypes(curTypes);
+    const existing = new Set(t.members);
+    const found = [];
+    for (const p of state.list) {
+      if (existing.has(p.id) || !recommendationFilterMatch(p, filter)) continue;
+      const types = state.details.get(p.id)?.types;
+      if (!types?.length) continue;
+      let best = null;
+      for (let i = 0; i < list.length; i++) {
+        const next = teamMetricsFromTypes(curTypes.map((x, k) => k === i ? types : x));
+        const gain = next.score - cur.score;
+        if (gain <= 0) continue;
+        const utility = gain * 100 + (next.covered.length - cur.covered.length) * 16 + (next.defensiveCovered - cur.defensiveCovered) * 8;
+        if (!best || utility > best.utility) best = { index: i, p, types, next, gain, utility };
+      }
+      if (best) found.push(best);
+    }
+    found.sort((a, b) => b.utility - a.utility || b.next.score - a.next.score || a.p.id - b.p.id);
+    const data = { cur, items: found.slice(0, limit).map(r => {
+      const newCov = r.next.covered.filter(x => !cur.covered.includes(x));
+      const fixed = cur.shared.filter(w => !r.next.shared.some(n => n.type === w.type && n.weak >= w.weak));
+      const reasons = [];
+      if (newCov.length) reasons.push(`Amplia a cobertura em +${newCov.length} ${newCov.length === 1 ? 'tipo' : 'tipos'} (${newCov.slice(0, 3).map(x => TYPE_PT[x]).join(', ')}${newCov.length > 3 ? '…' : ''})`);
+      if (fixed.length) reasons.push(`Reduz fraquezas compartilhadas: ${fixed.map(x => TYPE_PT[x.type]).join(', ')}`);
+      if (r.next.defensiveCovered > cur.defensiveCovered) reasons.push(`Resistência ou imunidade a +${r.next.defensiveCovered - cur.defensiveCovered} ${r.next.defensiveCovered - cur.defensiveCovered === 1 ? 'tipo' : 'tipos'}`);
+      if (!reasons.length) reasons.push(`Melhora o equilíbrio em +${r.gain}`);
+      return { ...r, reasons: reasons.slice(0, 4) };
+    }) };
+    swapCache = { sig, data };
+    return data;
+  }
+
+  function swapAssistantHTML(t) {
+    const filter = state.teamRecFilter || 'no-legend';
+    const regionOptions = REGIONS.map(r => `<option value="region:${r[0]}" ${filter === `region:${r[0]}` ? 'selected' : ''}>${r[0]}</option>`).join('');
+    const select = `<select id="teamRecFilter" aria-label="Filtro de recomendações"><option value="no-legend" ${filter === 'no-legend' ? 'selected' : ''}>Sem Lendários/Míticos</option><option value="all" ${filter === 'all' ? 'selected' : ''}>Todos</option><option value="legendary" ${filter === 'legendary' ? 'selected' : ''}>Lendários</option><option value="mythical" ${filter === 'mythical' ? 'selected' : ''}>Míticos</option>${regionOptions}</select>`;
+    const head = `<div class="side-head"><h3>✨ Sugestões de substituição</h3>${select}</div><p class="muted side-lead">Equipe completa (6/6): o assistente testa trocar cada membro por outro Pokémon. Nada é alterado sem a sua confirmação.</p>`;
+    const data = computeSwapRecs(t, filter, 8);
+    if (!data) return `<section class="side-panel assistant">${head}<p class="muted">Carregando dados para gerar sugestões…</p></section>`;
+    const sig = t.id + '|' + t.members.join(',') + '|' + filter + '|swap';
+    if (sig !== recSig) { recSig = sig; recOffset = 0; }
+    if (!data.items.length) return `<section class="side-panel assistant">${head}<div class="empty-state">Nenhuma substituição melhora a pontuação com este filtro. (Os dados dos Pokémon ainda podem estar carregando.)</div></section>`;
+    const i = recOffset % data.items.length, r = data.items[i];
+    const m = E.memberInfo(t, r.index);
+    const outName = nameOf(t.members[r.index], t.memberForms?.[r.index]);
+    const others = data.items.map((x, k) => [x, k]).filter(([, k]) => k !== i).slice(0, 4);
+    return `<section class="side-panel assistant">${head}
+      <article class="rec-featured swap">
+        <div class="swap-line">
+          <span class="swap-poke"><img src="${artOf(t.members[r.index], !!t.memberShiny?.[r.index], t.memberForms?.[r.index])}" alt=""><small>Sai · ${String(r.index + 1).padStart(2, '0')}</small><b>${esc(outName)}</b></span>
+          <span class="cmp-arrow" aria-hidden="true">→</span>
+          <span class="swap-poke"><img src="${sprite(r.p.id, false)}" alt=""><small>Entra · #${pad(r.p.id)}</small><b>${esc(cap(r.p.name))}</b></span>
+        </div>
+        <div class="types swap-types">${r.types.map(typeChip).join('')}</div>
+        <div class="swap-scores"><span>Pontuação atual <b>${data.cur.score}</b></span><span aria-hidden="true">→</span><span>Simulada <b>${r.next.score}</b></span>${deltaHTML(r.gain)}</div>
+      </article>
+      <div class="rec-why"><h4>Por que esta sugestão?</h4><ul>${r.reasons.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      <p class="muted swap-hint">Pontuação = Equilíbrio (critérios de tipos). Use “Comparar” para ver também Ataque e Defesa.</p>
+      <div class="rec-actions"><button type="button" class="primary" data-rec-compare="${r.p.id}:${r.index}">Comparar</button><button type="button" data-rec-next="1">Ver outras opções</button></div>
+      <p class="rec-count" aria-live="polite">Sugestão ${i + 1} de ${data.items.length}</p>
+      <h4 class="side-sub">🏆 Outras substituições</h4>
+      <div class="rec-top">${others.map(([x, k]) => `<button type="button" class="rec-mini" data-rec-show="${k}" title="Substituir ${String(x.index + 1).padStart(2, '0')} por ${esc(cap(x.p.name))} — ${data.cur.score} → ${x.next.score}"><img src="${sprite(x.p.id, false)}" alt="" loading="lazy"><b>${esc(cap(x.p.name))}</b><small class="rec-mini-sub">no lugar do ${String(x.index + 1).padStart(2, '0')}</small><small>${data.cur.score} → ${x.next.score}</small></button>`).join('')}</div>
+    </section>`;
   }
 
   teamRecommendationsHTML = function (t) {
     if (!t.members.length) return '';
-    return `<div class="team-recommendations team-side">${comparatorHTML(t)}${t.members.length < 6 ? assistantHTML(t) : '<section class="side-panel assistant"><div class="side-head"><h3>✨ Recomendação do Assistente</h3></div><p class="muted">A equipe está completa (6/6). Use o comparador para testar substituições.</p></section>'}</div>`;
+    return `<div class="team-recommendations team-side">${comparatorHTML(t)}${t.members.length < 6 ? assistantHTML(t) : swapAssistantHTML(t)}</div>`;
   };
-
   /* =============== DECORAÇÃO DO DOM APÓS CADA RENDER =============== */
   function decorate() {
     const t = activeTeam();
@@ -246,6 +340,18 @@
     const pick = tgt.closest?.('[data-rec-pick]');
     if (pick) { e.preventDefault(); await P.applySelection(t, null, { id: Number(pick.dataset.recPick), shiny: false, iv100: false, form: null }); return; }
     if (tgt.closest?.('[data-rec-next]')) { recOffset++; renderTeams(); return; }
+    const cmpBtn = tgt.closest?.('[data-rec-compare]');
+    if (cmpBtn) {
+      // inicia uma comparação a partir da sugestão (não altera a equipe)
+      const [cid, cidx] = cmpBtn.dataset.recCompare.split(':').map(Number);
+      await getDetail(cid);
+      cmp = { teamId: t.id, index: cidx, sel: { id: cid, shiny: false, iv100: false, form: null } };
+      selectedSlot = cidx;
+      renderTeams();
+      const panel = document.getElementById('comparatorPanel');
+      if (panel) panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+      return;
+    }
     const show = tgt.closest?.('[data-rec-show]');
     if (show) { recOffset = Number(show.dataset.recShow); renderTeams(); return; }
     if (tgt.closest?.('#cmpPick')) {
@@ -274,6 +380,18 @@
       document.querySelectorAll('#teamArea .slot.filled').forEach((s, k) => { s.classList.toggle('selected', selectedSlot === k); s.setAttribute('aria-pressed', selectedSlot === k ? 'true' : 'false'); });
       const sel = document.getElementById('cmpMember'); if (sel && selectedSlot != null) sel.value = String(selectedSlot);
     }
+  });
+  // navegação por teclado nas abas da análise (←/→/Home/End)
+  document.addEventListener('keydown', e => {
+    const tab = e.target.closest?.('[data-ana-tab]');
+    if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const tabs = [...tab.closest('.ana-tabs').querySelectorAll('[data-ana-tab]')];
+    let i = tabs.indexOf(tab);
+    i = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    e.preventDefault();
+    tabs[i].focus();
+    tabs[i].click();
+    document.querySelector(`[data-ana-tab="${tabs[i].dataset.anaTab}"]`)?.focus();
   });
   document.addEventListener('change', e => {
     if (e.target.id === 'cmpMember') {
