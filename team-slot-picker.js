@@ -76,16 +76,17 @@
 
   function team() { return teams.find(t => t.id === ctx?.teamId); }
 
-  function open(mode, index) {
+  // mode: 'add' | 'replace' | 'compare' (compare não altera a equipe: devolve a escolha via onPick)
+  function open(mode, index, onPick) {
     const t = teams.find(x => x.id === state.activeTeam);
     if (!t) return;
     if (mode === 'add' && t.members.length >= 6) { toast(`${t.name} está cheia (6/6).`); return; }
     build();
-    ctx = { teamId: t.id, mode, index: mode === 'replace' ? index : t.members.length };
+    ctx = { teamId: t.id, mode, onPick, index: (mode === 'replace' || mode === 'compare') ? index : t.members.length };
     sel = null;
     shown = PAGE;
     const slotN = ctx.index + 1;
-    el('slotPickerTitle').textContent = mode === 'replace' ? `Trocar Pokémon do slot ${slotN}` : `Escolher Pokémon para o slot ${slotN}`;
+    el('slotPickerTitle').textContent = mode === 'compare' ? `Candidato para substituir o slot ${slotN}` : mode === 'replace' ? `Trocar Pokémon do slot ${slotN}` : `Escolher Pokémon para o slot ${slotN}`;
     el('slotPickerSub').textContent = `Equipe: ${t.name}`;
     el('spSearch').value = ''; el('spRegion').value = 'all'; el('spType').value = 'all'; el('spCat').value = 'all';
     if (document.body.dataset.scrollLocked !== '1') { lockPageScroll(); ownsScrollLock = true; } else ownsScrollLock = false;
@@ -165,39 +166,60 @@
     const img = form ? (sel.shiny && form.shinyArt ? form.shinyArt : (form.art || sprite(sel.id, sel.shiny))) : sprite(sel.id, sel.shiny);
     const chips = [`<button type="button" class="sp-form${sel.formKey === 'base' ? ' active' : ''}" data-sp-form="base">Forma padrão</button>`].concat(formList().map(f => `<button type="button" class="sp-form${sel.formKey === f.key ? ' active' : ''}" data-sp-form="${f.key}">${esc(f.label)}</button>`)).join('');
     const replacing = ctx?.mode === 'replace';
+    const confirmLabel = ctx?.mode === 'compare' ? 'Usar na comparação' : (replacing ? 'Confirmar troca' : 'Confirmar');
     box.innerHTML = `<div class="sp-preview-art"><img src="${img}" alt="${esc(name)}"></div>
       <div class="sp-preview-info"><span class="num">#${pad(sel.id)}</span><h3>${esc(name)}${sel.shiny ? ' ✨' : ''}${sel.iv100 ? ' 💯' : ''}</h3>
       <div class="types">${types.map(t => `<span class="type ${t}">${TYPE_PT[t] || t}</span>`).join('') || '<span class="muted">carregando tipos…</span>'}</div></div>
       <div class="sp-toggles"><button type="button" id="spShiny" class="${sel.shiny ? 'on' : ''}" aria-pressed="${sel.shiny}">✨ Shiny</button><button type="button" id="spIV" class="${sel.iv100 ? 'on' : ''}" aria-pressed="${sel.iv100}">💯 100% IV</button></div>
       <div class="sp-forms-label">Formas${sel.formsLoading ? ' (carregando…)' : ''}</div><div class="sp-forms">${chips}</div>
-      <div class="sp-actions"><button type="button" id="spCancel">Cancelar</button><button type="button" id="spConfirm" class="primary">${replacing ? 'Confirmar troca' : 'Confirmar'}</button></div>`;
+      <div class="sp-actions"><button type="button" id="spCancel">Cancelar</button><button type="button" id="spConfirm" class="primary">${confirmLabel}</button></div>`;
   }
 
-  async function commit() {
-    const t = team();
-    if (!t || !sel) return;
-    const form = currentForm();
-    const payload = form ? { category: form.category, formName: form.formName, label: form.label, art: form.art, shinyArt: form.shinyArt, types: [...form.types] } : null;
+  function payloadOf(form) {
+    return form ? { category: form.category, formName: form.formName, label: form.label, art: form.art, shinyArt: form.shinyArt, types: [...(form.types || [])] } : null;
+  }
+
+  // Aplica uma escolha {id, shiny, iv100, form} à equipe: troca o slot `index` ou, se index == null, adiciona ao final.
+  // Mantém o formato de pt_teams (members, memberShiny, memberIV100, memberForms). Retorna o número do slot ou 0.
+  async function applySelection(t, index, selection) {
     const n = t.members.length;
     ['memberShiny', 'memberIV100', 'memberForms'].forEach(k => { t[k] = Array.isArray(t[k]) ? t[k].slice(0, n) : []; while (t[k].length < n) t[k].push(k === 'memberForms' ? null : false); });
-    const id = sel.id, shiny = !!sel.shiny, iv = !!sel.iv100;
-    const slotNumber = (ctx.mode === 'replace' && ctx.index < n ? ctx.index : n) + 1;
-    if (ctx.mode === 'replace' && ctx.index < n) {
-      const i = ctx.index;
-      t.members[i] = id; t.memberShiny[i] = shiny; t.memberIV100[i] = iv; t.memberForms[i] = payload;
+    const id = selection.id, shiny = !!selection.shiny, iv = !!selection.iv100, payload = selection.form || null;
+    let slotNumber;
+    if (index != null && index < n) {
+      t.members[index] = id; t.memberShiny[index] = shiny; t.memberIV100[index] = iv; t.memberForms[index] = payload;
+      slotNumber = index + 1;
     } else {
-      if (n >= 6) { toast(`${t.name} está cheia (6/6).`); return; }
+      if (n >= 6) { toast(`${t.name} está cheia (6/6).`); return 0; }
       t.members.push(id); t.memberShiny.push(shiny); t.memberIV100.push(iv); t.memberForms.push(payload);
+      slotNumber = n + 1;
     }
     const label = payload?.label || cap(state.list[id - 1]?.name || 'Pokémon');
     await getDetail(id);
     state.activeTeam = t.id;
     save();
-    close();
-    try { renderTeams(); } catch (e) { console.error('Falha ao atualizar Times após o seletor', e); }
+    try { renderTeams(); } catch (e) { console.error('Falha ao atualizar Times', e); }
     toast(`${label}${shiny ? ' ✨' : ''}${iv ? ' 💯' : ''} no slot ${slotNumber} de ${t.name}`);
+    return slotNumber;
   }
 
+  async function commit() {
+    const t = team();
+    if (!t || !sel) return;
+    const selection = { id: sel.id, shiny: !!sel.shiny, iv100: !!sel.iv100, form: payloadOf(currentForm()) };
+    if (ctx.mode === 'compare') {
+      const cb = ctx.onPick;
+      close();
+      if (typeof cb === 'function') cb(selection);
+      return;
+    }
+    const n = t.members.length;
+    const idx = (ctx.mode === 'replace' && ctx.index < n) ? ctx.index : null;
+    close();
+    await applySelection(t, idx, selection);
+  }
+
+  window.PTSlotPicker = { open, applySelection };
   /* ---- integração com a tela de Times ---- */
   function decorate() {
     const area = el('teamArea');
