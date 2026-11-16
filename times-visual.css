@@ -1,0 +1,138 @@
+/* PokéTeam — página Times: arena + cards com imagens oficiais.
+   Escopo: somente body[data-page="teams"]. Carregado depois do pacote01.css. */
+
+/* ---------- Wallpaper da arena ---------- */
+html:has(body[data-page="teams"]){background:#07030a!important}
+html body[data-page="teams"]{
+  background-color:#07030a!important;
+  background-image:
+    linear-gradient(180deg,rgba(5,2,9,.34) 0%,rgba(5,2,9,.18) 40%,rgba(5,2,9,.46) 100%),
+    url("times-arena-wallpaper.webp?v=1")!important;
+  background-size:cover!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+}
+@media(max-width:900px){
+  html body[data-page="teams"]{background-attachment:scroll!important;background-size:auto 100vh!important;background-position:center top!important}
+}
+
+/* ---------- Card lateral (Team Builder) ---------- */
+body[data-page="teams"] #teams .teams-shell{align-items:start}
+body[data-page="teams"] #teams .teams-side{
+  box-sizing:border-box;
+  background:url("times-card-lateral.webp?v=1") center bottom/100% 100% no-repeat!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:12% 10% 0 10%!important;
+  padding-bottom:118%!important;   /* reserva a área do escudo (parte inferior da imagem) */
+  min-height:0!important;
+}
+body[data-page="teams"] #teams .teams-side .teams-mascot{display:none!important}   /* o escudo da imagem substitui o mascote */
+body[data-page="teams"] #teams .teams-side h1{margin:2px 0 8px!important}
+body[data-page="teams"] #teams .teams-side p{margin:0 0 14px!important;line-height:1.45}
+body[data-page="teams"] #newTeam{display:block;width:100%;border-radius:999px!important}
+body[data-page="teams"] #teams .teams-side-label{margin:18px 0 8px!important}
+body[data-page="teams"] #teamTabs{max-height:150px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#b02336 transparent}
+body[data-page="teams"] #teamTabs button{
+  background:linear-gradient(135deg,rgba(150,22,36,.55),rgba(60,8,16,.75))!important;
+  border:1px solid rgba(255,90,104,.55)!important;
+}
+body[data-page="teams"] #teamTabs button.active{
+  background:linear-gradient(135deg,#c61d31,#ff4757)!important;border-color:#ff9aa4!important;
+  box-shadow:0 0 18px rgba(255,60,75,.35)!important;
+}
+
+/* ---------- Card Estratégia ---------- */
+body[data-page="teams"] #teams .workspace-head{
+  position:relative;
+  box-sizing:border-box;
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  min-height:clamp(150px,14vw,215px);
+  padding:22px 30px!important;
+  background:url("times-card-estrategia.webp?v=1") center center/cover no-repeat!important;
+  border:1px solid rgba(255,70,86,.65)!important;
+  border-radius:26px!important;
+  box-shadow:0 0 0 1px rgba(255,60,75,.15),0 0 34px rgba(255,40,60,.30),0 18px 44px rgba(0,0,0,.45)!important;
+  overflow:hidden;
+}
+/* remove a decoração antiga (X e anel dourado) — a imagem já traz a esfera */
+body[data-page="teams"] #teams .workspace-head::before,
+body[data-page="teams"] #teams .workspace-head::after{content:none!important;display:none!important}
+body[data-page="teams"] #teams .workspace-head .workspace-mark{display:none!important}
+body[data-page="teams"] #teams .strategy-copy{position:relative;z-index:2;flex:0 1 46%;min-width:0}
+body[data-page="teams"] #teams .strategy-copy h2{margin:4px 0 6px!important;font-size:clamp(22px,2.3vw,34px)!important;line-height:1.1;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+body[data-page="teams"] #teams .strategy-sub{margin:0;color:#f3d6da;font-size:clamp(12px,1.05vw,15px);line-height:1.4;text-shadow:0 1px 8px rgba(0,0,0,.7)}
+body[data-page="teams"] #teams .strategy-meters{
+  position:relative;z-index:2;flex:0 0 clamp(210px,24%,300px);
+  display:grid;gap:12px;padding:14px 16px;border-radius:16px;
+  background:rgba(14,3,8,.62);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(4px);
+}
+body[data-page="teams"] #teams .meter{display:grid;grid-template-columns:22px 82px 1fr;align-items:center;gap:8px;font-size:13px;color:#fff1f3}
+body[data-page="teams"] #teams .meter b{font-weight:800}
+body[data-page="teams"] #teams .meter-ico{font-size:17px;line-height:1;text-align:center}
+body[data-page="teams"] #teams .meter-bar{display:block;height:10px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);overflow:hidden}
+body[data-page="teams"] #teams .meter-bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ff3b4e,#ff8a5c);box-shadow:0 0 10px rgba(255,70,80,.6);transition:width .45s ease}
+body[data-page="teams"] #teams .strategy-meters[data-state="loading"] .meter-bar i{opacity:.55}
+body[data-page="teams"] #teams .strategy-meters[data-state="empty"] .meter-bar i{width:0!important}
+
+/* ---------- Cards de equipe, slots e análise sobre o wallpaper ---------- */
+body[data-page="teams"] #teams .team-card,
+body[data-page="teams"] #teams .team-analysis,
+body[data-page="teams"] #teams .team-recommendations{
+  background:linear-gradient(160deg,rgba(26,6,12,.86),rgba(11,3,7,.90))!important;
+  border:1px solid rgba(255,70,86,.55)!important;
+  box-shadow:0 0 0 1px rgba(255,60,75,.10),0 0 26px rgba(255,40,60,.18),0 16px 40px rgba(0,0,0,.45)!important;
+  backdrop-filter:blur(3px);
+}
+body[data-page="teams"] #teams .team-slots{counter-reset:slotn}
+body[data-page="teams"] #teams .slot{position:relative;counter-increment:slotn;padding-top:34px!important}
+body[data-page="teams"] #teams .slot::before{
+  content:counter(slotn,decimal-leading-zero);
+  position:absolute;top:0;left:0;right:0;height:26px;display:grid;place-items:center;
+  font-size:13px;font-weight:900;letter-spacing:1px;color:#ffe9ec;
+  background:linear-gradient(180deg,rgba(255,70,86,.28),transparent);
+  border-radius:12px 12px 0 0;pointer-events:none;
+}
+body[data-page="teams"] #teams .slot.empty-slot{
+  background:linear-gradient(180deg,rgba(60,10,20,.55),rgba(20,4,9,.80))!important;
+  border:1px solid rgba(255,70,86,.6)!important;
+}
+body[data-page="teams"] #teams .slot.filled{
+  background:linear-gradient(180deg,rgba(48,9,18,.70),rgba(14,4,8,.88))!important;
+  border:1px solid rgba(255,70,86,.5)!important;
+}
+body[data-page="teams"] #teams .slot.empty-slot .empty-plus{
+  width:44px;height:44px;display:grid;place-items:center;border-radius:50%;
+  color:#ffcf4a!important;border:2px solid #ffc83d!important;font-size:26px;
+  box-shadow:0 0 14px rgba(255,200,61,.35);
+}
+body[data-page="teams"] #teams .team-head button{border-radius:999px!important}
+
+/* ---------- Responsivo ---------- */
+/* o CSS antigo (linha ~520) reabria 2 colunas em telas pequenas; aqui a página empilha de verdade */
+@media(max-width:1100px){
+  body[data-page="teams"] #teams .team-slots{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))!important}
+}
+@media(max-width:1000px){
+  body[data-page="teams"] #teams .teams-shell{grid-template-columns:minmax(0,1fr)!important}
+  body[data-page="teams"] #teams .teams-side{
+    display:block!important;position:relative!important;top:auto!important;
+    width:100%;max-width:340px;justify-self:center;
+    padding:44px 30px 400px 30px!important;
+  }
+  body[data-page="teams"] #teams .teams-workspace{min-width:0}
+}
+@media(max-width:760px){
+  body[data-page="teams"] #teams .workspace-head{flex-direction:column;align-items:stretch;padding:20px 18px!important;min-height:0}
+  body[data-page="teams"] #teams .workspace-head{
+    background:linear-gradient(180deg,rgba(8,2,5,.55),rgba(8,2,5,.30)),url("times-card-estrategia.webp?v=1") 68% center/cover no-repeat!important;
+  }
+  body[data-page="teams"] #teams .strategy-copy{flex:0 0 auto}
+  body[data-page="teams"] #teams .strategy-meters{flex:0 0 auto;width:100%}
+  body[data-page="teams"] #teams .team-head{flex-wrap:wrap;gap:10px}
+}
