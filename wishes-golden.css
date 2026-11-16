@@ -37,7 +37,11 @@ body[data-page="wishes"] #wishes .gc-banner{
 
 /* ---------- Estrutura ---------- */
 body[data-page="wishes"] #wishes .wishes-shell{
-  display:grid!important;grid-template-columns:clamp(320px,21vw,400px) minmax(0,1fr)!important;gap:22px!important;align-items:start!important;
+  --gc-side-w:clamp(320px,21vw,400px);
+  display:grid!important;grid-template-columns:var(--gc-side-w) minmax(0,1fr)!important;gap:22px!important;align-items:start!important;
+  /* Pacote 03.2: a arte do card lateral tem ~9,8% de margem transparente à esquerda; o mesmo recuo é reservado à direita,
+     para que o conjunto VISÍVEL (troféu + painel) fique centrado na área útil, junto com o banner. Sem left/transform/margens negativas. */
+  padding-inline-end:calc(var(--gc-side-w) * .098);box-sizing:border-box;
 }
 
 /* ---------- Card lateral (imagem aprovada; números ficam nas áreas vazias da arte) ---------- */
@@ -116,7 +120,7 @@ body[data-page="wishes"] #wishes #favResults .poke-card .card-actions button{bac
 
 /* ---------- Responsivo ---------- */
 @media(max-width:1000px){
-  body[data-page="wishes"] #wishes .wishes-shell{grid-template-columns:minmax(0,1fr)!important}
+  body[data-page="wishes"] #wishes .wishes-shell{grid-template-columns:minmax(0,1fr)!important;padding-inline-end:0}
   .gc-side{position:relative;top:auto;width:min(100%,340px);margin:0 auto}
 }
 @media(max-width:560px){

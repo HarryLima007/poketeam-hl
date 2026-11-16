@@ -31,6 +31,40 @@
     if (!total) return '<div class="gc-empty"><b>Sua coleção está vazia</b><span>Favorite Pokémon na Pokédex (★) para vê-los aqui.</span></div>';
     return `<div class="gc-empty"><b>Nenhum favorito encontrado</b><span>${q ? 'Nada corresponde à busca com o filtro atual.' : 'Nenhum favorito nesta categoria.'} Ajuste a pesquisa ou escolha “Todos”.</span></div>`;
   }
+  /* ---- Tipos elementais dos cards (Pacote 03.2) ----
+     Os cards são desenhados antes dos detalhes (getDetail) chegarem; sem um novo desenho, ficavam para sempre em
+     'carregando tipos…'. Aqui cada Pokémon sem tipos pede seus detalhes UMA vez por vez (sem duplicar pedidos),
+     tenta de novo se a rede falhar (até 2 vezes) e atualiza apenas os cards que AINDA existem no DOM e continuam
+     marcados como 'carregando'. Formas especiais usam os tipos da própria forma (já salvos), por isso não entram aqui. */
+  const typeJobs = new Set();
+  const loadingCards = id => [...document.querySelectorAll(`#favResults .poke-card[data-id="${id}"]`)].filter(c => c.querySelector('.types .muted[data-loading-types], .types .muted'));
+  function paintTypes(id) {
+    const types = state.details.get(id)?.types;
+    if (!types?.length) return false;
+    loadingCards(id).forEach(c => {
+      const box = c.querySelector('.types');
+      if (box && box.querySelector('.muted')) box.innerHTML = types.map(t => `<span class="type ${t}">${(typeof TYPE_PT !== 'undefined' && TYPE_PT[t]) || t}</span>`).join('');
+    });
+    return true;
+  }
+  function markUnavailable(id) {
+    loadingCards(id).forEach(c => { const m = c.querySelector('.types .muted'); if (m) { m.textContent = 'tipos indisponíveis'; m.title = 'Não foi possível carregar os tipos agora. Reabra a página para tentar de novo.'; } });
+  }
+  async function requestTypes(id, attempt = 0) {
+    if (typeJobs.has(id)) return;
+    typeJobs.add(id);
+    try { await getDetail(id); } catch (e) { /* tratado abaixo */ }
+    typeJobs.delete(id);
+    if (paintTypes(id)) return;
+    if (!loadingCards(id).length) return;                 // o card foi removido ou recriado: nada a atualizar
+    if (attempt < 2) setTimeout(() => { if (loadingCards(id).length) requestTypes(id, attempt + 1); }, attempt ? 4000 : 1500);
+    else markUnavailable(id);
+  }
+  function fillTypes(shown) {
+    if (typeof getDetail !== 'function') return;
+    [...new Set(shown.filter(e => !(e.form?.types?.length) && !state.details.get(e.id)?.types?.length).map(e => e.id))].forEach(id => requestTypes(id));
+  }
+
   function after(all, shown) {
     const n = {
       total: all.length,
@@ -44,6 +78,7 @@
     set('gcCntAll', n.total); set('gcCntSpecial', n.special); set('gcCntShiny', n.shiny); set('gcCntLegend', n.legend);
     const c = $('gcCount');
     if (c) c.textContent = n.total ? `Exibindo ${shown.length} de ${n.total} ${n.total === 1 ? 'favorito' : 'favoritos'}` : '';
+    fillTypes(shown);
   }
   window.PTFavView = { apply, emptyHTML, after };
 
